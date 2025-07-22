@@ -1,8 +1,7 @@
 {
   "name": "web",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "ContextHub web app",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
