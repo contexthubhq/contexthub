@@ -1,0 +1,16 @@
+{
+  "name": "@contexthub/core",
+  "type": "module",
+  "description": "Core package for ContextHub",
+  "main": "index.js",
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "zod": "^4.0.5"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}
