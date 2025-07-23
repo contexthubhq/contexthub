@@ -56,6 +56,29 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
+  packages/data-sources/common:
+    dependencies:
+      '@contexthub/core':
+        specifier: workspace:*
+        version: link:../../core
+    devDependencies:
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
+
+  packages/data-sources/snowflake:
+    dependencies:
+      '@contexthub/core':
+        specifier: workspace:*
+        version: link:../../core
+      '@contexthub/data-sources-common':
+        specifier: workspace:*
+        version: link:../common
+    devDependencies:
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
+
 packages:
 
   '@emnapi/runtime@1.4.5':
