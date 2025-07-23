@@ -1,0 +1,21 @@
+{
+  "name": "@contexthub/data-sources-common",
+  "type": "module",
+  "description": "Data source common package for ContextHub",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@contexthub/core": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}
