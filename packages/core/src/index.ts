@@ -1,2 +1,16 @@
-export { type Column, columnSchema } from './context-model/column.js';
-export { type Table, tableSchema } from './context-model/table.js';
+export {
+  type ColumnMetadata,
+  type ColumnContext,
+  type ColumnSystemMetadata,
+  columnMetadataSchema,
+  columnContextSchema,
+  columnSystemMetadataSchema,
+} from './context-model/column-metadata.js';
+export {
+  type TableMetadata,
+  type TableContext,
+  type TableSystemMetadata,
+  tableMetadataSchema,
+  tableContextSchema,
+  tableSystemMetadataSchema,
+} from './context-model/table-metadata.js';
