@@ -1,1 +1,2 @@
-export type { ContextModel } from './context-model.js';
+export { type Column, columnSchema } from './context-model/column.js';
+export { type Table, tableSchema } from './context-model/table.js';
