@@ -48,6 +48,9 @@ importers:
       '@contexthub/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@contexthub/data-sources-all':
+        specifier: workspace:*
+        version: link:../../packages/data-sources/all
       next:
         specifier: ^15.4.3
         version: 15.4.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -81,6 +84,32 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
+  packages/data-sources/all:
+    dependencies:
+      '@contexthub/data-sources-bigquery':
+        specifier: workspace:*
+        version: link:../bigquery
+      '@contexthub/data-sources-common':
+        specifier: workspace:*
+        version: link:../common
+      '@contexthub/data-sources-snowflake':
+        specifier: workspace:*
+        version: link:../snowflake
+    devDependencies:
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
+
+  packages/data-sources/bigquery:
+    dependencies:
+      '@contexthub/data-sources-common':
+        specifier: workspace:*
+        version: link:../common
+    devDependencies:
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
+
   packages/data-sources/common:
     dependencies:
       '@contexthub/core':
@@ -93,9 +122,6 @@ importers:
 
   packages/data-sources/snowflake:
     dependencies:
-      '@contexthub/core':
-        specifier: workspace:*
-        version: link:../../core
       '@contexthub/data-sources-common':
         specifier: workspace:*
         version: link:../common

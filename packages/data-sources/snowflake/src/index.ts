@@ -1,1 +1,1 @@
-export type HelloWorld = string;
+export { SnowflakeDataSource } from './snowflake-datasource.js';
