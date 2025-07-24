@@ -1,20 +1,24 @@
-import { type DataSource, registry } from '@contexthub/data-sources-common';
+import {
+  type DataSource,
+  type QueryResult,
+  registry,
+} from '@contexthub/data-sources-common';
 
 export class BigQueryDataSource implements DataSource {
-  private credentials: Record<string, string>;
-
   constructor({ credentials }: { credentials: Record<string, string> }) {
     for (const field of credentialsFields) {
       if (field.isRequired && !credentials[field.name]) {
         throw new Error(`Missing required field ${field.name}`);
       }
     }
-
-    this.credentials = credentials;
   }
 
   async testConnection() {
     return true;
+  }
+
+  async executeQuery(query: string): Promise<QueryResult> {
+    return { rows: [] };
   }
 }
 
