@@ -1,15 +1,5 @@
-import {
-  SnowflakeDataSource,
-  snowflakeCredentialsSchema,
-} from '@contexthub/data-sources-snowflake';
-import { registry } from './registry.js';
+// These exports guarantee that the registration is done.
+export { SnowflakeDataSource } from '@contexthub/data-sources-snowflake';
+export { BigQueryDataSource } from '@contexthub/data-sources-bigquery';
 
-registry.register({
-  id: 'snowflake',
-  name: 'Snowflake',
-  description: 'Snowflake data source',
-  credentialsSchema: snowflakeCredentialsSchema,
-  factory: (credentials) => new SnowflakeDataSource(credentials),
-});
-
-export { registry } from './registry.js';
+export * from '@contexthub/data-sources-common';

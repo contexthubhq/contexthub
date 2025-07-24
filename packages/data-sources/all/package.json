@@ -15,6 +15,7 @@
   "dependencies": {
     "@contexthub/data-sources-common": "workspace:*",
     "@contexthub/data-sources-snowflake": "workspace:*",
+    "@contexthub/data-sources-bigquery": "workspace:*",
     "zod": "^4.0.5"
   },
   "devDependencies": {

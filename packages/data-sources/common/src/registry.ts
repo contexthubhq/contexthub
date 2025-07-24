@@ -1,18 +1,21 @@
-import { z } from 'zod';
 import { DataSource } from '@contexthub/data-sources-common';
 
-export interface DataSourceRegistration<CredentialsType = any> {
+export interface DataSourceRegistration {
   id: string;
   name: string;
   description?: string;
-  credentialsSchema: z.ZodSchema<CredentialsType>;
-  factory: (credentials: CredentialsType) => DataSource;
+  credentialsFields: {
+    name: string;
+    description?: string;
+    isRequired: boolean;
+  }[];
+  factory: (credentials: Record<string, string>) => DataSource;
 }
 
 class DataSourceRegistry {
   private sources = new Map<string, DataSourceRegistration>();
 
-  register<TCredentials>(registration: DataSourceRegistration<TCredentials>) {
+  register(registration: DataSourceRegistration) {
     if (this.sources.has(registration.id)) {
       throw new Error(`Data source ${registration.id} already registered`);
     }
@@ -27,16 +30,13 @@ class DataSourceRegistry {
     return Array.from(this.sources.values());
   }
 
-  createInstance(id: string, credentials: unknown): DataSource {
+  createInstance(id: string, credentials: Record<string, string>): DataSource {
     const registration = this.sources.get(id);
     if (!registration) {
       throw new Error(`Data source ${id} not found`);
     }
 
-    // Validate credentials against schema
-    const validatedCredentials =
-      registration.credentialsSchema.parse(credentials);
-    return registration.factory(validatedCredentials);
+    return registration.factory(credentials);
   }
 }
 

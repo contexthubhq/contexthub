@@ -1,9 +1,6 @@
 import { type DataSource, registry } from '@contexthub/data-sources-common';
 
-export class SnowflakeDataSource implements DataSource {
-  id = 'snowflake';
-  name = 'Snowflake';
-
+export class BigQueryDataSource implements DataSource {
   private credentials: Record<string, string>;
 
   constructor(credentials: Record<string, string>) {
@@ -21,15 +18,12 @@ export class SnowflakeDataSource implements DataSource {
   }
 }
 
-const credentialsFields = [
-  { name: 'username', isRequired: true },
-  { name: 'password', isRequired: true },
-];
+const credentialsFields = [{ name: 'credentialsJson', isRequired: true }];
 
 registry.register({
-  id: 'snowflake',
-  name: 'Snowflake',
+  id: 'bigquery',
+  name: 'BigQuery',
   credentialsFields,
   factory: (credentials: Record<string, string>) =>
-    new SnowflakeDataSource(credentials),
+    new BigQueryDataSource(credentials),
 });

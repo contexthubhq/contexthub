@@ -1,7 +1,7 @@
 {
-  "name": "@contexthub/data-sources-snowflake",
+  "name": "@contexthub/data-sources-bigquery",
   "type": "module",
-  "description": "Snowflake data source package for ContextHub",
+  "description": "BigQuery data source package for ContextHub",
   "exports": {
     ".": {
       "types": "./src/index.ts",

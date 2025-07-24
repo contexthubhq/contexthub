@@ -1,5 +1,9 @@
 import React from 'react';
+import { getDataSources } from './actions';
+import { DataSourceManager } from './components/DataSourceManager';
 
-export default function Home() {
-  return <div>Hello World</div>;
+export default async function Home() {
+  const dataSources = await getDataSources();
+
+  return <DataSourceManager dataSources={dataSources} />;
 }
