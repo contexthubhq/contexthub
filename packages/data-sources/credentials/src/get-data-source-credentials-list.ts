@@ -14,7 +14,6 @@ export async function getDataSourceCredentialsList(): Promise<
       updatedAt: true,
     },
   });
-  const credentialsSchema = z.record(z.string(), z.string());
   return dataSourceCredentialsList.map((dataSourceCredential) => {
     return {
       ...dataSourceCredential,
@@ -22,3 +21,5 @@ export async function getDataSourceCredentialsList(): Promise<
     };
   });
 }
+
+const credentialsSchema = z.record(z.string(), z.string());
