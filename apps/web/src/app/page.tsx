@@ -1,5 +1,5 @@
 import React from 'react';
-import { getDataSources } from './actions';
+import { getDataSources } from './actions/get-data-sources';
 import { DataSourceManager } from './components/DataSourceManager';
 
 export default async function Home() {

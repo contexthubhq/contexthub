@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import type { DataSourceInfo } from '../common/data-source-info.js';
+import type { DataSourceInfo } from '../common/data-source-info';
 import { Modal } from './Modal';
 import { DataSourceCredentialsForm } from './DataSourceCredentialsForm';
 

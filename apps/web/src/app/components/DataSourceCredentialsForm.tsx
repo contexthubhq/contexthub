@@ -1,4 +1,4 @@
-import type { DataSourceInfo } from '../common/data-source-info.js';
+import type { DataSourceInfo } from '../common/data-source-info';
 
 export function DataSourceCredentialsForm({
   dataSource,
