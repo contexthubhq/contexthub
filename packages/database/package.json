@@ -1,0 +1,27 @@
+{
+  "name": "@contexthub/database",
+  "type": "module",
+  "description": "Database package for ContextHub",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "prepare": "npm run db:generate && npm run build",
+    "type-check": "tsc --noEmit",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.12.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.1.0",
+    "prisma": "^6.12.0",
+    "typescript": "^5.8.3"
+  }
+}
