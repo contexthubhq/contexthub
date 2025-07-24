@@ -1,34 +1,63 @@
+import React from 'react';
 import type { DataSourceInfo } from '../common/data-source-info';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { DialogFooter } from '@/components/ui/dialog';
 
 export function DataSourceCredentialsForm({
   dataSource,
+  onClose,
 }: {
   dataSource: DataSourceInfo;
+  onClose?: () => void;
 }) {
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.target as HTMLFormElement);
     const data = Object.fromEntries(formData.entries());
-    alert(JSON.stringify(data));
+
+    // TODO: Replace with actual API call to save credentials
+    console.log('Saving credentials:', data);
+    alert(
+      `Credentials saved for ${dataSource.name}!\n\n${JSON.stringify(data, null, 2)}`
+    );
+
+    onClose?.();
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h3>Configure {dataSource.name}</h3>
-
-      {dataSource.description && <p>{dataSource.description}</p>}
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {dataSource.description && (
+        <p className="text-sm text-muted-foreground">
+          {dataSource.description}
+        </p>
+      )}
 
       {dataSource.fields.map((field) => (
-        <div key={field.name}>
-          <label>
+        <div key={field.name} className="space-y-2">
+          <Label htmlFor={field.name}>
             {field.description || field.name}
-            {field.isRequired && <span>*</span>}
-          </label>
-          <input type="text" name={field.name} />
+            {field.isRequired && (
+              <span className="text-destructive ml-1">*</span>
+            )}
+          </Label>
+          <Input
+            id={field.name}
+            name={field.name}
+            type={'text'}
+            required={field.isRequired}
+            placeholder={`Enter ${field.description || field.name}`}
+          />
         </div>
       ))}
 
-      <button type="submit">Save</button>
+      <DialogFooter>
+        <Button type="button" variant="outline" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button type="submit">Save Configuration</Button>
+      </DialogFooter>
     </form>
   );
 }
