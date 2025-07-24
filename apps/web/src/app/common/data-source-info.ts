@@ -5,7 +5,7 @@ export type FieldInfo = {
 };
 
 export type DataSourceInfo = {
-  id: string;
+  type: string;
   name: string;
   description?: string;
   fields: FieldInfo[];
