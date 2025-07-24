@@ -15,7 +15,6 @@ Options:
   --password    Snowflake password
   --database    Snowflake database name
   --warehouse   Snowflake warehouse name
-  --schema      Snowflake schema name
   --role        Snowflake role name
   --help        Show this help message
 
