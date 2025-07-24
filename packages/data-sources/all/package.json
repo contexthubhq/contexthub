@@ -1,7 +1,7 @@
 {
-  "name": "@contexthub/data-sources-snowflake",
+  "name": "@contexthub/data-sources-all",
   "type": "module",
-  "description": "Snowflake data source package for ContextHub",
+  "description": "All data sources package for ContextHub",
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -13,8 +13,8 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@contexthub/core": "workspace:*",
     "@contexthub/data-sources-common": "workspace:*",
+    "@contexthub/data-sources-snowflake": "workspace:*",
     "zod": "^4.0.5"
   },
   "devDependencies": {
