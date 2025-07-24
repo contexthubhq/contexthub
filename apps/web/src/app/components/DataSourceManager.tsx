@@ -34,7 +34,7 @@ export function DataSourceManager({
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {dataSources.map((dataSource) => (
             <button
-              key={dataSource.id}
+              key={dataSource.type}
               onClick={() => handleButtonClick(dataSource)}
             >
               <div>{dataSource.name}</div>

@@ -17,7 +17,7 @@ export async function getDataSources(): Promise<DataSourceInfo[]> {
     }
 
     return {
-      id: ds.id,
+      type: ds.type,
       name: ds.name,
       description: ds.description,
       fields,
