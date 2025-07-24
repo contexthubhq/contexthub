@@ -95,9 +95,6 @@ importers:
       '@contexthub/data-sources-snowflake':
         specifier: workspace:*
         version: link:../snowflake
-      zod:
-        specifier: ^4.0.5
-        version: 4.0.5
     devDependencies:
       typescript:
         specifier: ^5.8.3
@@ -108,9 +105,6 @@ importers:
       '@contexthub/data-sources-common':
         specifier: workspace:*
         version: link:../common
-      zod:
-        specifier: ^4.0.5
-        version: 4.0.5
     devDependencies:
       typescript:
         specifier: ^5.8.3
@@ -121,9 +115,6 @@ importers:
       '@contexthub/core':
         specifier: workspace:*
         version: link:../../core
-      zod:
-        specifier: ^4.0.5
-        version: 4.0.5
     devDependencies:
       typescript:
         specifier: ^5.8.3
@@ -134,9 +125,6 @@ importers:
       '@contexthub/data-sources-common':
         specifier: workspace:*
         version: link:../common
-      zod:
-        specifier: ^4.0.5
-        version: 4.0.5
     devDependencies:
       typescript:
         specifier: ^5.8.3
