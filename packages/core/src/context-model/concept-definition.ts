@@ -19,10 +19,6 @@ export const conceptDefinitionSchema = z.object({
    */
   synonyms: z.array(z.string()),
   /**
-   * The category of the concept. For example: "Entity", "Event", "Attribute", etc.
-   */
-  category: z.string().nullable(),
-  /**
    * Tags used for categorization.
    */
   tags: z.array(z.string()),
@@ -30,18 +26,6 @@ export const conceptDefinitionSchema = z.object({
    * Example values for the concept.
    */
   exampleValues: z.array(z.string()),
-  /**
-   * The ids of the related concepts.
-   */
-  relatedConcepts: z.array(z.string()),
-  /**
-   * The fully qualified names of the source tables.
-   */
-  sourceTables: z.array(z.string()),
-  /**
-   * The fully qualified names of the source columns.
-   */
-  sourceColumns: z.array(z.string()),
 });
 
 export type ConceptDefinition = z.infer<typeof conceptDefinitionSchema>;

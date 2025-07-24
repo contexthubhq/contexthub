@@ -19,10 +19,6 @@ export const metricDefinitionSchema = z.object({
    */
   formula: z.string().nullable(),
   /**
-   * For example: "Financial", "Marketing", "Sales", etc.
-   */
-  category: z.string().nullable(),
-  /**
    * Tags used for categorization.
    */
   tags: z.array(z.string()),
@@ -34,14 +30,6 @@ export const metricDefinitionSchema = z.object({
    * The unit of measure of the metric. For example: "USD", "Count", "Percentage", etc.
    */
   unitOfMeasure: z.string().nullable(),
-  /**
-   * The fully qualified names of the source tables.
-   */
-  sourceTables: z.array(z.string()),
-  /**
-   * The fully qualified names of the source columns.
-   */
-  sourceColumns: z.array(z.string()),
 });
 
 export type MetricDefinition = z.infer<typeof metricDefinitionSchema>;
