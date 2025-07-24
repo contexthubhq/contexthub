@@ -10,12 +10,9 @@
   "dependencies": {
     "@contexthub/core": "workspace:*",
     "@contexthub/data-sources-all": "workspace:*",
-    "@hookform/resolvers": "^5.1.1",
     "next": "^15.4.3",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-hook-form": "^7.61.0",
-    "zod": "^4.0.5"
+    "react-dom": "^19.1.0"
   },
   "devDependencies": {
     "@types/node": "24.1.0",
