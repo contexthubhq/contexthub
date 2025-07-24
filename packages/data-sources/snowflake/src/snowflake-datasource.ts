@@ -1,9 +1,6 @@
 import { type DataSource, registry } from '@contexthub/data-sources-common';
 
 export class SnowflakeDataSource implements DataSource {
-  id = 'snowflake';
-  name = 'Snowflake';
-
   private credentials: Record<string, string>;
 
   constructor(credentials: Record<string, string>) {
