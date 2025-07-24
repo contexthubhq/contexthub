@@ -1,3 +1,4 @@
+import { TableSystemMetadata } from '@contexthub/core';
 import {
   type DataSource,
   type QueryResult,
@@ -19,6 +20,10 @@ export class BigQueryDataSource implements DataSource {
 
   async executeQuery(query: string): Promise<QueryResult> {
     return { rows: [] };
+  }
+
+  async getTablesList(): Promise<TableSystemMetadata[]> {
+    return [];
   }
 }
 

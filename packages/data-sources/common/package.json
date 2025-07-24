@@ -12,6 +12,9 @@
     "type-check": "tsc --noEmit",
     "build": "tsc"
   },
+  "dependencies": {
+    "@contexthub/core": "workspace:*"
+  },
   "devDependencies": {
     "typescript": "^5.8.3"
   }
