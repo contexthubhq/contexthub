@@ -44,6 +44,11 @@ export const columnSystemMetadataSchema = z.object({
    * for the table.
    */
   fullyQualifiedTableName: z.string(),
+  /**
+   * Fully qualified column name. This should be an unambiguous identifier
+   * for the column.
+   */
+  fullyQualifiedColumnName: z.string(),
 });
 
 export type ColumnSystemMetadata = z.infer<typeof columnSystemMetadataSchema>;
