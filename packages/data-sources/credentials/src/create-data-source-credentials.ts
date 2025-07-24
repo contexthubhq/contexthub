@@ -15,7 +15,7 @@ export async function createDataSourceCredentials({
     });
   // Currently only support one credential per data source type.
   if (existingDataSourceCredential) {
-    throw new Error('DataSourceCredential already exists');
+    throw new Error(`DataSourceCredential already exists for type: ${type}`);
   }
   const dataSourceCredential = await prisma.dataSourceCredential.create({
     data: {
