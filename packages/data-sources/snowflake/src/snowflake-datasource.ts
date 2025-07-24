@@ -29,37 +29,40 @@ export class SnowflakeDataSource implements DataSource {
 
   async executeQuery(query: string): Promise<QueryResult> {
     const connection = createConnection(this.credentials);
-    await new Promise<void>((resolve, reject) => {
-      connection.connect((err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
-      });
-    });
-    const results = await new Promise<QueryResult>((resolve, reject) => {
-      connection.execute({
-        sqlText: query,
-        complete: (err, _stmt, rows) => {
+    try {
+      await new Promise<void>((resolve, reject) => {
+        connection.connect((err) => {
           if (err) {
             reject(err);
           } else {
-            resolve({ rows: rows ?? [] });
+            resolve();
           }
-        },
+        });
       });
-    });
-    await new Promise<void>((resolve, reject) => {
-      connection.destroy((err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
+      const results = await new Promise<QueryResult>((resolve, reject) => {
+        connection.execute({
+          sqlText: query,
+          complete: (err, _stmt, rows) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve({ rows: rows ?? [] });
+            }
+          },
+        });
       });
-    });
-    return results;
+      return results;
+    } finally {
+      await new Promise<void>((resolve, reject) => {
+        connection.destroy((err) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      });
+    }
   }
 }
 

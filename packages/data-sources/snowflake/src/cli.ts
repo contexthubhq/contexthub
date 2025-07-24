@@ -34,7 +34,6 @@ async function main() {
         password: { type: 'string' },
         database: { type: 'string' },
         warehouse: { type: 'string' },
-        schema: { type: 'string' },
         role: { type: 'string' },
         help: { type: 'boolean' },
       },
@@ -54,7 +53,6 @@ async function main() {
       password: values.password as string,
       database: values.database as string,
       warehouse: values.warehouse as string,
-      schema: values.schema as string,
       role: values.role as string,
     };
     const dataSource = new SnowflakeDataSource({ credentials });
