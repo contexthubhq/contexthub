@@ -20,7 +20,7 @@ Options:
   --help        Show this help message
 
 Example:
-  snowflake-test-cli --account myaccount --username myuser --password mypass --database mydb --warehouse mywh --schema myschema --role myrole
+  snowflake-test-cli --account myaccount --username CONTEXTHUB_USER --password mypassword --database mydb --warehouse CONTEXTHUB_WAREHOUSE --role CONTEXTHUB_ROLE
 `);
 }
 
