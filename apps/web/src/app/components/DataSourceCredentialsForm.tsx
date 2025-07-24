@@ -16,11 +16,13 @@ export function DataSourceCredentialsForm({
     event.preventDefault();
     const formData = new FormData(event.target as HTMLFormElement);
     const data = Object.fromEntries(formData.entries());
-    
+
     // TODO: Replace with actual API call to save credentials
     console.log('Saving credentials:', data);
-    alert(`Credentials saved for ${dataSource.name}!\n\n${JSON.stringify(data, null, 2)}`);
-    
+    alert(
+      `Credentials saved for ${dataSource.name}!\n\n${JSON.stringify(data, null, 2)}`
+    );
+
     onClose?.();
   }
 
@@ -36,12 +38,14 @@ export function DataSourceCredentialsForm({
         <div key={field.name} className="space-y-2">
           <Label htmlFor={field.name}>
             {field.description || field.name}
-            {field.isRequired && <span className="text-destructive ml-1">*</span>}
+            {field.isRequired && (
+              <span className="text-destructive ml-1">*</span>
+            )}
           </Label>
           <Input
             id={field.name}
             name={field.name}
-            type={field.name.toLowerCase().includes('password') ? 'password' : 'text'}
+            type={'text'}
             required={field.isRequired}
             placeholder={`Enter ${field.description || field.name}`}
           />
@@ -52,9 +56,7 @@ export function DataSourceCredentialsForm({
         <Button type="button" variant="outline" onClick={onClose}>
           Cancel
         </Button>
-        <Button type="submit">
-          Save Configuration
-        </Button>
+        <Button type="submit">Save Configuration</Button>
       </DialogFooter>
     </form>
   );

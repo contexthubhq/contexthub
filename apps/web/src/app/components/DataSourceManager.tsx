@@ -3,9 +3,20 @@
 import React, { useState } from 'react';
 import { Database, Settings } from 'lucide-react';
 import type { DataSourceInfo } from '../common/data-source-info';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { DataSourceCredentialsForm } from './DataSourceCredentialsForm';
 
 export function DataSourceManager({
@@ -32,7 +43,8 @@ export function DataSourceManager({
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Data Sources</h1>
         <p className="text-muted-foreground mt-2">
-          Connect to your data sources to start generating context for your tables.
+          Connect to your data sources to start generating context for your
+          tables.
         </p>
       </div>
 
@@ -42,15 +54,16 @@ export function DataSourceManager({
             <Database className="h-12 w-12 text-muted-foreground mb-4" />
             <p className="text-lg font-medium">No data sources available</p>
             <p className="text-muted-foreground text-center max-w-sm">
-              No data source connectors are currently registered. Please check your configuration.
+              No data source connectors are currently registered. Please check
+              your configuration.
             </p>
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {dataSources.map((dataSource) => (
-            <Card 
-              key={dataSource.type} 
+            <Card
+              key={dataSource.type}
               className="cursor-pointer transition-shadow hover:shadow-md"
               onClick={() => handleButtonClick(dataSource)}
             >
@@ -66,7 +79,8 @@ export function DataSourceManager({
               <CardContent>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">
-                    {dataSource.fields.length} configuration {dataSource.fields.length === 1 ? 'field' : 'fields'}
+                    {dataSource.fields.length} configuration{' '}
+                    {dataSource.fields.length === 1 ? 'field' : 'fields'}
                   </span>
                   <Button variant="ghost" size="sm">
                     <Settings className="h-4 w-4 mr-2" />
@@ -86,8 +100,8 @@ export function DataSourceManager({
               <DialogHeader>
                 <DialogTitle>Configure {selectedDataSource.name}</DialogTitle>
               </DialogHeader>
-              <DataSourceCredentialsForm 
-                dataSource={selectedDataSource} 
+              <DataSourceCredentialsForm
+                dataSource={selectedDataSource}
                 onClose={handleCloseModal}
               />
             </>
