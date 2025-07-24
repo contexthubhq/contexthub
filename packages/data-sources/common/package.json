@@ -13,7 +13,8 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@contexthub/core": "workspace:*"
+    "@contexthub/core": "workspace:*",
+    "zod": "^4.0.5"
   },
   "devDependencies": {
     "typescript": "^5.8.3"
