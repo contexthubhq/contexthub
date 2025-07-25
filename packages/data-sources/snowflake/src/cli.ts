@@ -14,7 +14,6 @@ Options:
   --account     Snowflake account identifier
   --username    Snowflake username
   --password    Snowflake password
-  --database    Snowflake database name
   --warehouse   Snowflake warehouse name
   --role        Snowflake role name
   --help        Show this help message
@@ -33,7 +32,6 @@ async function main() {
         account: { type: 'string' },
         username: { type: 'string' },
         password: { type: 'string' },
-        database: { type: 'string' },
         warehouse: { type: 'string' },
         role: { type: 'string' },
         help: { type: 'boolean' },
@@ -52,7 +50,6 @@ async function main() {
       account: values.account as string,
       username: values.username as string,
       password: values.password as string,
-      database: values.database as string,
       warehouse: values.warehouse as string,
       role: values.role as string,
     };
