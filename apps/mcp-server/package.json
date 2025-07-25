@@ -2,7 +2,7 @@
   "name": "@contexthub/mcp-server",
   "version": "1.0.0",
   "description": "MCP server for ContextHub",
-  "main": "dist/index.js",
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "dev": "ts-node src/index.ts",
@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.16.0",
+    "@contexthub/data-sources-all": "workspace:*",
+    "@contexthub/data-sources-credentials": "workspace:*",
     "dotenv": "^17.2.0",
     "express": "^5.1.0"
   },
