@@ -50,7 +50,7 @@ const transports: Map<string, StreamableHTTPServerTransport> = new Map<
 >();
 
 app.post('/mcp', async (req: Request, res: Response) => {
-  console.error('Received MCP POST request');
+  console.log('Received MCP POST request');
   try {
     // Check for existing session ID
     const sessionId = req.headers['mcp-session-id'] as string | undefined;
