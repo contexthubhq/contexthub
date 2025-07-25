@@ -1,7 +1,9 @@
-FROM node:20-alpine
+ARG NODE_VERSION=20-alpine
+FROM node:${NODE_VERSION}
 
 # Install pnpm
-RUN corepack enable && corepack prepare pnpm@10.13.1 --activate
+ARG PNPM_VERSION=10.13.1
+RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
 
 WORKDIR /app
 

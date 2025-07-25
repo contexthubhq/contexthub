@@ -1,18 +1,16 @@
-version: '3.8'
-
 services:
   postgres:
-    image: postgres:17.5-alpine
+    image: postgres:${POSTGRES_VERSION}
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: contexhub_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - '5432:5432'
+      - '${POSTGRES_PORT}:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
       interval: 5s
       timeout: 5s
       retries: 5
@@ -21,25 +19,31 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.migrate
+      args:
+        NODE_VERSION: ${NODE_VERSION}
+        PNPM_VERSION: ${PNPM_VERSION}
     depends_on:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/contexhub_db
+      DATABASE_URL: ${DATABASE_URL}
     command: pnpm --filter @contexthub/database prisma migrate deploy
 
   web:
     build:
       context: .
       dockerfile: Dockerfile.web
+      args:
+        NODE_VERSION: ${NODE_VERSION}
+        PNPM_VERSION: ${PNPM_VERSION}
     ports:
-      - '3000:3000'
+      - '${WEB_PORT}:3000'
     depends_on:
       migrate:
         condition: service_completed_successfully
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/contexhub_db
-      NODE_ENV: development
+      DATABASE_URL: ${DATABASE_URL}
+      NODE_ENV: ${NODE_ENV}
     command: pnpm --filter @contexthub/web start
 
 volumes:
