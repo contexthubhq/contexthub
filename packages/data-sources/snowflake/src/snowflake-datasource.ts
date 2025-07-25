@@ -4,15 +4,19 @@ import { z } from 'zod';
 
 import {
   type DataSource,
+  type GetColumnsListParams,
   type QueryResult,
   registry,
 } from '@contexthub/data-sources-common';
+import type {
+  ColumnSystemMetadata,
+  TableSystemMetadata,
+} from '@contexthub/core';
 
 import {
   snowflakeCredentialsSchema,
   type SnowflakeCredentials,
 } from './types.js';
-import type { TableSystemMetadata } from '@contexthub/core';
 
 export class SnowflakeDataSource implements DataSource {
   private readonly credentials: SnowflakeCredentials;
@@ -94,6 +98,55 @@ export class SnowflakeDataSource implements DataSource {
       tableCatalog: row.TABLE_CATALOG,
       tableType: row.TABLE_TYPE,
       fullyQualifiedTableName: `${row.TABLE_CATALOG}.${row.TABLE_SCHEMA}.${row.TABLE_NAME}`,
+    }));
+  }
+
+  async getColumnsList({
+    tableCatalog,
+    tableSchema,
+    tableName,
+  }: GetColumnsListParams): Promise<ColumnSystemMetadata[]> {
+    const query = `
+    SELECT 
+      TABLE_CATALOG,
+      TABLE_SCHEMA,
+      TABLE_NAME,
+      COLUMN_NAME,
+      DATA_TYPE,
+      IS_NULLABLE,
+      COLUMN_DEFAULT,
+      ORDINAL_POSITION
+    FROM information_schema.columns
+    WHERE TABLE_CATALOG = '${tableCatalog}'
+    AND TABLE_SCHEMA = '${tableSchema}'
+    AND TABLE_NAME = '${tableName}'
+    ORDER BY ORDINAL_POSITION
+  `;
+    const results = await this.executeQuery(query);
+    const schema = z.array(
+      z.object({
+        TABLE_CATALOG: z.string(),
+        TABLE_SCHEMA: z.string(),
+        TABLE_NAME: z.string(),
+        COLUMN_NAME: z.string(),
+        DATA_TYPE: z.string(),
+        IS_NULLABLE: z.string(),
+        COLUMN_DEFAULT: z.string().nullable(),
+        ORDINAL_POSITION: z.number(),
+      })
+    );
+    const parsedRows = schema.parse(results.rows);
+    return parsedRows.map((row) => ({
+      columnName: row.COLUMN_NAME,
+      tableCatalog: row.TABLE_CATALOG,
+      tableSchema: row.TABLE_SCHEMA,
+      tableName: row.TABLE_NAME,
+      ordinalPosition: row.ORDINAL_POSITION,
+      isNullable: row.IS_NULLABLE === 'YES',
+      dataType: row.DATA_TYPE,
+      columnDefault: row.COLUMN_DEFAULT,
+      fullyQualifiedTableName: `${row.TABLE_CATALOG}.${row.TABLE_SCHEMA}.${row.TABLE_NAME}`,
+      fullyQualifiedColumnName: `${row.TABLE_CATALOG}.${row.TABLE_SCHEMA}.${row.TABLE_NAME}.${row.COLUMN_NAME}`,
     }));
   }
 }
