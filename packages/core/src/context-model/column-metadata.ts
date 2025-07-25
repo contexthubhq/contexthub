@@ -38,7 +38,7 @@ export const columnSystemMetadataSchema = z.object({
   /**
    * Corresponds to `INFORMATION_SCHEMA.COLUMNS.COLUMN_DEFAULT`
    */
-  columnDefault: z.string(),
+  columnDefault: z.string().nullable(),
   /**
    * Fully qualified table name. This should be an unambiguous identifier
    * for the table.

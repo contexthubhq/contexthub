@@ -131,7 +131,7 @@ export class SnowflakeDataSource implements DataSource {
         COLUMN_NAME: z.string(),
         DATA_TYPE: z.string(),
         IS_NULLABLE: z.string(),
-        COLUMN_DEFAULT: z.string(),
+        COLUMN_DEFAULT: z.string().nullable(),
         ORDINAL_POSITION: z.number(),
       })
     );
