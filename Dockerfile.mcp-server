@@ -16,4 +16,4 @@ RUN pnpm install --frozen-lockfile
 # Build the application
 RUN pnpm run build
 
-EXPOSE 3001
+EXPOSE ${MCP_SERVER_PORT}
