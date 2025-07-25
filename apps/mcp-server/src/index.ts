@@ -123,71 +123,23 @@ app.post('/mcp', async (req: Request, res: Response) => {
   }
 });
 
-// Handle GET requests for SSE streams (using built-in support from StreamableHTTP)
-app.get('/mcp', async (req: Request, res: Response) => {
-  console.error('Received MCP GET request');
+// Reusable handler for GET and DELETE requests
+const handleSessionRequest = async (
+  req: express.Request,
+  res: express.Response
+) => {
   const sessionId = req.headers['mcp-session-id'] as string | undefined;
   if (!sessionId || !transports.has(sessionId)) {
-    res.status(400).json({
-      jsonrpc: '2.0',
-      error: {
-        code: -32000,
-        message: 'Bad Request: No valid session ID provided',
-      },
-      id: req?.body?.id,
-    });
+    res.status(400).send('Invalid or missing session ID');
     return;
   }
 
-  // Check for Last-Event-ID header for resumability
-  const lastEventId = req.headers['last-event-id'] as string | undefined;
-  if (lastEventId) {
-    console.error(`Client reconnecting with Last-Event-ID: ${lastEventId}`);
-  } else {
-    console.error(`Establishing new SSE stream for session ${sessionId}`);
-  }
+  const transport = transports.get(sessionId)!;
+  await transport.handleRequest(req, res);
+};
 
-  const transport = transports.get(sessionId);
-  await transport!.handleRequest(req, res);
-});
-
-// Handle DELETE requests for session termination (according to MCP spec)
-app.delete('/mcp', async (req: Request, res: Response) => {
-  const sessionId = req.headers['mcp-session-id'] as string | undefined;
-  if (!sessionId || !transports.has(sessionId)) {
-    res.status(400).json({
-      jsonrpc: '2.0',
-      error: {
-        code: -32000,
-        message: 'Bad Request: No valid session ID provided',
-      },
-      id: req?.body?.id,
-    });
-    return;
-  }
-
-  console.error(
-    `Received session termination request for session ${sessionId}`
-  );
-
-  try {
-    const transport = transports.get(sessionId);
-    await transport!.handleRequest(req, res);
-  } catch (error) {
-    console.error('Error handling session termination:', error);
-    if (!res.headersSent) {
-      res.status(500).json({
-        jsonrpc: '2.0',
-        error: {
-          code: -32603,
-          message: 'Error handling session termination',
-        },
-        id: req?.body?.id,
-      });
-      return;
-    }
-  }
-});
+app.get('/mcp', handleSessionRequest);
+app.delete('/mcp', handleSessionRequest);
 
 // Start the server
 app.listen(PORT, () => {
@@ -197,6 +149,16 @@ app.listen(PORT, () => {
 // Handle server shutdown
 process.on('SIGINT', async () => {
   console.log('Shutting down server...');
+  // Close all active transports to properly clean up resources
+  for (const sessionId of transports.keys()) {
+    try {
+      console.log(`Closing transport for session ${sessionId}`);
+      await transports.get(sessionId)!.close();
+      transports.delete(sessionId);
+    } catch (error) {
+      console.error(`Error closing transport for session ${sessionId}:`, error);
+    }
+  }
   console.log('Server shutdown complete');
   process.exit(0);
 });
