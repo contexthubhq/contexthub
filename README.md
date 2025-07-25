@@ -9,3 +9,7 @@ docker-compose up
 ```
 
 Now visit [http://localhost:3000](http://localhost:3000).
+
+## Data sources
+
+[See README](packages/data-sources)
