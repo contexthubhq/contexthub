@@ -1,5 +1,5 @@
 {
-  "name": "web",
+  "name": "@contexthub/web",
   "version": "1.0.0",
   "description": "ContextHub web app",
   "scripts": {
