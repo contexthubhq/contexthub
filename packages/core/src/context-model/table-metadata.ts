@@ -20,10 +20,6 @@ export const tableSystemMetadataSchema = z.object({
    */
   tableCatalog: z.string(),
   /**
-   * Corresponds to `INFORMATION_SCHEMA.TABLES.TABLE_TYPE`
-   */
-  tableType: z.string(),
-  /**
    * Fully qualified table name. This should be an unambiguous identifier
    * for the table.
    */

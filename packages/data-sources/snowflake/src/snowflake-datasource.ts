@@ -72,32 +72,22 @@ export class SnowflakeDataSource implements DataSource {
   }
 
   async getTablesList(): Promise<TableSystemMetadata[]> {
-    const query = `
-    SELECT 
-      TABLE_CATALOG,
-      TABLE_SCHEMA,
-      TABLE_NAME,
-      TABLE_TYPE,
-    FROM information_schema.tables 
-    WHERE TABLE_CATALOG = '${this.credentials.database}'
-    ORDER BY TABLE_NAME
-  `;
+    const query = `SHOW TABLES IN ACCOUNT`;
     const schema = z.array(
       z.object({
-        TABLE_CATALOG: z.string(),
-        TABLE_SCHEMA: z.string(),
-        TABLE_NAME: z.string(),
-        TABLE_TYPE: z.string(),
+        database_name: z.string(),
+        schema_name: z.string(),
+        name: z.string(),
+        kind: z.string(),
       })
     );
     const results = await this.executeQuery(query);
     const parsedRows = schema.parse(results.rows);
     return parsedRows.map((row) => ({
-      tableName: row.TABLE_NAME,
-      tableSchema: row.TABLE_SCHEMA,
-      tableCatalog: row.TABLE_CATALOG,
-      tableType: row.TABLE_TYPE,
-      fullyQualifiedTableName: `${row.TABLE_CATALOG}.${row.TABLE_SCHEMA}.${row.TABLE_NAME}`,
+      tableName: row.name,
+      tableSchema: row.schema_name,
+      tableCatalog: row.database_name,
+      fullyQualifiedTableName: `${row.database_name}.${row.schema_name}.${row.name}`,
     }));
   }
 
@@ -155,7 +145,6 @@ const credentialsFields = [
   { name: 'account', isRequired: true },
   { name: 'username', isRequired: true },
   { name: 'password', isRequired: true },
-  { name: 'database', isRequired: true },
   { name: 'warehouse', isRequired: true },
   { name: 'role', isRequired: true },
 ];
