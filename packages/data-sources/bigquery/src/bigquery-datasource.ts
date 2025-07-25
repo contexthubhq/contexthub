@@ -1,6 +1,7 @@
-import { TableSystemMetadata } from '@contexthub/core';
+import { ColumnSystemMetadata, TableSystemMetadata } from '@contexthub/core';
 import {
   type DataSource,
+  GetColumnsListParams,
   type QueryResult,
   registry,
 } from '@contexthub/data-sources-common';
@@ -23,6 +24,12 @@ export class BigQueryDataSource implements DataSource {
   }
 
   async getTablesList(): Promise<TableSystemMetadata[]> {
+    return [];
+  }
+
+  async getColumnsList(
+    params: GetColumnsListParams
+  ): Promise<ColumnSystemMetadata[]> {
     return [];
   }
 }
