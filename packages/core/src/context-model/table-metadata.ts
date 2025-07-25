@@ -24,10 +24,6 @@ export const tableSystemMetadataSchema = z.object({
    */
   tableType: z.string(),
   /**
-   * Corresponds to `INFORMATION_SCHEMA.TABLES.CREATION_TIME`
-   */
-  creationTime: z.coerce.date(),
-  /**
    * Fully qualified table name. This should be an unambiguous identifier
    * for the table.
    */

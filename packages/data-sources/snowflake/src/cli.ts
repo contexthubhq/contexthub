@@ -7,9 +7,10 @@ function printUsage() {
   console.log(`
 Usage: snowflake-test-cli [options]
 
-Test Snowflake data source connection
+Test Snowflake data source functionality
 
 Options:
+  --command     Command to run (test-connection, list-tables)
   --account     Snowflake account identifier
   --username    Snowflake username
   --password    Snowflake password
@@ -28,6 +29,7 @@ async function main() {
     const { values } = parseArgs({
       args: process.argv.slice(2),
       options: {
+        command: { type: 'string' },
         account: { type: 'string' },
         username: { type: 'string' },
         password: { type: 'string' },
@@ -55,20 +57,34 @@ async function main() {
       role: values.role as string,
     };
     const dataSource = new SnowflakeDataSource({ credentials });
-    const isConnected = await dataSource.testConnection();
-
-    if (isConnected) {
-      console.log('✅ Connection test successful!');
-      process.exit(0);
+    if (values.command === 'test-connection') {
+      await testConnection(dataSource);
+    } else if (values.command === 'list-tables') {
+      await listTables(dataSource);
     } else {
-      console.log('❌ Connection test failed!');
-      process.exit(1);
+      console.error('❌ Invalid command');
     }
   } catch (error) {
-    console.error('❌ Error testing connection:');
+    console.error('❌ Error:');
     console.error(error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
+}
+
+async function listTables(dataSource: SnowflakeDataSource) {
+  const tables = await dataSource.getTablesList();
+  console.log(tables);
+  process.exit(0);
+}
+
+async function testConnection(dataSource: SnowflakeDataSource) {
+  const isConnected = await dataSource.testConnection();
+  if (isConnected) {
+    console.log('✅ Connection test successful!');
+  } else {
+    console.log('❌ Connection test failed!');
+  }
+  process.exit(0);
 }
 
 main();
