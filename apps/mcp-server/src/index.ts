@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 // Load environment variables
 dotenv.config();
 
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3001;
 
 // Create Express app
 const app = express();
