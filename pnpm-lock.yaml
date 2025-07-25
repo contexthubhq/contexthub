@@ -20,6 +20,12 @@ importers:
 
   apps/mcp-server:
     dependencies:
+      '@contexthub/data-sources-all':
+        specifier: workspace:*
+        version: link:../../packages/data-sources/all
+      '@contexthub/data-sources-credentials':
+        specifier: workspace:*
+        version: link:../../packages/data-sources/credentials
       '@modelcontextprotocol/sdk':
         specifier: ^1.16.0
         version: 1.16.0
