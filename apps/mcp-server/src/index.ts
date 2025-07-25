@@ -70,7 +70,7 @@ app.post('/mcp', async (req: Request, res: Response) => {
         onsessioninitialized: (sessionId: string) => {
           // Store the transport by session ID when session is initialized
           // This avoids race conditions where requests might come in before the session is stored
-          console.error(`Session initialized with ID: ${sessionId}`);
+          console.log(`Session initialized with ID: ${sessionId}`);
           transports.set(sessionId, transport);
         },
       });
