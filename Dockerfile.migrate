@@ -1,0 +1,15 @@
+FROM node:20-alpine
+
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@10.13.1 --activate
+
+WORKDIR /app
+
+# Copy source files
+COPY . .
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Generate Prisma client
+RUN pnpm --filter @contexthub/database prisma generate
