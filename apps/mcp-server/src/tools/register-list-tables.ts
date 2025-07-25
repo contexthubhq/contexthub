@@ -6,7 +6,7 @@ export function registerListTables(server: McpServer) {
   server.tool(
     'list-tables',
     {
-      description: 'List all tables available warehouses',
+      description: 'List all tables from available warehouses',
     },
 
     async () => {
