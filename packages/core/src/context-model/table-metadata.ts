@@ -1,12 +1,12 @@
 import { z } from 'zod';
 
 /**
- * System-defined metadata for a table.
+ * Data source definition of a table.
  *
  * The source of this should be the data source INFORMATION_SCHEMA.TABLES or
  * equivalent.
  */
-export const tableSystemMetadataSchema = z.object({
+export const tableDefinitionSchema = z.object({
   /**
    * Corresponds to `INFORMATION_SCHEMA.TABLES.TABLE_NAME`
    */
@@ -26,7 +26,7 @@ export const tableSystemMetadataSchema = z.object({
   fullyQualifiedTableName: z.string(),
 });
 
-export type TableSystemMetadata = z.infer<typeof tableSystemMetadataSchema>;
+export type TableDefinition = z.infer<typeof tableDefinitionSchema>;
 
 /**
  * Natural language context for a table that allows LLMs to understand what's
@@ -48,7 +48,7 @@ export type TableContext = z.infer<typeof tableContextSchema>;
  * Metadata for a table that includes both system-defined and natural language
  * context.
  */
-export const tableMetadataSchema = tableSystemMetadataSchema.extend(
+export const tableMetadataSchema = tableDefinitionSchema.extend(
   tableContextSchema.shape
 );
 

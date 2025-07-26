@@ -1,4 +1,4 @@
-import { ColumnSystemMetadata, TableSystemMetadata } from '@contexthub/core';
+import type { ColumnDefinition, TableDefinition } from '@contexthub/core';
 import {
   type DataSource,
   GetColumnsListParams,
@@ -23,13 +23,13 @@ export class BigQueryDataSource implements DataSource {
     return { rows: [] };
   }
 
-  async getTablesList(): Promise<TableSystemMetadata[]> {
+  async getTablesList(): Promise<TableDefinition[]> {
     return [];
   }
 
   async getColumnsList(
     params: GetColumnsListParams
-  ): Promise<ColumnSystemMetadata[]> {
+  ): Promise<ColumnDefinition[]> {
     return [];
   }
 }
