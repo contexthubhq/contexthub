@@ -1,16 +1,16 @@
 export {
   type ColumnMetadata,
   type ColumnContext,
-  type ColumnSystemMetadata,
+  type ColumnDefinition,
   columnMetadataSchema,
   columnContextSchema,
-  columnSystemMetadataSchema,
+  columnDefinitionSchema,
 } from './context-model/column-metadata.js';
 export {
   type TableMetadata,
   type TableContext,
-  type TableSystemMetadata,
+  type TableDefinition,
   tableMetadataSchema,
   tableContextSchema,
-  tableSystemMetadataSchema,
+  tableDefinitionSchema,
 } from './context-model/table-metadata.js';

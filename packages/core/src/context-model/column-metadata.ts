@@ -1,12 +1,12 @@
 import { z } from 'zod';
 
 /**
- * System-defined metadata for a column.
+ * Data source definition of a column.
  *
  * The source of this should be the data source INFORMATION_SCHEMA.COLUMNS or
  * equivalent.
  */
-export const columnSystemMetadataSchema = z.object({
+export const columnDefinitionSchema = z.object({
   /**
    * Corresponds to `INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME`
    */
@@ -51,7 +51,7 @@ export const columnSystemMetadataSchema = z.object({
   fullyQualifiedColumnName: z.string(),
 });
 
-export type ColumnSystemMetadata = z.infer<typeof columnSystemMetadataSchema>;
+export type ColumnDefinition = z.infer<typeof columnDefinitionSchema>;
 
 /**
  * Natural language context for a column that allows LLMs to understand what's
@@ -78,7 +78,7 @@ export type ColumnContext = z.infer<typeof columnContextSchema>;
  * Metadata for a column that includes both system-defined and natural language
  * context.
  */
-export const columnMetadataSchema = columnSystemMetadataSchema.extend(
+export const columnMetadataSchema = columnDefinitionSchema.extend(
   columnContextSchema.shape
 );
 

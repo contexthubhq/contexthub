@@ -8,10 +8,7 @@ import {
   type QueryResult,
   registry,
 } from '@contexthub/data-sources-common';
-import type {
-  ColumnSystemMetadata,
-  TableSystemMetadata,
-} from '@contexthub/core';
+import type { ColumnDefinition, TableDefinition } from '@contexthub/core';
 
 import {
   snowflakeCredentialsSchema,
@@ -71,7 +68,7 @@ export class SnowflakeDataSource implements DataSource {
     }
   }
 
-  async getTablesList(): Promise<TableSystemMetadata[]> {
+  async getTablesList(): Promise<TableDefinition[]> {
     const query = `SHOW TABLES IN ACCOUNT`;
     const schema = z.array(
       z.object({
@@ -95,7 +92,7 @@ export class SnowflakeDataSource implements DataSource {
     tableCatalog,
     tableSchema,
     tableName,
-  }: GetColumnsListParams): Promise<ColumnSystemMetadata[]> {
+  }: GetColumnsListParams): Promise<ColumnDefinition[]> {
     const query = `
     SELECT 
       TABLE_CATALOG,
