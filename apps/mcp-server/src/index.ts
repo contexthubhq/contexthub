@@ -1,8 +1,8 @@
-import express, { NextFunction, type Request, type Response } from 'express';
+import express, { type Request, type Response } from 'express';
 
+import { z } from 'zod';
 import dotenv from 'dotenv';
 import { mcpRouter } from './mcp/mcp-router.js';
-import { mcpAuthMetadataRouter } from '@modelcontextprotocol/sdk/server/auth/router.js';
 import {
   OAuthMetadata,
   OAuthProtectedResourceMetadata,
@@ -10,6 +10,7 @@ import {
 import { metadataHandler } from '@modelcontextprotocol/sdk/server/auth/handlers/metadata.js';
 import { requireBearerAuth } from '@modelcontextprotocol/sdk/server/auth/middleware/bearerAuth.js';
 import { OAuthTokenVerifier } from '@modelcontextprotocol/sdk/server/auth/provider.js';
+import { jwtVerify, createRemoteJWKSet } from 'jose';
 
 // Load environment variables
 dotenv.config();
@@ -25,6 +26,7 @@ const oauthMetadata: OAuthMetadata = {
   token_endpoint: process.env.TOKEN_URL!,
   registration_endpoint: process.env.REGISTRATION_URL!,
   response_types_supported: ['code'],
+  scopes_supported: process.env.SCOPES!.split(','),
 };
 
 const oauthProtectedResourceMetadata: OAuthProtectedResourceMetadata = {
@@ -32,6 +34,7 @@ const oauthProtectedResourceMetadata: OAuthProtectedResourceMetadata = {
   authorization_servers: [process.env.MCP_SERVER_HOST!],
   bearer_methods_supported: ['header'],
   resource_name: 'MCP Server',
+  scopes_supported: process.env.SCOPES!.split(','),
 };
 
 app.use(
@@ -44,21 +47,34 @@ app.use(
   metadataHandler(oauthMetadata)
 );
 
+const JWKS = createRemoteJWKSet(new URL(process.env.JWKS_URL!));
+
+const jwtSchema = z.object({
+  cid: z.string(),
+  exp: z.number(),
+  scp: z.array(z.string()),
+});
+
 const verifier: OAuthTokenVerifier = {
   verifyAccessToken: async (token: string) => {
-    console.log('verifyAccessToken', token);
+    const { payload } = await jwtVerify(token, JWKS, {
+      issuer: process.env.ISSUER_URL!,
+      audience: process.env.AUDIENCE!,
+      algorithms: ['RS256'],
+    });
+    const parsed = jwtSchema.parse(payload);
     return {
       token,
-      scopes: ['claudeai'],
-      clientId: process.env.CLIENT_ID!,
-      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).getTime(),
+      clientId: parsed.cid,
+      expiresAt: parsed.exp,
+      scopes: parsed.scp,
     };
   },
 };
 
 const authMiddleware = requireBearerAuth({
   verifier,
-  requiredScopes: ['claudeai'],
+  requiredScopes: process.env.SCOPES!.split(','),
   resourceMetadataUrl: new URL(
     '/.well-known/oauth-protected-resource',
     process.env.MCP_SERVER_HOST!
