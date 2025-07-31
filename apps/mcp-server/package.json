@@ -10,11 +10,13 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.16.0",
     "@contexthub/data-sources-all": "workspace:*",
     "@contexthub/data-sources-credentials": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.16.0",
     "dotenv": "^17.2.0",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "jose": "^6.0.12",
+    "zod": "^4.0.5"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
