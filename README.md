@@ -1,6 +1,6 @@
 # ContextHub
 
-Make Claude / ChatGPT your data scientist!
+Make Claude your data scientist!
 
 ContextHub is the easiest way to connect your data warehouse to AI assistants and agents, and make the LLMs understand not only the structure but also the business context of your data.
 
