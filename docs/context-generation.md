@@ -25,5 +25,3 @@ Context sources are designed to be used with the `@openai/agents` library. The `
 ## Available Implementations
 
 - `InMemoryTextInputContextSource`: Stores text content in memory and provides it as a tool
-
-

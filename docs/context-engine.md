@@ -2,13 +2,15 @@
 
 ## Overview
 
-The context engine generates contextual information about database tables and columns using AI agents. It processes context sources iteratively and synthesizes the results into comprehensive descriptions.
+The context engine generates contextual information about database tables and columns using AI agents.
 
 ## Interface
 
 ```typescript
 interface ContextEngine {
-  generateTableContext(input: GenerateTableContextInput): Promise<TableContextResult>;
+  generateTableContext(
+    input: GenerateTableContextInput
+  ): Promise<TableContextResult>;
 }
 ```
 
@@ -27,7 +29,6 @@ interface GenerateTableContextInput {
 interface TableContextResult {
   table: TableDefinition;
   context: TableContext;
-  confidence: number;
   sourcesUsed: string[];
 }
 ```
@@ -38,4 +39,4 @@ The context engine uses the `@openai/agents` library to process context sources 
 
 ## Available Implementations
 
-- `OpenAIAgentContextEngine`: Processes context sources using OpenAI agents with iterative accumulation 
+- `OpenAIAgentContextEngine`: Processes context sources using OpenAI agents with iterative accumulation
