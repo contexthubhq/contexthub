@@ -33,6 +33,11 @@ export function createAuthMetadataRouter({
 
     const oauthProtectedResourceMetadata: OAuthProtectedResourceMetadata = {
       resource: authConfig.MCP_SERVER_HOST,
+      // Note that we deliberately have the resource server here as the authorization server.
+      // This is because some authorization servers have non-standard endpoint URLs (for example, Okta's), which
+      // makes the client (Claude) unable to find the authorization server metadata endpoint.
+      // Doing this allows us to control the metadata ourselves so that we can comply with what Claude and other
+      // clients expect.
       authorization_servers: [authConfig.MCP_SERVER_HOST],
       bearer_methods_supported: ['header'],
       resource_name: 'MCP Server',
@@ -44,6 +49,9 @@ export function createAuthMetadataRouter({
       metadataHandler(oauthProtectedResourceMetadata)
     );
 
+    // Note that it is non-standard to serve the authorization server metadata from the resource server as we do here.
+    // This is done because some authorization servers have non-standard endpoint URLs (for example, Okta's), which
+    // makes the client (Claude) unable to find the authorization server metadata endpoint.
     authMetadataRouter.use(
       '/.well-known/oauth-authorization-server',
       metadataHandler(oauthMetadata)
