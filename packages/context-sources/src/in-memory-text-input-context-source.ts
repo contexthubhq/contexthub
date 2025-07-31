@@ -11,19 +11,12 @@ export class InMemoryTextInputContextSource implements ContextSource {
   private text: string = '';
   private description: string = '';
 
-  constructor(config?: InMemoryTextInputConfig) {
-    if (config) {
-      this.text = config.text;
-      this.description = config.description || '';
-    }
+  constructor(text: string, description?: string) {
+    this.text = text;
+    this.description = description || '';
   }
 
-  async create(input: InMemoryTextInputConfig): Promise<void> {
-    this.text = input.text;
-    this.description = input.description || '';
-  }
-
-  async getTools(): Promise<Tool[]> {
+  getTools(): Tool[] {
     return [
       tool({
         name: 'get_text_content',
