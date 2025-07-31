@@ -6,7 +6,7 @@ import {
 import { metadataHandler } from '@modelcontextprotocol/sdk/server/auth/handlers/metadata.js';
 import { authConfig } from './auth-config.js';
 
-const metadataRouter: Router = Router();
+const authMetadataRouter: Router = Router();
 
 if (authConfig.AUTH_ENABLED) {
   const oauthMetadata: OAuthMetadata = {
@@ -26,15 +26,15 @@ if (authConfig.AUTH_ENABLED) {
     scopes_supported: authConfig.SCOPES,
   };
 
-  metadataRouter.use(
+  authMetadataRouter.use(
     '/.well-known/oauth-protected-resource',
     metadataHandler(oauthProtectedResourceMetadata)
   );
 
-  metadataRouter.use(
+  authMetadataRouter.use(
     '/.well-known/oauth-authorization-server',
     metadataHandler(oauthMetadata)
   );
 }
 
-export { metadataRouter };
+export { authMetadataRouter };

@@ -48,6 +48,7 @@ if (authConfig.AUTH_ENABLED) {
     ).toString(),
   });
 } else {
+  // If authentication is disabled, the middleware is a no-op.
   authMiddleware = (_req: Request, _res: Response, next: NextFunction) => {
     next();
   };
