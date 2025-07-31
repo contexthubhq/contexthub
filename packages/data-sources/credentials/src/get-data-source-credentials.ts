@@ -2,6 +2,8 @@ import { z } from 'zod';
 import { prisma } from '@contexthub/database';
 import { type DataSourceCredential } from './types.js';
 
+const credentialsSchema = z.record(z.string(), z.string());
+
 export async function getDataSourceCredentials({
   dataSourceId,
 }: {
@@ -27,5 +29,3 @@ export async function getDataSourceCredentials({
     credentials: credentialsSchema.parse(dataSourceCredentials.credentials),
   };
 }
-
-export const credentialsSchema = z.record(z.string(), z.string());
