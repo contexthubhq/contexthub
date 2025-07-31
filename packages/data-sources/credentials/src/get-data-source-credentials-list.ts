@@ -1,25 +1,13 @@
 import { prisma } from '@contexthub/database';
-import type { DataSourceCredential } from './types.js';
-import { z } from 'zod';
 
 export async function getDataSourceCredentialsList(): Promise<
-  DataSourceCredential[]
+  { id: string; type: string }[]
 > {
   const dataSourceCredentialsList = await prisma.dataSourceCredential.findMany({
     select: {
       id: true,
       type: true,
-      credentials: true,
-      createdAt: true,
-      updatedAt: true,
     },
   });
-  return dataSourceCredentialsList.map((dataSourceCredential) => {
-    return {
-      ...dataSourceCredential,
-      credentials: credentialsSchema.parse(dataSourceCredential.credentials),
-    };
-  });
+  return dataSourceCredentialsList;
 }
-
-const credentialsSchema = z.record(z.string(), z.string());

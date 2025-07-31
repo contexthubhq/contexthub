@@ -1,29 +1,31 @@
-import { getDataSourceCredentialsList } from '@contexthub/data-sources-credentials';
+import { z } from 'zod';
+
+import { getDataSourceCredentials } from '@contexthub/data-sources-credentials';
 import { registry } from '@contexthub/data-sources-all';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 
 export function registerListTables(server: McpServer) {
-  server.tool(
+  server.registerTool(
     'list-tables',
     {
-      description: 'List all tables from available warehouses',
+      title: 'List tables',
+      description: 'List all tables for a given data source.',
+      inputSchema: {
+        dataSourceId: z.string(),
+      },
     },
-
-    async () => {
-      console.log('🔧 [list-tables] Tool called.');
+    async ({ dataSourceId }): Promise<CallToolResult> => {
+      console.log(
+        `🔧 [list-tables] Tool called. dataSourceId: ${dataSourceId}`
+      );
       try {
-        const credentials = await getDataSourceCredentialsList();
-        if (credentials.length === 0) {
-          return {
-            content: [
-              { type: 'text', text: 'No data source credentials found' },
-            ],
-          };
-        }
-        const firstCredential = credentials[0];
+        const credentials = await getDataSourceCredentials({
+          dataSourceId,
+        });
         const dataSource = registry.createInstance({
-          type: firstCredential.type,
-          credentials: firstCredential.credentials,
+          type: credentials.type,
+          credentials: credentials.credentials,
         });
         const tables = await dataSource.getTablesList();
         console.log(
@@ -34,7 +36,7 @@ export function registerListTables(server: McpServer) {
           content: [
             {
               type: 'text',
-              text: JSON.stringify(tables, null, 2),
+              text: JSON.stringify(tables),
             },
           ],
         };
