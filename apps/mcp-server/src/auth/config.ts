@@ -1,7 +1,4 @@
-import dotenv from 'dotenv';
 import { z } from 'zod';
-
-dotenv.config();
 
 const authConfigDisabledEnvironmentSchema = z.object({
   /**
@@ -77,4 +74,6 @@ const authConfigSchema = z.discriminatedUnion('AUTH_ENABLED', [
 
 export type AuthConfig = z.infer<typeof authConfigSchema>;
 
-export const authConfig: AuthConfig = authConfigSchema.parse(process.env);
+export function getAuthConfig() {
+  return authConfigSchema.parse(process.env);
+}
