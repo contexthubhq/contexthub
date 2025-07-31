@@ -11,12 +11,12 @@ The MCP protocol specifies [OAuth 2.1 for authorization](https://modelcontextpro
 
 ### OAuth 2.1 Roles (Mapped to MCP)
 
-| OAuth Role              | Description                                                | MCP Mapping                               |
-|-------------------------|------------------------------------------------------------|-------------------------------------------|
-| **Resource owner**      | End user who can grant access to data/services             | The human using the AI chat product/agent |
-| **Client**              | App requesting access on behalf of the resource owner      | The AI chat product or agent              |
-| **Authorization server**| Authenticates the resource owner, obtains consent, issues tokens | The chosen OAuth/OIDC/IAM provider        |
-| **Resource server**     | API hosting protected resources                            | The MCP server API                        |
+| OAuth Role               | Description                                                      | MCP Mapping                               |
+| ------------------------ | ---------------------------------------------------------------- | ----------------------------------------- |
+| **Resource owner**       | End user who can grant access to data/services                   | The human using the AI chat product/agent |
+| **Client**               | App requesting access on behalf of the resource owner            | The AI chat product or agent              |
+| **Authorization server** | Authenticates the resource owner, obtains consent, issues tokens | The chosen OAuth/OIDC/IAM provider        |
+| **Resource server**      | API hosting protected resources                                  | The MCP server API                        |
 
 ### Dynamic client registration (DCR)
 
@@ -53,11 +53,13 @@ a cloud version can implement a vibe-coder friendly authentication while the ent
 Instead, recommend users place the app behind their choice of **reverse proxy / SSO** or **network-based restrictions** (e.g., VPN, IP allowlists).
 
 **Rationale**
+
 - The admin UI typically serves a small set of internal users, whereas the MCP server faces many end users. The strongest auth needs are on the MCP server side.
 - Supporting web-app auth would require choosing providers, implementing roles/permissions, and invite flows—none of which are essential to getting a functional MCP server running.
 - Deferring web-app auth keeps local testing simple and avoids premature commitment to specific auth stacks.
 
 **If/When We Add Web-App Auth**
+
 - Start with a **simple password gate** as a lightweight option.
 - Hosted/cloud or enterprise editions can integrate **SSO/OIDC/SAML** and role-based access control without adding that complexity to OSS.
 
@@ -65,16 +67,19 @@ Instead, recommend users place the app behind their choice of **reverse proxy / 
 
 **Decision:** Support both no auth and OAuth 2.1
 **Rationale**
+
 - We want to allow users to test the MCP server locally very easily without worrying about authentication.
 - At least for now, OAuth 2.1 is the only authentication method in the MCP protocol, and we want users to be able to deploy ContextHub and have web client users to be able to be authorized.
 
 **Decision:** Implement only the Resource server, delegate the Authorization server to third parties
 **Rationale**
+
 - Many IdPs (Okta, Auth0, Microsoft, AWS) allow you to set up an authorization server, and provide authentication, user management, roles and other features.
 - We have to implement the resource server in order to authorize access to MCP resources in a secure way.
 - If we would want to implement an authorization server, we would have to implement many endpoints and provide a web-based authentication to the users, all of which are quite complicated and difficult to make compliant with all the different auth methods ContextHub customers might want.
 
 **Downsides**
+
 - Auth providers have limited support for dynamic client registration and they all implement it a little differently. The spec says that authorization servers should provide a registration endpoint which clients can use to register themselves, but many providers require and admin access token for that endpoint or require you to use a different admin API to register. I believe most enterprise applications and users will want to explicitly register the clients anyway, and therefore the limited support for DCR is acceptable.
 
 **Decision:** Support JWT access tokens to begin with
@@ -98,6 +103,7 @@ Note that Okta doesn't support unauthenticated DCR, but rather requires an admin
    - Navigate to Applications -> Applications -> Create app integration
 
 **MCP server setup**
+
 1. Find the OAuth endpoints for the authorization server created in step 1
 2. Set the appropriate env vars with the information above
 3. Run the server
