@@ -1,0 +1,27 @@
+{
+  "name": "@contexthub/context-engine",
+  "type": "module",
+  "description": "AI engine for generating table and column context from various sources",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "build": "tsc",
+    "test:agent": "tsx src/test-openai-agent-context-engine.ts"
+  },
+  "dependencies": {
+    "@contexthub/context-sources": "workspace:*",
+    "@contexthub/core": "workspace:*",
+    "@openai/agents": "0.0.14",
+    "zod": "3.25.66"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.8.3"
+  }
+}
