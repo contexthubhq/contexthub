@@ -2,8 +2,8 @@ import express, { type Request, type Response } from 'express';
 
 import dotenv from 'dotenv';
 import { mcpRouter } from './mcp/mcp-router.js';
-import { metadataRouter } from './mcp/auth/metadata-router.js';
-import { authMiddleware } from './mcp/auth/auth-middleware.js';
+import { metadataRouter } from './auth/metadata-router.js';
+import { authMiddleware } from './auth/auth-middleware.js';
 
 // Load environment variables
 dotenv.config();
