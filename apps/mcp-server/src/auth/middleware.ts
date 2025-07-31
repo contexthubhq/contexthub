@@ -5,6 +5,14 @@ import { requireBearerAuth } from '@modelcontextprotocol/sdk/server/auth/middlew
 import { OAuthTokenVerifier } from '@modelcontextprotocol/sdk/server/auth/provider.js';
 import { AuthConfig } from './config.js';
 
+/**
+ * Creates an Express middleware that authenticates requests using OAuth 2.0 Bearer tokens.
+ *
+ * If authentication is disabled, the middleware is a no-op.
+ *
+ * @param authConfig - The authentication configuration.
+ * @returns An Express middleware that authenticates requests using OAuth 2.0 Bearer tokens.
+ */
 export function createAuthMiddleware({
   authConfig,
 }: {

@@ -6,6 +6,14 @@ import {
 import { metadataHandler } from '@modelcontextprotocol/sdk/server/auth/handlers/metadata.js';
 import { AuthConfig } from './config.js';
 
+/**
+ * Creates an Express router that serves the OAuth 2.0 metadata endpoints.
+ *
+ * If authentication is disabled, the router is a no-op.
+ *
+ * @param authConfig - The authentication configuration.
+ * @returns An Express router that serves the authentication metadata endpoints.
+ */
 export function createAuthMetadataRouter({
   authConfig,
 }: {
