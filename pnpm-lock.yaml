@@ -131,28 +131,12 @@ importers:
 
   packages/data-sources/all:
     dependencies:
-      '@contexthub/data-sources-bigquery':
-        specifier: workspace:*
-        version: link:../bigquery
       '@contexthub/data-sources-common':
         specifier: workspace:*
         version: link:../common
       '@contexthub/data-sources-snowflake':
         specifier: workspace:*
         version: link:../snowflake
-    devDependencies:
-      typescript:
-        specifier: ^5.8.3
-        version: 5.8.3
-
-  packages/data-sources/bigquery:
-    dependencies:
-      '@contexthub/core':
-        specifier: workspace:*
-        version: link:../../core
-      '@contexthub/data-sources-common':
-        specifier: workspace:*
-        version: link:../common
     devDependencies:
       typescript:
         specifier: ^5.8.3
