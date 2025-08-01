@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { getDataSourceCredentials } from '@contexthub/data-sources-credentials';
+import { getDataSourceConnection } from '@contexthub/data-sources-connections';
 import { registry } from '@contexthub/data-sources-all';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
@@ -24,12 +24,12 @@ export function registerListColumns(server: McpServer) {
         `🔧 [get-table] Tool called. dataSourceId: ${dataSourceId}, fullyQualifiedTableName: ${fullyQualifiedTableName}`
       );
       try {
-        const credentials = await getDataSourceCredentials({
+        const connection = await getDataSourceConnection({
           dataSourceId,
         });
         const dataSource = registry.createInstance({
-          type: credentials.type,
-          credentials: credentials.credentials,
+          type: connection.type,
+          credentials: connection.credentials,
         });
         const columns = await dataSource.getColumnsList({
           fullyQualifiedTableName,

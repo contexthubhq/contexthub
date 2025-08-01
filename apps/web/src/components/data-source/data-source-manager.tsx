@@ -17,7 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { DataSourceCredentialsForm } from './data-source-credentials-form';
+import { DataSourceConnectionForm } from './data-source-connection-form';
 
 export function DataSourceManager({
   dataSources,
@@ -100,7 +100,7 @@ export function DataSourceManager({
               <DialogHeader>
                 <DialogTitle>Configure {selectedDataSource.name}</DialogTitle>
               </DialogHeader>
-              <DataSourceCredentialsForm
+              <DataSourceConnectionForm
                 dataSource={selectedDataSource}
                 onClose={handleCloseModal}
               />

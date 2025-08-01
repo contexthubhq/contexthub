@@ -1,4 +1,4 @@
-import { getDataSourceCredentialsList } from '@contexthub/data-sources-credentials';
+import { getDataSourceConnectionsList } from '@contexthub/data-sources-connections';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
 export function registerListDataSources(server: McpServer) {
@@ -11,11 +11,11 @@ export function registerListDataSources(server: McpServer) {
     async () => {
       console.log(`🔧 [list-data-sources] Tool called.`);
       try {
-        const credentials = await getDataSourceCredentialsList();
-        const returnValue = credentials.map((credential) => {
+        const connections = await getDataSourceConnectionsList();
+        const returnValue = connections.map((connection) => {
           return {
-            id: credential.id,
-            type: credential.type,
+            id: connection.id,
+            type: connection.type,
           };
         });
         return {

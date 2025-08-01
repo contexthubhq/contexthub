@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { getDataSourceCredentials } from '@contexthub/data-sources-credentials';
+import { getDataSourceConnection } from '@contexthub/data-sources-connections';
 import { registry } from '@contexthub/data-sources-all';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
@@ -20,12 +20,12 @@ export function registerListTables(server: McpServer) {
         `🔧 [list-tables] Tool called. dataSourceId: ${dataSourceId}`
       );
       try {
-        const credentials = await getDataSourceCredentials({
+        const connection = await getDataSourceConnection({
           dataSourceId,
         });
         const dataSource = registry.createInstance({
-          type: credentials.type,
-          credentials: credentials.credentials,
+          type: connection.type,
+          credentials: connection.credentials,
         });
         const tables = await dataSource.getTablesList();
         console.log(
