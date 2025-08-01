@@ -14,12 +14,5 @@ export async function updateDataSourceConnection({
     data: {
       credentials,
     },
-    select: {
-      id: true,
-      type: true,
-      credentials: true,
-      createdAt: true,
-      updatedAt: true,
-    },
   });
 }

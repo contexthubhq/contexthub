@@ -12,12 +12,5 @@ export async function createDataSourceConnection({
       type,
       credentials,
     },
-    select: {
-      id: true,
-      type: true,
-      credentials: true,
-      createdAt: true,
-      updatedAt: true,
-    },
   });
 }
