@@ -1,6 +1,6 @@
 import { DataSourceCredential, prisma } from '@contexthub/database';
 
-export async function createDataSourceCredentials({
+export async function createDataSourceConnection({
   type,
   credentials,
 }: {

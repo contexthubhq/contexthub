@@ -1,7 +1,7 @@
 {
-  "name": "@contexthub/data-sources-credentials",
+  "name": "@contexthub/data-sources-connections",
   "type": "module",
-  "description": "Data source credentials package for ContextHub",
+  "description": "Data source connections package for ContextHub",
   "exports": {
     ".": {
       "types": "./src/index.ts",

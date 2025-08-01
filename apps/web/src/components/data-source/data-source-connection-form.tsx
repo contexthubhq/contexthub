@@ -4,9 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { DialogFooter } from '@/components/ui/dialog';
-import { createDataSourceCredentialsAction } from '@/actions/create-data-source-credentials';
+import { createDataSourceConnectionAction } from '@/actions/create-data-source-connection';
 
-export function DataSourceCredentialsForm({
+export function DataSourceConnectionForm({
   dataSource,
   onClose,
 }: {
@@ -28,7 +28,7 @@ export function DataSourceCredentialsForm({
         string
       >;
 
-      const result = await createDataSourceCredentialsAction({
+      const result = await createDataSourceConnectionAction({
         type: dataSource.type,
         credentials,
       });

@@ -23,9 +23,9 @@ importers:
       '@contexthub/data-sources-all':
         specifier: workspace:*
         version: link:../../packages/data-sources/all
-      '@contexthub/data-sources-credentials':
+      '@contexthub/data-sources-connections':
         specifier: workspace:*
-        version: link:../../packages/data-sources/credentials
+        version: link:../../packages/data-sources/connections
       '@modelcontextprotocol/sdk':
         specifier: ^1.16.0
         version: 1.16.0
@@ -63,9 +63,9 @@ importers:
       '@contexthub/data-sources-all':
         specifier: workspace:*
         version: link:../../packages/data-sources/all
-      '@contexthub/data-sources-credentials':
+      '@contexthub/data-sources-connections':
         specifier: workspace:*
-        version: link:../../packages/data-sources/credentials
+        version: link:../../packages/data-sources/connections
       '@radix-ui/react-dialog':
         specifier: ^1.1.14
         version: 1.1.14(@types/react-dom@19.1.6(@types/react@19.1.8))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -161,7 +161,7 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
-  packages/data-sources/credentials:
+  packages/data-sources/connections:
     dependencies:
       '@contexthub/database':
         specifier: workspace:*
