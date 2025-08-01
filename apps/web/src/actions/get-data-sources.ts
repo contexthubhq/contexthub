@@ -1,7 +1,7 @@
 'use server';
 
 import { registry } from '@contexthub/data-sources-all';
-import type { DataSourceInfo, FieldInfo } from '@/common/data-source-info';
+import type { DataSourceInfo, FieldInfo } from '@/types/data-source-info';
 
 export async function getDataSources(): Promise<DataSourceInfo[]> {
   const dataSources = registry.getAll();

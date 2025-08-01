@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Database, Settings } from 'lucide-react';
-import type { DataSourceInfo } from '../../common/data-source-info';
+import type { DataSourceInfo } from '@/types/data-source-info';
 import {
   Card,
   CardContent,
