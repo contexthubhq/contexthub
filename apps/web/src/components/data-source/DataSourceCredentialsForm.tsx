@@ -1,5 +1,5 @@
 import React from 'react';
-import type { DataSourceInfo } from '../common/data-source-info';
+import type { DataSourceInfo } from '../../common/data-source-info';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,7 +20,11 @@ export function DataSourceCredentialsForm({
     // TODO: Replace with actual API call to save credentials
     console.log('Saving credentials:', data);
     alert(
-      `Credentials saved for ${dataSource.name}!\n\n${JSON.stringify(data, null, 2)}`
+      `Credentials saved for ${dataSource.name}!\n\n${JSON.stringify(
+        data,
+        null,
+        2
+      )}`
     );
 
     onClose?.();
@@ -29,7 +33,7 @@ export function DataSourceCredentialsForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {dataSource.description && (
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           {dataSource.description}
         </p>
       )}
