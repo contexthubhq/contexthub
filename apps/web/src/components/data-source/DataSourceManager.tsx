@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Database, Settings } from 'lucide-react';
-import type { DataSourceInfo } from '../common/data-source-info';
+import type { DataSourceInfo } from '@/types/data-source-info';
 import {
   Card,
   CardContent,
@@ -39,7 +39,7 @@ export function DataSourceManager({
   };
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Data Sources</h1>
         <p className="text-muted-foreground mt-2">
@@ -51,9 +51,9 @@ export function DataSourceManager({
       {dataSources.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <Database className="h-12 w-12 text-muted-foreground mb-4" />
+            <Database className="text-muted-foreground mb-4 h-12 w-12" />
             <p className="text-lg font-medium">No data sources available</p>
-            <p className="text-muted-foreground text-center max-w-sm">
+            <p className="text-muted-foreground max-w-sm text-center">
               No data source connectors are currently registered. Please check
               your configuration.
             </p>
@@ -78,12 +78,12 @@ export function DataSourceManager({
               </CardHeader>
               <CardContent>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">
+                  <span className="text-muted-foreground text-sm">
                     {dataSource.fields.length} configuration{' '}
                     {dataSource.fields.length === 1 ? 'field' : 'fields'}
                   </span>
                   <Button variant="ghost" size="sm">
-                    <Settings className="h-4 w-4 mr-2" />
+                    <Settings className="mr-2 h-4 w-4" />
                     Configure
                   </Button>
                 </div>
