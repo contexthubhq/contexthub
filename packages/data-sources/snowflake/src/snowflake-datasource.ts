@@ -89,10 +89,13 @@ export class SnowflakeDataSource implements DataSource {
   }
 
   async getColumnsList({
-    tableCatalog,
-    tableSchema,
-    tableName,
+    fullyQualifiedTableName,
   }: GetColumnsListParams): Promise<ColumnDefinition[]> {
+    const [tableCatalog, tableSchema, tableName] =
+      fullyQualifiedTableName.split('.');
+    if (!tableCatalog || !tableSchema || !tableName) {
+      throw new Error('Invalid fully qualified table name');
+    }
     const query = `
     SELECT 
       TABLE_CATALOG,
@@ -103,9 +106,8 @@ export class SnowflakeDataSource implements DataSource {
       IS_NULLABLE,
       COLUMN_DEFAULT,
       ORDINAL_POSITION
-    FROM information_schema.columns
-    WHERE TABLE_CATALOG = '${tableCatalog}'
-    AND TABLE_SCHEMA = '${tableSchema}'
+    FROM ${tableCatalog}.information_schema.columns
+    WHERE TABLE_SCHEMA = '${tableSchema}'
     AND TABLE_NAME = '${tableName}'
     ORDER BY ORDINAL_POSITION
   `;
