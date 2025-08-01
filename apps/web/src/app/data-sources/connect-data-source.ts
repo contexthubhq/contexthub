@@ -1,15 +1,13 @@
 'use server';
 
+import { ConnectDataSourceFormData } from '@/types/connect-data-source-form';
 import { registry } from '@contexthub/data-sources-all';
-import { createDataSourceConnection as _createDataSourceConnection } from '@contexthub/data-sources-connections';
+import { createDataSourceConnection } from '@contexthub/data-sources-connections';
 
-export async function createDataSourceConnection({
+export async function connectDataSource({
   type,
   credentials,
-}: {
-  type: string;
-  credentials: Record<string, string>;
-}) {
+}: ConnectDataSourceFormData) {
   try {
     const dataSource = registry.createInstance({
       type,
@@ -20,7 +18,7 @@ export async function createDataSourceConnection({
       throw new Error('Failed to connect to data source');
     }
 
-    const result = await _createDataSourceConnection({
+    const result = await createDataSourceConnection({
       type,
       credentials,
     });
