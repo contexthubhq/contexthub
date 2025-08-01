@@ -11,10 +11,11 @@ model DataSourceConnection {
   id          String   @id @default(cuid())
   // For example: "bigquery", "snowflake".
   type        String
+  // The display name of the data source connection. Set by the user.
+  name        String
   // The credentials to connect to the data source.
   // The format of the credentials is data source specific.
   credentials Json
-
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now()) @updatedAt
 

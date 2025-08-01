@@ -16,6 +16,7 @@ export async function getDataSourceConnection({
     select: {
       id: true,
       type: true,
+      name: true,
       credentials: true,
       createdAt: true,
       updatedAt: true,

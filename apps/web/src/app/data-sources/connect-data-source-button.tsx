@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -99,6 +98,7 @@ export function ConnectDataSourceButton({
                     startTransition(async () => {
                       const result = await action({
                         type: selectedDataSource.type,
+                        name: data.name,
                         credentials: data.credentials,
                       });
                       if (result.success) {
@@ -112,6 +112,27 @@ export function ConnectDataSourceButton({
                   })}
                 >
                   <div className="pb-4">
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      rules={{ required: true }}
+                      defaultValue={''}
+                      render={({ field }) => (
+                        <div className="pb-4">
+                          <FormItem>
+                            <FormLabel required>Name</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormDescription>
+                              The name you want to use to identify this data
+                              source connection.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        </div>
+                      )}
+                    />
                     {selectedDataSource.fields.map((dataSourceField) => (
                       <FormField
                         key={dataSourceField.name}

@@ -16,6 +16,7 @@ export function registerListDataSources(server: McpServer) {
           return {
             id: connection.id,
             type: connection.type,
+            name: connection.name,
           };
         });
         return {
