@@ -1,5 +1,5 @@
 import { Inbox } from 'lucide-react';
-import { Card, CardContent } from './ui/card';
+import { Card } from './ui/card';
 
 export function EmptySection({
   title,
@@ -18,7 +18,7 @@ export function EmptySection({
         </div>
       </Card>
       <div className="flex flex-col items-center justify-center gap-2">
-        <h1 className="text-xl font-medium">{title}</h1>
+        <h2 className="text-xl font-medium">{title}</h2>
         <p className="text-muted-foreground text-sm">{description}</p>
       </div>
 
