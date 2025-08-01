@@ -7,7 +7,7 @@ export async function updateDataSourceConnection({
   id: string;
   credentials: Record<string, string>;
 }): Promise<void> {
-  await prisma.dataSourceCredential.update({
+  await prisma.dataSourceConnection.update({
     where: {
       id,
     },
