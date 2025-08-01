@@ -13,7 +13,6 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@contexthub/data-sources-bigquery": "workspace:*",
     "@contexthub/data-sources-common": "workspace:*",
     "@contexthub/data-sources-snowflake": "workspace:*"
   },
