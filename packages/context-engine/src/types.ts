@@ -56,11 +56,6 @@ export interface TableContextResult {
   context: TableContext;
 
   /**
-   * Confidence score for the generated context (0-1)
-   */
-  confidence: number;
-
-  /**
    * Sources used to generate this context
    */
   sourcesUsed: string[];
@@ -79,9 +74,4 @@ export interface ColumnContextResult {
    * Generated column context
    */
   context: ColumnContext;
-
-  /**
-   * Confidence score for the generated context (0-1)
-   */
-  confidence: number;
 }

@@ -105,8 +105,7 @@ async function testOpenAIAgentContextEngine() {
 
       // Test creating new context sources
       console.log('🔧 Testing context source creation:');
-      const newSource = new InMemoryTextInputContextSource();
-      await newSource.create({
+      const newSource = new InMemoryTextInputContextSource({
         text: 'This is a test text input for the context source.',
         description: 'Test description',
       });

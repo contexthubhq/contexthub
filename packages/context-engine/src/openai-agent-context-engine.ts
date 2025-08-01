@@ -1,6 +1,6 @@
 import type { GenerateTableContextInput, TableContextResult } from './types.js';
 import type { ContextEngine } from './context-engine.js';
-import type { TableContext } from '@contexthub/core';
+import type { TableContext, TableDefinition } from '@contexthub/core';
 import { Agent, run } from '@openai/agents';
 
 /**
@@ -84,7 +84,6 @@ export class OpenAIAgentContextEngine implements ContextEngine {
     return {
       table: input.table,
       context,
-      confidence: 0.8, // Default confidence for agent-generated content
       sourcesUsed,
     };
   }
@@ -93,7 +92,7 @@ export class OpenAIAgentContextEngine implements ContextEngine {
    * Generate prompt for individual context source processing
    */
   private generateTableContextPrompt(
-    table: any,
+    table: TableDefinition,
     previousContext: string
   ): string {
     return `You are a database expert. Based on the available tools and any previous context information, provide additional insights about what the table "${table.tableName}" in schema "${table.tableSchema}" is used for.
@@ -122,7 +121,7 @@ Provide clear, concise additional information based on the tools available. If t
    * Generate prompt for final synthesis of all accumulated context
    */
   private generateFinalSynthesisPrompt(
-    table: any,
+    table: TableDefinition,
     accumulatedContext: string
   ): string {
     return `You are a database expert. Synthesize the following accumulated context information into a clear, comprehensive description of what the table "${table.tableName}" in schema "${table.tableSchema}" is used for.
