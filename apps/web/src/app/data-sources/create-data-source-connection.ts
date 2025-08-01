@@ -1,9 +1,9 @@
 'use server';
 
 import { registry } from '@contexthub/data-sources-all';
-import { createDataSourceConnection } from '@contexthub/data-sources-connections';
+import { createDataSourceConnection as _createDataSourceConnection } from '@contexthub/data-sources-connections';
 
-export async function createDataSourceConnectionAction({
+export async function createDataSourceConnection({
   type,
   credentials,
 }: {
@@ -20,7 +20,7 @@ export async function createDataSourceConnectionAction({
       throw new Error('Failed to connect to data source');
     }
 
-    const result = await createDataSourceConnection({
+    const result = await _createDataSourceConnection({
       type,
       credentials,
     });

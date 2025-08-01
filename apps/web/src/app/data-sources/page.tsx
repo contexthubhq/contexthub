@@ -1,22 +1,23 @@
 import React from 'react';
-import { getDataSources } from '@/actions/get-data-sources';
-import { DataSourceManager } from '@/components/data-source/data-source-manager';
 import { PageHeader } from '@/components/layout/page-header';
-import { Button } from '@/components/ui/button';
-import { PlusIcon } from 'lucide-react';
+import { ConnectDataSourceButton } from './connect-data-source-button';
+import { getAvailableDataSources } from './get-available-data-sources';
+import { getDataSourceConnections } from './get-data-source-connections';
 
 export default async function DataSourcesPage() {
-  const dataSources = await getDataSources();
+  const availableDataSources = await getAvailableDataSources();
+  const dataSourceConnections = await getDataSourceConnections();
 
   return (
     <div className="space-y-4">
       <PageHeader title="Data sources">
-        <Button>
-          <PlusIcon className="h-4 w-4" />
-          Add data source
-        </Button>
+        <ConnectDataSourceButton availableDataSources={availableDataSources} />
       </PageHeader>
-      <DataSourceManager dataSources={dataSources} />
+      <div className="flex flex-col gap-4">
+        {dataSourceConnections.map((connection) => (
+          <div key={connection.id}>{connection.type}</div>
+        ))}
+      </div>
     </div>
   );
 }
