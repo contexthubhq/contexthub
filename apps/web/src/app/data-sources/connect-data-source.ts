@@ -6,6 +6,7 @@ import { createDataSourceConnection } from '@contexthub/data-sources-connections
 
 export async function connectDataSource({
   type,
+  name,
   credentials,
 }: ConnectDataSourceFormData) {
   try {
@@ -20,6 +21,7 @@ export async function connectDataSource({
 
     const result = await createDataSourceConnection({
       type,
+      name,
       credentials,
     });
 

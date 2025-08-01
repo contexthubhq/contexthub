@@ -19,7 +19,7 @@ export default async function DataSourcesPage() {
       </PageHeader>
       <div className="flex flex-col gap-4">
         {dataSourceConnections.map((connection) => (
-          <div key={connection.id}>{connection.type}</div>
+          <div key={connection.id}>{connection.name}</div>
         ))}
       </div>
     </div>
