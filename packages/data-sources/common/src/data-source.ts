@@ -5,9 +5,7 @@ export interface QueryResult {
 }
 
 export interface GetColumnsListParams {
-  tableName: string;
-  tableSchema: string;
-  tableCatalog: string;
+  fullyQualifiedTableName: string;
 }
 
 export interface DataSource {
