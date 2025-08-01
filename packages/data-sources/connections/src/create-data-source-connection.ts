@@ -1,4 +1,4 @@
-import { DataSourceCredential, prisma } from '@contexthub/database';
+import { prisma } from '@contexthub/database';
 
 export async function createDataSourceConnection({
   type,
@@ -6,8 +6,8 @@ export async function createDataSourceConnection({
 }: {
   type: string;
   credentials: Record<string, string>;
-}): Promise<DataSourceCredential> {
-  const dataSourceCredential = await prisma.dataSourceCredential.create({
+}): Promise<void> {
+  await prisma.dataSourceConnection.create({
     data: {
       type,
       credentials,
@@ -20,5 +20,4 @@ export async function createDataSourceConnection({
       updatedAt: true,
     },
   });
-  return dataSourceCredential;
 }

@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model DataSourceCredential {
+model DataSourceConnection {
   id          String   @id @default(cuid())
   // For example: "bigquery", "snowflake".
   type        String
@@ -18,5 +18,5 @@ model DataSourceCredential {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now()) @updatedAt
 
-  @@map("data_source_credentials")
+  @@map("data_source_connections")
 }

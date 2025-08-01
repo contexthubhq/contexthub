@@ -9,7 +9,7 @@ export async function getDataSourceConnection({
 }: {
   dataSourceId: string;
 }): Promise<DataSourceConnection> {
-  const dataSourceConnection = await prisma.dataSourceCredential.findUnique({
+  const dataSourceConnection = await prisma.dataSourceConnection.findUnique({
     where: {
       id: dataSourceId,
     },
