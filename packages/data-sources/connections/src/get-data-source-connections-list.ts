@@ -9,6 +9,9 @@ export async function getDataSourceConnectionsList(): Promise<
       type: true,
       name: true,
     },
+    orderBy: {
+      createdAt: 'desc',
+    },
   });
   return dataSourceConnectionsList;
 }
