@@ -11,7 +11,7 @@ export class InMemoryTextInputContextSource implements ContextSource {
   private text: string = '';
   private description: string = '';
 
-  constructor(text: string, description?: string) {
+  constructor({ text, description }: InMemoryTextInputConfig) {
     this.text = text;
     this.description = description || '';
   }
