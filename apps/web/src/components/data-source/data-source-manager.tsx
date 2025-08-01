@@ -17,7 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { DataSourceCredentialsForm } from './DataSourceCredentialsForm';
+import { DataSourceCredentialsForm } from './data-source-credentials-form';
 
 export function DataSourceManager({
   dataSources,
