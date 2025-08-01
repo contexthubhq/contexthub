@@ -47,6 +47,7 @@ function DataSourceConnectionDisplay({
 }: {
   dataSourceConnections: { id: string; name: string }[];
 }) {
+  // Note: We expect there to be at least one data source connection if this component is rendered.
   const [selectedDataSourceConnection, setSelectedDataSourceConnection] =
     useState(dataSourceConnections[0].id);
   return (
