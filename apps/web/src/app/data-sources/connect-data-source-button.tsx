@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -47,7 +48,7 @@ export function ConnectDataSourceButton({
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [pending, startTransition] = useTransition();
-  const form = useForm();
+  const form = useForm<ConnectDataSourceFormData>();
 
   const handleDataSourceSelect = (dataSource: DataSourceInfo) => {
     setSelectedDataSource(dataSource);
@@ -98,7 +99,7 @@ export function ConnectDataSourceButton({
                     startTransition(async () => {
                       const result = await action({
                         type: selectedDataSource.type,
-                        credentials: data,
+                        credentials: data.credentials,
                       });
                       if (result.success) {
                         handleCloseModal();
@@ -110,41 +111,42 @@ export function ConnectDataSourceButton({
                     });
                   })}
                 >
-                  {selectedDataSource.fields.map((dataSourceField) => (
-                    <FormField
-                      key={dataSourceField.name}
-                      control={form.control}
-                      name={dataSourceField.name}
-                      rules={{
-                        required: dataSourceField.isRequired
-                          ? `${dataSourceField.name} is required`
-                          : false,
-                      }}
-                      defaultValue={''}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel required={dataSourceField.isRequired}>
-                            {dataSourceField.name}
-                          </FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormDescription>
-                            {dataSourceField.description ?? ''}
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  ))}
+                  <div className="pb-4">
+                    {selectedDataSource.fields.map((dataSourceField) => (
+                      <FormField
+                        key={dataSourceField.name}
+                        control={form.control}
+                        name={`credentials.${dataSourceField.name}`}
+                        rules={{ required: dataSourceField.isRequired }}
+                        defaultValue={''}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel required={dataSourceField.isRequired}>
+                              {dataSourceField.name}
+                            </FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormDescription>
+                              {dataSourceField.description ?? ''}
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    ))}
 
-                  {form.formState.errors.root && (
-                    <p className="text-destructive text-[0.8rem] font-medium">
-                      {form.formState.errors.root.message}
-                    </p>
-                  )}
+                    {form.formState.errors.root && (
+                      <p className="text-destructive text-[0.8rem] font-medium">
+                        {form.formState.errors.root.message}
+                      </p>
+                    )}
+                  </div>
 
                   <DialogFooter>
+                    <Button variant="outline" onClick={handleCloseModal}>
+                      Cancel
+                    </Button>
                     <Button type="submit" disabled={pending}>
                       {pending ? 'Connecting...' : 'Connect'}
                     </Button>
