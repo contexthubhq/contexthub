@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import type { DataSourceInfo } from '../common/data-source-info';
+import type { DataSourceInfo } from '@/types/data-source-info';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { DialogFooter } from '@/components/ui/dialog';
-import { createDataSourceCredentialsAction } from '../actions/create-data-source-credentials';
+import { createDataSourceCredentialsAction } from '@/actions/create-data-source-credentials';
 
 export function DataSourceCredentialsForm({
   dataSource,
