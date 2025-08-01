@@ -11,6 +11,7 @@
     "@contexthub/core": "workspace:*",
     "@contexthub/data-sources-all": "workspace:*",
     "@contexthub/data-sources-connections": "workspace:*",
+    "@hookform/resolvers": "^5.2.1",
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-dropdown-menu": "^2.1.15",
     "@radix-ui/react-label": "^2.1.7",
@@ -23,8 +24,10 @@
     "next": "^15.4.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-hook-form": "^7.61.1",
     "tailwind-merge": "^2.6.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "3.25.66"
   },
   "devDependencies": {
     "@types/node": "24.1.0",
