@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { DialogFooter } from '@/components/ui/dialog';
-import { createDataSourceConnectionAction } from '@/actions/create-data-source-connection';
+
+import { createDataSourceConnection } from './create-data-source-connection';
 
 export function DataSourceConnectionForm({
   dataSource,
@@ -28,7 +29,7 @@ export function DataSourceConnectionForm({
         string
       >;
 
-      const result = await createDataSourceConnectionAction({
+      const result = await createDataSourceConnection({
         type: dataSource.type,
         credentials,
       });
@@ -36,7 +37,7 @@ export function DataSourceConnectionForm({
       if (result.success) {
         onClose?.();
       } else {
-        setError(result.error || 'Failed to save credentials');
+        setError(result.error || 'Failed to connect to data source');
       }
     } catch (error) {
       setError('An unexpected error occurred');
@@ -89,7 +90,7 @@ export function DataSourceConnectionForm({
           Cancel
         </Button>
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Saving...' : 'Save Configuration'}
+          {isSubmitting ? 'Connecting...' : 'Connect'}
         </Button>
       </DialogFooter>
     </form>
