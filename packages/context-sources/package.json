@@ -1,7 +1,7 @@
 {
-  "name": "@contexthub/data-sources-connections",
+  "name": "@contexthub/context-sources",
   "type": "module",
-  "description": "Data source connections package for ContextHub",
+  "description": "Context sources for table and column inference",
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -13,11 +13,11 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@contexthub/database": "workspace:*",
-    "zod": "3.25.66"
+    "@contexthub/core": "workspace:*",
+    "zod": "3.25.66",
+    "@openai/agents": "^0.0.14"
   },
   "devDependencies": {
-    "@types/node": "24.1.0",
     "typescript": "^5.8.3"
   }
 }
