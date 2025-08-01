@@ -39,15 +39,7 @@ export function DataSourceManager({
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Data Sources</h1>
-        <p className="text-muted-foreground mt-2">
-          Connect to your data sources to start generating context for your
-          tables.
-        </p>
-      </div>
-
+    <div>
       {dataSources.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
