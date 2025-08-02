@@ -16,15 +16,11 @@ import {
 } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import type { SelectedTable } from '@/types/tables-query-result';
 
 interface SelectTablesProps {
   connectionId: string;
 }
-
-interface SelectedTable {
-  fullyQualifiedName: string;
-}
-
 export function SelectTables({ connectionId }: SelectTablesProps) {
   const {
     data: tablesQueryResult,
