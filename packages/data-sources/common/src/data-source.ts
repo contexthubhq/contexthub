@@ -8,9 +8,18 @@ export interface GetColumnsListParams {
   fullyQualifiedTableName: string;
 }
 
+export interface GetTablesListParams {
+  /**
+   * If provided, only tables in this list will be returned.
+   */
+  selectedTables?: {
+    fullyQualifiedTableName: string;
+  }[];
+}
+
 export interface DataSource {
   testConnection(): Promise<boolean>;
   executeQuery(query: string): Promise<QueryResult>;
-  getTablesList(): Promise<TableDefinition[]>;
+  getTablesList(params?: GetTablesListParams): Promise<TableDefinition[]>;
   getColumnsList(params: GetColumnsListParams): Promise<ColumnDefinition[]>;
 }

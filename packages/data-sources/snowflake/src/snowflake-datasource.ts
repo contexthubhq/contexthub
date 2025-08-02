@@ -5,6 +5,7 @@ import { z } from 'zod';
 import {
   type DataSource,
   type GetColumnsListParams,
+  GetTablesListParams,
   type QueryResult,
   registry,
 } from '@contexthub/data-sources-common';
@@ -68,7 +69,9 @@ export class SnowflakeDataSource implements DataSource {
     }
   }
 
-  async getTablesList(): Promise<TableDefinition[]> {
+  async getTablesList(
+    params?: GetTablesListParams
+  ): Promise<TableDefinition[]> {
     const query = `SHOW TABLES IN ACCOUNT`;
     const schema = z.array(
       z.object({
@@ -80,12 +83,25 @@ export class SnowflakeDataSource implements DataSource {
     );
     const results = await this.executeQuery(query);
     const parsedRows = schema.parse(results.rows);
-    return parsedRows.map((row) => ({
+    const tables = parsedRows.map((row) => ({
       tableName: row.name,
       tableSchema: row.schema_name,
       tableCatalog: row.database_name,
       fullyQualifiedTableName: `${row.database_name}.${row.schema_name}.${row.name}`,
     }));
+    // Fetching all tables and then filtering afterwards might be inefficient.
+    // If this becomes a problem, we can adjust the query and do the filtering
+    // in the Snowflake database instead.
+    if (params?.selectedTables) {
+      const selectedTablesSet = new Set(
+        params.selectedTables.map((table) => table.fullyQualifiedTableName)
+      );
+      return tables.filter((table) =>
+        selectedTablesSet.has(table.fullyQualifiedTableName)
+      );
+    } else {
+      return tables;
+    }
   }
 
   async getColumnsList({
