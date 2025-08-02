@@ -5,6 +5,7 @@ import './globals.css';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import { ReactQueryProvider } from './react-query-provider';
+import { Toaster } from '@/components/ui/sonner';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -27,6 +28,7 @@ export default function RootLayout({
             <SidebarInset className="px-6">{children}</SidebarInset>
           </SidebarProvider>
         </ReactQueryProvider>
+        <Toaster />
       </body>
     </html>
   );
