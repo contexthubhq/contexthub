@@ -14,6 +14,7 @@ import {
 import { DataSourceInfo } from '@/types/data-source-info';
 import { ConnectDataSourceFormData } from '@/types/connect-data-source-form';
 import { useState } from 'react';
+import { useDataSourceConnection } from '@/api/use-data-source-connection';
 
 export function DataSourceDisplay({
   dataSourceConnections,
@@ -68,6 +69,36 @@ function DataSourceConnectionDisplay({
           ))}
         </SelectContent>
       </Select>
+      <DataSourceConnectionTableDisplay
+        connectionId={selectedDataSourceConnection}
+      />
+    </div>
+  );
+}
+
+function DataSourceConnectionTableDisplay({
+  connectionId,
+}: {
+  connectionId: string;
+}) {
+  const { data: dataSourceConnectionDetails, isLoading } =
+    useDataSourceConnection({
+      connectionId,
+    });
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!dataSourceConnectionDetails) {
+    return <div>No data source connection details found</div>;
+  }
+
+  return (
+    <div>
+      {dataSourceConnectionDetails.tables
+        .map((table) => table.tableName)
+        .join(', ')}
     </div>
   );
 }
