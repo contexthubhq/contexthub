@@ -34,5 +34,7 @@ model SelectedTable {
 
   connection DataSourceConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
 
+  @@unique([connectionId, fullyQualifiedName])
+
   @@map("selected_tables")
 }
