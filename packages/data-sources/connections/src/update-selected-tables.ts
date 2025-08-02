@@ -15,11 +15,13 @@ export async function updateSelectedTables({
       },
     });
 
-    await tx.selectedTable.createMany({
-      data: selectedTables.map((table) => ({
-        connectionId,
-        fullyQualifiedName: table.fullyQualifiedName,
-      })),
-    });
+    if (selectedTables.length > 0) {
+      await tx.selectedTable.createMany({
+        data: selectedTables.map((table) => ({
+          connectionId,
+          fullyQualifiedName: table.fullyQualifiedName,
+        })),
+      });
+    }
   });
 }
