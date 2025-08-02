@@ -19,7 +19,7 @@ async function getTables({
 
   const data = await response.json();
   if (!response.ok) {
-    throw Error('Failed to fetch data source connection');
+    throw Error('Failed to fetch tables.');
   }
 
   return tablesQueryResultSchema.parse(data);
