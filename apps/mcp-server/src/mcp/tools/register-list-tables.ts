@@ -1,6 +1,9 @@
 import { z } from 'zod';
 
-import { getDataSourceConnection } from '@contexthub/data-sources-connections';
+import {
+  getDataSourceConnection,
+  getSelectedTables,
+} from '@contexthub/data-sources-connections';
 import { registry } from '@contexthub/data-sources-all';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
@@ -20,23 +23,34 @@ export function registerListTables(server: McpServer) {
         `🔧 [list-tables] Tool called. dataSourceId: ${dataSourceId}`
       );
       try {
-        const connection = await getDataSourceConnection({
-          id: dataSourceId,
-        });
+        const [connection, selectedTables] = await Promise.all([
+          getDataSourceConnection({
+            id: dataSourceId,
+          }),
+          getSelectedTables({
+            connectionId: dataSourceId,
+          }),
+        ]);
         const dataSource = registry.createInstance({
           type: connection.type,
           credentials: connection.credentials,
         });
+        const selectedTablesSet = new Set(
+          selectedTables.map((table) => table.fullyQualifiedName)
+        );
         const tables = await dataSource.getTablesList();
+        const filteredTables = tables.filter((table) =>
+          selectedTablesSet.has(table.fullyQualifiedTableName)
+        );
         console.log(
           '✅ [list-tables] Success, response length:',
-          tables.length
+          filteredTables.length
         );
         return {
           content: [
             {
               type: 'text',
-              text: JSON.stringify(tables),
+              text: JSON.stringify(filteredTables),
             },
           ],
         };
