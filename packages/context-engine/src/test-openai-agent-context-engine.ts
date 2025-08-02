@@ -65,7 +65,6 @@ async function testOpenAIAgentContextEngine() {
 
       console.log('✅ Context Generation Complete!\n');
       console.log('📊 Results:');
-      console.log('   Confidence:', result.confidence);
       console.log('   Sources Used:', result.sourcesUsed.join(', '));
       console.log('   Description:', result.context.description);
       console.log('');
