@@ -19,5 +19,20 @@ model DataSourceConnection {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @default(now()) @updatedAt
 
+  // The tables that have been selected by the user for this data source.
+  selectedTables SelectedTable[]
+
   @@map("data_source_connections")
+}
+
+// A table that has been selected by the user for a data source.
+model SelectedTable {
+  id                 String   @id @default(cuid())
+  fullyQualifiedName String
+  connectionId       String
+  createdAt          DateTime @default(now())
+
+  connection DataSourceConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+
+  @@map("selected_tables")
 }
