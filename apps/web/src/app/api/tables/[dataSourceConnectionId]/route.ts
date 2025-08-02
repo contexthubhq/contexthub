@@ -24,9 +24,6 @@ export async function GET(
   const tableTree = buildTableTree({ tables });
 
   return NextResponse.json({
-    id: dataSourceConnection.id,
-    name: dataSourceConnection.name,
-    type: dataSourceConnection.type,
     tables,
     tableTree,
   });
