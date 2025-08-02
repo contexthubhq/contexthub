@@ -12,6 +12,7 @@ async function updateSelectedTables({
     `/api/tables/${dataSourceConnectionId}/selected`,
     {
       method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ selectedTables }),
     }
   );
