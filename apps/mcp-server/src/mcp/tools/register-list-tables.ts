@@ -21,7 +21,7 @@ export function registerListTables(server: McpServer) {
       );
       try {
         const connection = await getDataSourceConnection({
-          dataSourceId,
+          id: dataSourceId,
         });
         const dataSource = registry.createInstance({
           type: connection.type,
