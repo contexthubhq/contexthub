@@ -5,13 +5,13 @@ import { type DataSourceConnection } from './types.js';
 const credentialsSchema = z.record(z.string(), z.string());
 
 export async function getDataSourceConnection({
-  dataSourceId,
+  id,
 }: {
-  dataSourceId: string;
+  id: string;
 }): Promise<DataSourceConnection> {
   const dataSourceConnection = await prisma.dataSourceConnection.findUnique({
     where: {
-      id: dataSourceId,
+      id,
     },
     select: {
       id: true,
@@ -23,7 +23,7 @@ export async function getDataSourceConnection({
     },
   });
   if (!dataSourceConnection) {
-    throw new Error(`DataSource connection with id ${dataSourceId} not found`);
+    throw new Error(`DataSource connection with id ${id} not found`);
   }
   return {
     ...dataSourceConnection,
