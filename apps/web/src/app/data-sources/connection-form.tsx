@@ -44,10 +44,13 @@ export function ConnectionForm({
   const [pending, startTransition] = useTransition();
 
   // Initialize all credential fields with empty strings to prevent controlled/uncontrolled issues
-  const initialCredentials = dataSource.fields.reduce((acc, field) => {
-    acc[field.name] = initialData?.credentials?.[field.name] || '';
-    return acc;
-  }, {} as Record<string, string>);
+  const initialCredentials = dataSource.fields.reduce(
+    (acc, field) => {
+      acc[field.name] = initialData?.credentials?.[field.name] || '';
+      return acc;
+    },
+    {} as Record<string, string>
+  );
 
   const form = useForm<ConnectDataSourceFormData>({
     defaultValues: {
