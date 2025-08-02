@@ -14,6 +14,8 @@ import {
 import { DataSourceInfo } from '@/types/data-source-info';
 import { ConnectDataSourceFormData } from '@/types/connect-data-source-form';
 import { useState } from 'react';
+import { useTablesQuery } from '@/api/use-tables-query';
+import { TableTree } from '@/components/table-tree';
 
 export function DataSourceDisplay({
   dataSourceConnections,
@@ -51,23 +53,70 @@ function DataSourceConnectionDisplay({
   const [selectedDataSourceConnection, setSelectedDataSourceConnection] =
     useState(dataSourceConnections[0].id);
   return (
-    <div className="flex max-w-sm flex-col gap-2">
-      <h2 className="text-sm">Selected connection</h2>
-      <Select
-        value={selectedDataSourceConnection}
-        onValueChange={setSelectedDataSourceConnection}
-      >
-        <SelectTrigger>
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {dataSourceConnections.map((connection) => (
-            <SelectItem key={connection.id} value={connection.id}>
-              {connection.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+    <div className="flex flex-col gap-8">
+      <div className="max-w-sm">
+        <Select
+          value={selectedDataSourceConnection}
+          onValueChange={setSelectedDataSourceConnection}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {dataSourceConnections.map((connection) => (
+              <SelectItem key={connection.id} value={connection.id}>
+                {connection.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <DataSourceConnectionTableDisplay
+        connectionId={selectedDataSourceConnection}
+      />
+    </div>
+  );
+}
+
+function DataSourceConnectionTableDisplay({
+  connectionId,
+}: {
+  connectionId: string;
+}) {
+  const {
+    data: tablesQueryResult,
+    isLoading,
+    error,
+  } = useTablesQuery({
+    dataSourceConnectionId: connectionId,
+  });
+  const [selectedTables, setSelectedTables] = useState<Set<string>>(new Set());
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error loading tables: {error.message}</div>;
+  }
+
+  if (!tablesQueryResult) {
+    return <div>No tables received. Please try again.</div>;
+  }
+
+  return (
+    <div className="flex max-w-md flex-col gap-2">
+      <div className="flex flex-row items-center gap-4">
+        <h2 className="text-lg font-medium">Select tables</h2>
+        <p className="text-muted-foreground text-sm">
+          {selectedTables.size} selected
+        </p>
+      </div>
+      <TableTree
+        tableTree={tablesQueryResult.tableTree}
+        selectedTables={selectedTables}
+        onSelectionChange={setSelectedTables}
+      />
     </div>
   );
 }
