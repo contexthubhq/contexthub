@@ -14,7 +14,7 @@ import {
 import { DataSourceInfo } from '@/types/data-source-info';
 import { ConnectDataSourceFormData } from '@/types/connect-data-source-form';
 import { useState } from 'react';
-import { useDataSourceConnection } from '@/api/use-data-source-connection';
+import { useTablesQuery } from '@/api/use-tables-query';
 import { TableTree } from '@/components/table-tree';
 
 export function DataSourceDisplay({
@@ -84,18 +84,25 @@ function DataSourceConnectionTableDisplay({
 }: {
   connectionId: string;
 }) {
-  const { data: dataSourceConnectionDetails, isLoading } =
-    useDataSourceConnection({
-      connectionId,
-    });
+  const {
+    data: tablesQueryResult,
+    isLoading,
+    error,
+  } = useTablesQuery({
+    dataSourceConnectionId: connectionId,
+  });
   const [selectedTables, setSelectedTables] = useState<Set<string>>(new Set());
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  if (!dataSourceConnectionDetails) {
-    return <div>No data source connection details found</div>;
+  if (error) {
+    return <div>Error loading tables: {error.message}</div>;
+  }
+
+  if (!tablesQueryResult) {
+    return <div>No tables received. Please try again.</div>;
   }
 
   return (
@@ -107,7 +114,7 @@ function DataSourceConnectionTableDisplay({
         </p>
       </div>
       <TableTree
-        tableTree={dataSourceConnectionDetails.tableTree}
+        tableTree={tablesQueryResult.tableTree}
         selectedTables={selectedTables}
         onSelectionChange={setSelectedTables}
       />
