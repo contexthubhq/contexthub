@@ -25,7 +25,9 @@ model DataSourceConnection {
   @@map("data_source_connections")
 }
 
-// A table that has been selected by the user for a data source.
+// A table that has been selected by the user for a data source. This table is meant
+// to only contain information on which tables have been selected and not be connected
+// to any other tables as it might be deleted.
 model SelectedTable {
   id                 String   @id @default(cuid())
   fullyQualifiedName String

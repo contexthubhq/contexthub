@@ -6,3 +6,7 @@ export type DataSourceConnection = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export type SelectedTable = {
+  fullyQualifiedName: string;
+};
