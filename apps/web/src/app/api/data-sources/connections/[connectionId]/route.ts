@@ -21,7 +21,7 @@ export async function GET(
   });
 
   const tables: TableDefinition[] = await dataSource.getTablesList();
-  const tableTree = buildTableTree(tables);
+  const tableTree = buildTableTree({ tables });
 
   return NextResponse.json({
     id: dataSourceConnection.id,

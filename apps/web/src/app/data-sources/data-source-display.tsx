@@ -15,6 +15,7 @@ import { DataSourceInfo } from '@/types/data-source-info';
 import { ConnectDataSourceFormData } from '@/types/connect-data-source-form';
 import { useState } from 'react';
 import { useDataSourceConnection } from '@/api/use-data-source-connection';
+import { TableTree } from '@/components/table-tree';
 
 export function DataSourceDisplay({
   dataSourceConnections,
@@ -52,23 +53,25 @@ function DataSourceConnectionDisplay({
   const [selectedDataSourceConnection, setSelectedDataSourceConnection] =
     useState(dataSourceConnections[0].id);
   return (
-    <div className="flex max-w-sm flex-col gap-2">
-      <h2 className="text-sm">Selected connection</h2>
-      <Select
-        value={selectedDataSourceConnection}
-        onValueChange={setSelectedDataSourceConnection}
-      >
-        <SelectTrigger>
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {dataSourceConnections.map((connection) => (
-            <SelectItem key={connection.id} value={connection.id}>
-              {connection.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+    <div className="flex flex-col gap-8">
+      <div className="flex max-w-sm flex-col gap-2">
+        <h2 className="text-sm">Selected connection</h2>
+        <Select
+          value={selectedDataSourceConnection}
+          onValueChange={setSelectedDataSourceConnection}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {dataSourceConnections.map((connection) => (
+              <SelectItem key={connection.id} value={connection.id}>
+                {connection.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
       <DataSourceConnectionTableDisplay
         connectionId={selectedDataSourceConnection}
       />
@@ -85,6 +88,7 @@ function DataSourceConnectionTableDisplay({
     useDataSourceConnection({
       connectionId,
     });
+  const [selectedTables, setSelectedTables] = useState<Set<string>>(new Set());
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -95,10 +99,18 @@ function DataSourceConnectionTableDisplay({
   }
 
   return (
-    <div>
-      {dataSourceConnectionDetails.tables
-        .map((table) => table.tableName)
-        .join(', ')}
+    <div className="flex max-w-md flex-col gap-2">
+      <div className="flex flex-row items-center gap-4">
+        <h2 className="text-lg font-medium">Select tables</h2>
+        <p className="text-muted-foreground text-sm">
+          {selectedTables.size} selected
+        </p>
+      </div>
+      <TableTree
+        tableTree={dataSourceConnectionDetails.tableTree}
+        selectedTables={selectedTables}
+        onSelectionChange={setSelectedTables}
+      />
     </div>
   );
 }
