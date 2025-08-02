@@ -17,6 +17,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import type { SelectedTable } from '@/types/tables-query-result';
+import { toast } from 'sonner';
 
 interface SelectTablesProps {
   connectionId: string;
@@ -75,6 +76,7 @@ export function SelectTables({ connectionId }: SelectTablesProps) {
       })
     );
     await updateSelectedTables({ selectedTables: tablesToSave });
+    toast.success('Tables updated');
   }, [selectedTables, updateSelectedTables]);
 
   const handleReset = useCallback(() => {
