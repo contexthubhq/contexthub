@@ -144,7 +144,7 @@ export function SelectTables({ connectionId }: SelectTablesProps) {
       <CardHeader>
         <CardTitle>Select tables</CardTitle>
         <CardDescription>
-          Select the tables you want to use for your data source.
+          Only the selected tables will be published via the MCP server.
         </CardDescription>
       </CardHeader>
       <Separator />
