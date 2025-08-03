@@ -1,4 +1,7 @@
-import { Database, FileJson } from 'lucide-react';
+'use client';
+
+import { ChevronRight, Database, FileJson } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
 import {
   Sidebar,
@@ -9,23 +12,20 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import Link from 'next/link';
 
-const items = [
-  {
-    title: 'Data sources',
-    url: '/data-sources',
-    icon: Database,
-  },
-  {
-    title: 'Context',
-    url: '/context',
-    icon: FileJson,
-  },
-];
-
 export function AppSidebar() {
+  const pathname = usePathname();
+
   return (
     <Sidebar>
       <SidebarHeader className="border-b">
@@ -46,16 +46,44 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
+              <SidebarMenuItem key="data-sources">
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === '/data-sources'}
+                >
+                  <Link href="/data-sources">
+                    <Database />
+                    <span>Data sources</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+            <SidebarMenu>
+              <Collapsible defaultOpen className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton>
+                      <FileJson />
+                      <span>Context</span>
+                      <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={pathname === '/context/tables-and-columns'}
+                        >
+                          <Link href="/context/tables-and-columns">
+                            Tables and columns
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
                 </SidebarMenuItem>
-              ))}
+              </Collapsible>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
