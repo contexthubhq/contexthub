@@ -8,14 +8,43 @@ import { useExpansion } from './use-expansion';
 
 interface TableTreeProps {
   tableTree: DataSourceTableTree;
-  selectedTables: Set<string>;
-  onSelectionChange: (selectedTables: Set<string>) => void;
+  /**
+   * Currently selected tables. Optional when `selectable` is false.
+   */
+  selectedTables?: Set<string>;
+  /**
+   * Callback invoked whenever the selected tables change. Optional when `selectable` is false.
+   */
+  onSelectionChange?: (selectedTables: Set<string>) => void;
+  /**
+   * Whether the tree should render checkboxes and enable selection.
+   * Defaults to `true` for backwards-compatibility.
+   */
+  selectable?: boolean;
+  /**
+   * Currently highlighted table ID. Optional when `highlightable` is false.
+   */
+  highlightedTable?: string;
+  /**
+   * Callback invoked when a table is clicked for highlighting.
+   * Optional when `highlightable` is false.
+   */
+  onHighlightChange?: (tableId: string | null) => void;
+  /**
+   * Whether the tree should enable table highlighting on click.
+   * Defaults to `false`.
+   */
+  highlightable?: boolean;
 }
 
 export function TableTree({
   tableTree,
   selectedTables,
   onSelectionChange,
+  selectable = true,
+  highlightedTable,
+  onHighlightChange,
+  highlightable = false,
 }: TableTreeProps) {
   const {
     expandedCatalogs,
@@ -43,7 +72,7 @@ export function TableTree({
       catalogTableIds.forEach((id) => newSelectedTables.delete(id));
     }
 
-    onSelectionChange(newSelectedTables);
+    onSelectionChange?.(newSelectedTables);
   };
 
   const handleSchemaSelectionChange = ({
@@ -68,7 +97,7 @@ export function TableTree({
       schemaTableIds.forEach((id) => newSelectedTables.delete(id));
     }
 
-    onSelectionChange(newSelectedTables);
+    onSelectionChange?.(newSelectedTables);
   };
 
   const handleTableSelectionChange = ({
@@ -86,7 +115,7 @@ export function TableTree({
       newSelectedTables.delete(tableId);
     }
 
-    onSelectionChange(newSelectedTables);
+    onSelectionChange?.(newSelectedTables);
   };
 
   if (!tableTree.catalogs.length) {
@@ -110,6 +139,10 @@ export function TableTree({
           onCatalogSelectionChange={handleCatalogSelectionChange}
           onSchemaSelectionChange={handleSchemaSelectionChange}
           onTableSelectionChange={handleTableSelectionChange}
+          selectable={selectable}
+          highlightedTable={highlightedTable}
+          onHighlightChange={onHighlightChange}
+          highlightable={highlightable}
           onToggleCatalogExpansion={toggleCatalogExpansion}
           onToggleSchemaExpansion={toggleSchemaExpansion}
         />

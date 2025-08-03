@@ -11,22 +11,29 @@ import { SchemaItem } from './schema-item';
 interface CatalogItemProps {
   tableTree: DataSourceTableTree;
   catalog: DataSourceTableTree['catalogs'][number];
-  selectedTables: Set<string>;
+  selectedTables?: Set<string>;
   expandedCatalogs: Set<string>;
   expandedSchemas: Set<string>;
-  onCatalogSelectionChange: (params: {
+  /** Whether the tree is selectable */
+  selectable: boolean;
+  /** Currently highlighted table ID */
+  highlightedTable?: string;
+  /** Whether the tree supports highlighting */
+  highlightable?: boolean;
+  onCatalogSelectionChange?: (params: {
     catalogName: string;
     checked: boolean;
   }) => void;
-  onSchemaSelectionChange: (params: {
+  onSchemaSelectionChange?: (params: {
     catalogName: string;
     schemaName: string;
     checked: boolean;
   }) => void;
-  onTableSelectionChange: (params: {
+  onTableSelectionChange?: (params: {
     tableId: string;
     checked: boolean;
   }) => void;
+  onHighlightChange?: (tableId: string | null) => void;
   onToggleCatalogExpansion: (params: { catalogName: string }) => void;
   onToggleSchemaExpansion: (params: {
     catalogName: string;
@@ -37,7 +44,7 @@ interface CatalogItemProps {
 export function CatalogItem({
   tableTree,
   catalog,
-  selectedTables,
+  selectedTables = new Set<string>(),
   expandedCatalogs,
   expandedSchemas,
   onCatalogSelectionChange,
@@ -45,6 +52,10 @@ export function CatalogItem({
   onTableSelectionChange,
   onToggleCatalogExpansion,
   onToggleSchemaExpansion,
+  selectable,
+  highlightedTable,
+  onHighlightChange,
+  highlightable,
 }: CatalogItemProps) {
   const checkboxState = getCatalogCheckboxState({
     tableTree,
@@ -64,15 +75,17 @@ export function CatalogItem({
       }
     >
       <div className={STYLES.hoverRow}>
-        <Checkbox
-          checked={checkboxState}
-          onCheckedChange={(checked) =>
-            onCatalogSelectionChange({
-              catalogName: catalog.name,
-              checked: checked === true,
-            })
-          }
-        />
+        {selectable && (
+          <Checkbox
+            checked={checkboxState}
+            onCheckedChange={(checked) =>
+              onCatalogSelectionChange?.({
+                catalogName: catalog.name,
+                checked: checked === true,
+              })
+            }
+          />
+        )}
         <CollapsibleTrigger className="flex flex-1 items-center space-x-2 text-left">
           {isExpanded ? (
             <ChevronDown className={STYLES.chevron} />
@@ -95,6 +108,10 @@ export function CatalogItem({
             expandedSchemas={expandedSchemas}
             onSelectionChange={onSchemaSelectionChange}
             onTableSelectionChange={onTableSelectionChange}
+            selectable={selectable}
+            highlightedTable={highlightedTable}
+            onHighlightChange={onHighlightChange}
+            highlightable={highlightable}
             onToggleExpansion={onToggleSchemaExpansion}
           />
         ))}
