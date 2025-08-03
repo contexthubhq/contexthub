@@ -12,6 +12,16 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { X } from 'lucide-react';
+import { useState } from 'react';
 
 export function EditTable({
   connectionId,
@@ -78,8 +88,8 @@ function Columns({ columns }: { columns: ColumnMetadata[] }) {
       <Table className="text-xs">
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[100px]">Name</TableHead>
-            <TableHead className="w-[100px]">Type</TableHead>
+            <TableHead className="max-w-[50px]">Name</TableHead>
+            <TableHead className="max-w-[50px]">Type</TableHead>
             <TableHead>Description</TableHead>
             <TableHead>Example values</TableHead>
           </TableRow>
@@ -87,14 +97,16 @@ function Columns({ columns }: { columns: ColumnMetadata[] }) {
         <TableBody>
           {orderedColumns.map((column) => (
             <TableRow key={column.columnName}>
-              <TableCell className="w-[100px]">{column.columnName}</TableCell>
-              <TableCell className="text-muted-foreground w-[100px]">
+              <TableCell className="max-w-[50px] truncate whitespace-nowrap">
+                {column.columnName}
+              </TableCell>
+              <TableCell className="text-muted-foreground max-w-[50px] truncate whitespace-nowrap">
                 {column.dataType}
               </TableCell>
-              <TableCell className="text-muted-foreground">
+              <TableCell className="text-muted-foreground max-w-[100px] truncate">
                 <EditableDescription description={column.description} />
               </TableCell>
-              <TableCell className="text-muted-foreground">
+              <TableCell className="text-muted-foreground max-w-[100px] truncate">
                 <EditableExampleValues exampleValues={column.exampleValues} />
               </TableCell>
             </TableRow>
@@ -106,11 +118,159 @@ function Columns({ columns }: { columns: ColumnMetadata[] }) {
 }
 
 function EditableDescription({ description }: { description: string | null }) {
-  return <div className="text-muted-foreground">{description ?? ''}</div>;
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState<string>(description ?? '');
+  const [draft, setDraft] = useState<string>(value);
+
+  const onSave = () => {
+    setValue(draft);
+    setOpen(false);
+  };
+
+  const onCancel = () => {
+    setDraft(value);
+    setOpen(false);
+  };
+
+  const hasValue = value.trim().length > 0;
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <span
+          role="button"
+          tabIndex={0}
+          className="group block w-full cursor-pointer truncate whitespace-nowrap text-left focus:outline-none"
+        >
+          {hasValue ? (
+            value
+          ) : (
+            <span className="text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
+              Add description
+            </span>
+          )}
+        </span>
+      </PopoverTrigger>
+      <PopoverContent className="w-80">
+        <div className="flex flex-col gap-2">
+          <Textarea
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            placeholder="Add description..."
+            className="min-h-[120px]"
+          />
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" size="sm" onClick={onCancel}>
+              Cancel
+            </Button>
+            <Button size="sm" onClick={onSave}>
+              Save
+            </Button>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
 }
 
 function EditableExampleValues({ exampleValues }: { exampleValues: string[] }) {
+  const [open, setOpen] = useState(false);
+  const [values, setValues] = useState<string[]>(exampleValues);
+  const [draftValues, setDraftValues] = useState<string[]>(values);
+  const [newValue, setNewValue] = useState<string>('');
+
+  const addValue = () => {
+    const trimmed = newValue.trim();
+    if (!trimmed) return;
+    if (!draftValues.includes(trimmed)) {
+      setDraftValues([...draftValues, trimmed]);
+    }
+    setNewValue('');
+  };
+
+  const removeValue = (valueToRemove: string) => {
+    setDraftValues(draftValues.filter((v) => v !== valueToRemove));
+  };
+
+  const onSave = () => {
+    setValues(draftValues);
+    setOpen(false);
+  };
+
+  const onCancel = () => {
+    setDraftValues(values);
+    setOpen(false);
+  };
+
+  const hasValue = values.length > 0;
+
   return (
-    <div className="text-muted-foreground">{exampleValues.join(', ')}</div>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <span
+          role="button"
+          tabIndex={0}
+          className="group block w-full cursor-pointer truncate whitespace-nowrap text-left focus:outline-none"
+        >
+          {hasValue ? (
+            values.join(', ')
+          ) : (
+            <span className="text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
+              Add example values
+            </span>
+          )}
+        </span>
+      </PopoverTrigger>
+      <PopoverContent className="w-96">
+        <div className="flex flex-col gap-4">
+          <div className="flex max-h-48 flex-col gap-2 overflow-auto">
+            {draftValues.map((v) => (
+              <div
+                key={v}
+                className="flex items-center justify-between gap-2 rounded border px-2 py-1 text-sm"
+              >
+                <span className="truncate">{v}</span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-5 w-5 p-0"
+                  onClick={() => removeValue(v)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+            {draftValues.length === 0 && (
+              <p className="text-muted-foreground text-sm italic">No values</p>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <Input
+              value={newValue}
+              onChange={(e) => setNewValue(e.target.value)}
+              placeholder="New value"
+              className="flex-1"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  addValue();
+                }
+              }}
+            />
+            <Button size="sm" onClick={addValue} disabled={!newValue.trim()}>
+              Add
+            </Button>
+          </div>
+          <div className="flex justify-end gap-2 border-t pt-2">
+            <Button variant="secondary" size="sm" onClick={onCancel}>
+              Cancel
+            </Button>
+            <Button size="sm" onClick={onSave}>
+              Save
+            </Button>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }
