@@ -16,6 +16,10 @@ interface CatalogItemProps {
   expandedSchemas: Set<string>;
   /** Whether the tree is selectable */
   selectable: boolean;
+  /** Currently highlighted table ID */
+  highlightedTable?: string;
+  /** Whether the tree supports highlighting */
+  highlightable?: boolean;
   onCatalogSelectionChange?: (params: {
     catalogName: string;
     checked: boolean;
@@ -29,6 +33,7 @@ interface CatalogItemProps {
     tableId: string;
     checked: boolean;
   }) => void;
+  onHighlightChange?: (tableId: string | null) => void;
   onToggleCatalogExpansion: (params: { catalogName: string }) => void;
   onToggleSchemaExpansion: (params: {
     catalogName: string;
@@ -48,6 +53,9 @@ export function CatalogItem({
   onToggleCatalogExpansion,
   onToggleSchemaExpansion,
   selectable,
+  highlightedTable,
+  onHighlightChange,
+  highlightable,
 }: CatalogItemProps) {
   const checkboxState = getCatalogCheckboxState({
     tableTree,
@@ -101,6 +109,9 @@ export function CatalogItem({
             onSelectionChange={onSchemaSelectionChange}
             onTableSelectionChange={onTableSelectionChange}
             selectable={selectable}
+            highlightedTable={highlightedTable}
+            onHighlightChange={onHighlightChange}
+            highlightable={highlightable}
             onToggleExpansion={onToggleSchemaExpansion}
           />
         ))}

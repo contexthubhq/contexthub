@@ -21,6 +21,20 @@ interface TableTreeProps {
    * Defaults to `true` for backwards-compatibility.
    */
   selectable?: boolean;
+  /**
+   * Currently highlighted table ID. Optional when `highlightable` is false.
+   */
+  highlightedTable?: string;
+  /**
+   * Callback invoked when a table is clicked for highlighting.
+   * Optional when `highlightable` is false.
+   */
+  onHighlightChange?: (tableId: string | null) => void;
+  /**
+   * Whether the tree should enable table highlighting on click.
+   * Defaults to `false`.
+   */
+  highlightable?: boolean;
 }
 
 export function TableTree({
@@ -28,6 +42,9 @@ export function TableTree({
   selectedTables,
   onSelectionChange,
   selectable = true,
+  highlightedTable,
+  onHighlightChange,
+  highlightable = false,
 }: TableTreeProps) {
   const {
     expandedCatalogs,
@@ -123,6 +140,9 @@ export function TableTree({
           onSchemaSelectionChange={handleSchemaSelectionChange}
           onTableSelectionChange={handleTableSelectionChange}
           selectable={selectable}
+          highlightedTable={highlightedTable}
+          onHighlightChange={onHighlightChange}
+          highlightable={highlightable}
           onToggleCatalogExpansion={toggleCatalogExpansion}
           onToggleSchemaExpansion={toggleSchemaExpansion}
         />

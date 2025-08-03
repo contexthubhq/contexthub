@@ -5,6 +5,7 @@ import { TableTree } from '@/components/table-tree';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useState } from 'react';
 
 interface SelectTablesProps {
   connectionId: string;
@@ -12,12 +13,14 @@ interface SelectTablesProps {
 export function TableAndColumnContextEdit({ connectionId }: SelectTablesProps) {
   const {
     data: tablesQueryResult,
-    isFetching: isTablesQueryFetching,
     isLoading: isTablesQueryLoading,
     error: tablesQueryError,
   } = useTablesQuery({
     dataSourceConnectionId: connectionId,
   });
+  const [highlightedTableId, setHighlightedTableId] = useState<string | null>(
+    null
+  );
 
   if (isTablesQueryLoading) {
     return <div>Loading...</div>;
@@ -35,11 +38,32 @@ export function TableAndColumnContextEdit({ connectionId }: SelectTablesProps) {
     );
   }
 
+  const highlightedTable = tablesQueryResult?.tables.find(
+    (table) => table.fullyQualifiedTableName === highlightedTableId
+  );
+
   return (
-    <ScrollArea className="h-96 w-full">
-      {tablesQueryResult && (
-        <TableTree tableTree={tablesQueryResult.tableTree} selectable={false} />
-      )}
-    </ScrollArea>
+    <div className="grid grid-cols-3 gap-4">
+      <ScrollArea className="h-96 w-full">
+        {tablesQueryResult && (
+          <TableTree
+            tableTree={tablesQueryResult.tableTree}
+            selectable={false}
+            highlightable={true}
+            highlightedTable={highlightedTableId ?? undefined}
+            onHighlightChange={setHighlightedTableId}
+          />
+        )}
+      </ScrollArea>
+      <div className="col-span-2">
+        <div className="flex flex-col gap-4">
+          <h2 className="text-lg font-semibold">
+            {highlightedTable
+              ? highlightedTable.tableName
+              : 'No table selected'}
+          </h2>
+        </div>
+      </div>
+    </div>
   );
 }
