@@ -30,9 +30,20 @@ export async function GET(
   const tables: TableDefinition[] = await dataSource.getTablesList();
   const tableTree = buildTableTree({ tables });
 
+  const selectedTableDefinitions = tables.filter((table) =>
+    selectedTables.some(
+      (selectedTable) =>
+        selectedTable.fullyQualifiedName === table.fullyQualifiedTableName
+    )
+  );
+  const tableTreeSelectedOnly = buildTableTree({
+    tables: selectedTableDefinitions,
+  });
+
   return NextResponse.json({
     tables,
     tableTree,
     selectedTables,
+    tableTreeSelectedOnly,
   });
 }

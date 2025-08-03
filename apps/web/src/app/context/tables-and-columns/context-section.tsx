@@ -1,7 +1,7 @@
 'use client';
 
-import { EmptySection } from '@/components/empty-section';
-import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { EditContext } from './edit-context';
 import {
   Select,
   SelectContent,
@@ -9,11 +9,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { EmptySection } from '@/components/empty-section';
+import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { useState } from 'react';
-import { TableAndColumnContextEdit } from './table-and-column-context-edit';
 
-export function TableAndColumnContextSection({
+export function ContextSection({
   dataSourceConnections,
 }: {
   dataSourceConnections: { id: string; name: string }[];
@@ -22,15 +22,35 @@ export function TableAndColumnContextSection({
     return <NoDataSources />;
   }
 
-  // Note: We expect there to be at least one data source connection if this component is rendered.
-  const [selectedDataSourceConnection, setSelectedDataSourceConnection] =
+  return <_ContextSection dataSourceConnections={dataSourceConnections} />;
+}
+
+function _ContextSection({
+  dataSourceConnections,
+}: {
+  dataSourceConnections: { id: string; name: string }[];
+}) {
+  const [selectedDataSourceConnectionId, setSelectedDataSourceConnectionId] =
     useState(dataSourceConnections[0].id);
+
+  const selectedDataSourceConnection = dataSourceConnections.find(
+    (connection) => connection.id === selectedDataSourceConnectionId
+  );
+
+  if (!selectedDataSourceConnection) {
+    // Fallback: render nothing or an error message if the selected connection is not found
+    return (
+      <div className="text-red-500">
+        Selected data source connection not found.
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col gap-8">
       <div className="max-w-sm">
         <Select
-          value={selectedDataSourceConnection}
-          onValueChange={setSelectedDataSourceConnection}
+          value={selectedDataSourceConnectionId}
+          onValueChange={setSelectedDataSourceConnectionId}
         >
           <SelectTrigger>
             <SelectValue />
@@ -44,7 +64,10 @@ export function TableAndColumnContextSection({
           </SelectContent>
         </Select>
       </div>
-      <TableAndColumnContextEdit connectionId={selectedDataSourceConnection} />
+      <EditContext
+        connectionId={selectedDataSourceConnectionId}
+        connectionName={selectedDataSourceConnection.name}
+      />
     </div>
   );
 }
@@ -56,23 +79,8 @@ function NoDataSources() {
       description="Connect a data source to get started."
     >
       <div className="flex flex-row gap-2">
-        <Button variant="outline" asChild>
+        <Button asChild>
           <Link href="/data-sources">Connect a data source</Link>
-        </Button>
-      </div>
-    </EmptySection>
-  );
-}
-
-function NoTablesSelected() {
-  return (
-    <EmptySection
-      title="No tables selected"
-      description="Select a table to get started."
-    >
-      <div className="flex flex-row gap-2">
-        <Button variant="outline" asChild>
-          <Link href="/data-sources">Select a table</Link>
         </Button>
       </div>
     </EmptySection>
