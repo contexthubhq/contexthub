@@ -12,14 +12,15 @@ interface SchemaItemProps {
   tableTree: DataSourceTableTree;
   catalogName: string;
   schema: DataSourceTableTree['catalogs'][number]['schemas'][number];
-  selectedTables: Set<string>;
+  selectedTables?: Set<string>;
   expandedSchemas: Set<string>;
-  onSelectionChange: (params: {
+  selectable: boolean;
+  onSelectionChange?: (params: {
     catalogName: string;
     schemaName: string;
     checked: boolean;
   }) => void;
-  onTableSelectionChange: (params: {
+  onTableSelectionChange?: (params: {
     tableId: string;
     checked: boolean;
   }) => void;
@@ -33,11 +34,12 @@ export function SchemaItem({
   tableTree,
   catalogName,
   schema,
-  selectedTables,
+  selectedTables = new Set<string>(),
   expandedSchemas,
   onSelectionChange,
   onTableSelectionChange,
   onToggleExpansion,
+  selectable,
 }: SchemaItemProps) {
   const schemaKey = `${catalogName}.${schema.name}`;
   const isSchemaExpanded = expandedSchemas.has(schemaKey);
@@ -60,16 +62,18 @@ export function SchemaItem({
       }
     >
       <div className={STYLES.hoverRowSpaced}>
-        <Checkbox
-          checked={checkboxState}
-          onCheckedChange={(checked) =>
-            onSelectionChange({
-              catalogName,
-              schemaName: schema.name,
-              checked: checked === true,
-            })
-          }
-        />
+        {selectable && (
+          <Checkbox
+            checked={checkboxState}
+            onCheckedChange={(checked) =>
+              onSelectionChange?.({
+                catalogName,
+                schemaName: schema.name,
+                checked: checked === true,
+              })
+            }
+          />
+        )}
         <CollapsibleTrigger className="flex flex-1 items-center space-x-2 text-left">
           {isSchemaExpanded ? (
             <ChevronDown className={STYLES.chevron} />
@@ -88,6 +92,7 @@ export function SchemaItem({
             table={table}
             selectedTables={selectedTables}
             onSelectionChange={onTableSelectionChange}
+            selectable={selectable}
           />
         ))}
       </CollapsibleContent>

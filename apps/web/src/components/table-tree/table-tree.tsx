@@ -8,14 +8,26 @@ import { useExpansion } from './use-expansion';
 
 interface TableTreeProps {
   tableTree: DataSourceTableTree;
-  selectedTables: Set<string>;
-  onSelectionChange: (selectedTables: Set<string>) => void;
+  /**
+   * Currently selected tables. Optional when `selectable` is false.
+   */
+  selectedTables?: Set<string>;
+  /**
+   * Callback invoked whenever the selected tables change. Optional when `selectable` is false.
+   */
+  onSelectionChange?: (selectedTables: Set<string>) => void;
+  /**
+   * Whether the tree should render checkboxes and enable selection.
+   * Defaults to `true` for backwards-compatibility.
+   */
+  selectable?: boolean;
 }
 
 export function TableTree({
   tableTree,
   selectedTables,
   onSelectionChange,
+  selectable = true,
 }: TableTreeProps) {
   const {
     expandedCatalogs,
@@ -43,7 +55,7 @@ export function TableTree({
       catalogTableIds.forEach((id) => newSelectedTables.delete(id));
     }
 
-    onSelectionChange(newSelectedTables);
+    onSelectionChange?.(newSelectedTables);
   };
 
   const handleSchemaSelectionChange = ({
@@ -68,7 +80,7 @@ export function TableTree({
       schemaTableIds.forEach((id) => newSelectedTables.delete(id));
     }
 
-    onSelectionChange(newSelectedTables);
+    onSelectionChange?.(newSelectedTables);
   };
 
   const handleTableSelectionChange = ({
@@ -86,7 +98,7 @@ export function TableTree({
       newSelectedTables.delete(tableId);
     }
 
-    onSelectionChange(newSelectedTables);
+    onSelectionChange?.(newSelectedTables);
   };
 
   if (!tableTree.catalogs.length) {
@@ -110,6 +122,7 @@ export function TableTree({
           onCatalogSelectionChange={handleCatalogSelectionChange}
           onSchemaSelectionChange={handleSchemaSelectionChange}
           onTableSelectionChange={handleTableSelectionChange}
+          selectable={selectable}
           onToggleCatalogExpansion={toggleCatalogExpansion}
           onToggleSchemaExpansion={toggleSchemaExpansion}
         />
