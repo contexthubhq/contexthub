@@ -35,8 +35,16 @@ function _ContextSection({
 
   const selectedDataSourceConnection = dataSourceConnections.find(
     (connection) => connection.id === selectedDataSourceConnectionId
-  )!;
+  );
 
+  if (!selectedDataSourceConnection) {
+    // Fallback: render nothing or an error message if the selected connection is not found
+    return (
+      <div className="text-red-500">
+        Selected data source connection not found.
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col gap-8">
       <div className="max-w-sm">
