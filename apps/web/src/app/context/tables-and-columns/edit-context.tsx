@@ -6,11 +6,19 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useState } from 'react';
+import { EmptySection } from '@/components/empty-section';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 interface SelectTablesProps {
   connectionId: string;
+  connectionName: string;
 }
-export function TableAndColumnContextEdit({ connectionId }: SelectTablesProps) {
+
+export function EditContext({
+  connectionId,
+  connectionName,
+}: SelectTablesProps) {
   const {
     data: tablesQueryResult,
     isLoading: isTablesQueryLoading,
@@ -42,18 +50,24 @@ export function TableAndColumnContextEdit({ connectionId }: SelectTablesProps) {
     (table) => table.fullyQualifiedTableName === highlightedTableId
   );
 
+  if (!tablesQueryResult) {
+    return <div>Loading...</div>;
+  }
+
+  if (tablesQueryResult.tableTreeSelectedOnly.catalogs.length === 0) {
+    return <NoTablesSelected connectionName={connectionName} />;
+  }
+
   return (
     <div className="grid grid-cols-3 gap-4">
       <ScrollArea className="h-96 w-full">
-        {tablesQueryResult && (
-          <TableTree
-            tableTree={tablesQueryResult.tableTree}
-            selectable={false}
-            highlightable={true}
-            highlightedTable={highlightedTableId ?? undefined}
-            onHighlightChange={setHighlightedTableId}
-          />
-        )}
+        <TableTree
+          tableTree={tablesQueryResult.tableTreeSelectedOnly}
+          selectable={false}
+          highlightable={true}
+          highlightedTable={highlightedTableId ?? undefined}
+          onHighlightChange={setHighlightedTableId}
+        />
       </ScrollArea>
       <div className="col-span-2">
         <div className="flex flex-col gap-4">
@@ -65,5 +79,20 @@ export function TableAndColumnContextEdit({ connectionId }: SelectTablesProps) {
         </div>
       </div>
     </div>
+  );
+}
+
+function NoTablesSelected({ connectionName }: { connectionName: string }) {
+  return (
+    <EmptySection
+      title="No tables selected"
+      description={`Select which tables to include from the ${connectionName} data source or change the data source.`}
+    >
+      <div className="flex flex-row gap-2">
+        <Button asChild>
+          <Link href="/data-sources">Select tables</Link>
+        </Button>
+      </div>
+    </EmptySection>
   );
 }

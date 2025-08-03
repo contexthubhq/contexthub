@@ -8,6 +8,7 @@ export const selectedTableSchema = z.object({
 export const tablesQueryResultSchema = z.object({
   tables: z.array(tableDefinitionSchema),
   tableTree: dataSourceTableTreeSchema,
+  tableTreeSelectedOnly: dataSourceTableTreeSchema,
   selectedTables: z.array(selectedTableSchema),
 });
 
