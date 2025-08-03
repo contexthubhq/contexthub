@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { EmptySection } from '@/components/empty-section';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { EditTable } from './edit-table';
 
 interface SelectTablesProps {
   connectionId: string;
@@ -46,10 +47,6 @@ export function EditContext({
     );
   }
 
-  const highlightedTable = tablesQueryResult?.tables.find(
-    (table) => table.fullyQualifiedTableName === highlightedTableId
-  );
-
   if (!tablesQueryResult) {
     return <div>Loading...</div>;
   }
@@ -59,24 +56,32 @@ export function EditContext({
   }
 
   return (
-    <div className="grid grid-cols-3 gap-4">
-      <ScrollArea className="h-96 w-full">
-        <TableTree
-          tableTree={tablesQueryResult.tableTreeSelectedOnly}
-          selectable={false}
-          highlightable={true}
-          highlightedTable={highlightedTableId ?? undefined}
-          onHighlightChange={setHighlightedTableId}
-        />
-      </ScrollArea>
-      <div className="col-span-2">
-        <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-semibold">
-            {highlightedTable
-              ? highlightedTable.tableName
-              : 'No table selected'}
-          </h2>
-        </div>
+    <div className="grid grid-cols-4 gap-8">
+      <div className="col-span-1 flex flex-col gap-4">
+        <h3 className="text-md font-semibold">Tables</h3>
+        <ScrollArea className="h-[calc(100vh-15rem)] w-full">
+          <TableTree
+            tableTree={tablesQueryResult.tableTreeSelectedOnly}
+            selectable={false}
+            highlightable={true}
+            highlightedTable={highlightedTableId ?? undefined}
+            onHighlightChange={setHighlightedTableId}
+          />
+        </ScrollArea>
+      </div>
+      <div className="col-span-3">
+        {highlightedTableId ? (
+          <ScrollArea className="h-[calc(100vh-15rem)] w-full">
+            <EditTable
+              connectionId={connectionId}
+              fullyQualifiedTableName={highlightedTableId}
+            />
+          </ScrollArea>
+        ) : (
+          <h3 className="text-md">
+            Select a table from the list to edit the context
+          </h3>
+        )}
       </div>
     </div>
   );
