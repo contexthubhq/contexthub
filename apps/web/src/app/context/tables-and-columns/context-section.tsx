@@ -9,13 +9,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { EmptySection } from '@/components/empty-section';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export function ContextSection({
   dataSourceConnections,
 }: {
   dataSourceConnections: { id: string; name: string }[];
 }) {
-  // Note: We expect there to be at least one data source connection if this component is rendered.
+  if (dataSourceConnections.length === 0) {
+    return <NoDataSources />;
+  }
+
+  return <_ContextSection dataSourceConnections={dataSourceConnections} />;
+}
+
+function _ContextSection({
+  dataSourceConnections,
+}: {
+  dataSourceConnections: { id: string; name: string }[];
+}) {
   const [selectedDataSourceConnectionId, setSelectedDataSourceConnectionId] =
     useState(dataSourceConnections[0].id);
 
@@ -47,5 +61,20 @@ export function ContextSection({
         connectionName={selectedDataSourceConnection.name}
       />
     </div>
+  );
+}
+
+function NoDataSources() {
+  return (
+    <EmptySection
+      title="No data sources connected"
+      description="Connect a data source to get started."
+    >
+      <div className="flex flex-row gap-2">
+        <Button asChild>
+          <Link href="/data-sources">Connect a data source</Link>
+        </Button>
+      </div>
+    </EmptySection>
   );
 }
