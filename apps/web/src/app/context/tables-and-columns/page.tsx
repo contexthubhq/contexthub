@@ -1,6 +1,6 @@
 import React from 'react';
 import { PageHeader } from '@/components/layout/page-header';
-import { getDataSourceConnections } from '../../data-sources/get-data-source-connections';
+import { getDataSourceConnections } from '@/app/data-sources/get-data-source-connections';
 import { TableAndColumnContextSection } from './table-and-column-context-section';
 
 export default async function ContextPage() {
