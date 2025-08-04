@@ -6,18 +6,30 @@ import {
   getDataSourceConnection,
   getSelectedTables,
 } from '@contexthub/data-sources-connections';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { withErrorHandling } from '@/lib/with-error-handling';
+import { ApiError } from '@/lib/api-error';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(
-  _request: Request,
+async function getTablesHandler(
+  _request: NextRequest,
   { params }: { params: Promise<{ dataSourceConnectionId: string }> }
 ): Promise<NextResponse<TablesQueryResult>> {
   const { dataSourceConnectionId } = await params;
+  
+  if (!dataSourceConnectionId) {
+    throw ApiError.badRequest('Data source connection ID is required');
+  }
+
   const dataSourceConnection = await getDataSourceConnection({
     id: dataSourceConnectionId,
   });
+
+  if (!dataSourceConnection) {
+    throw ApiError.notFound('Data source connection not found');
+  }
+
   const dataSource = registry.createInstance({
     type: dataSourceConnection.type,
     credentials: dataSourceConnection.credentials,
@@ -47,3 +59,5 @@ export async function GET(
     tableTreeSelectedOnly,
   });
 }
+
+export const GET = withErrorHandling(getTablesHandler);
