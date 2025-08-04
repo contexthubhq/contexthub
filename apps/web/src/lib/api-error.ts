@@ -14,8 +14,8 @@ export class ApiError extends Error {
     );
   }
 
-  static badRequest(message: string, details?: unknown): ApiError {
-    return new ApiError(message, 400, details);
+  static badRequest(message: string): ApiError {
+    return new ApiError(message, 400);
   }
 
   static unauthorized(message: string = 'Unauthorized'): ApiError {
