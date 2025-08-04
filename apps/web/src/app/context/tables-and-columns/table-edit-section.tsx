@@ -70,16 +70,19 @@ export function TableEditSection({
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
         <h2 className="text-md font-semibold">
           {tableDetailsQueryResult.table.tableName}
         </h2>
       </div>
-      <div>
-        <p className="text-muted-foreground text-xs">
-          {tableDetailsQueryResult.table.description ?? 'Add a description...'}
-        </p>
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-2">
+          <h4 className="text-sm font-semibold">Table description</h4>
+          <EditableTableDescription
+            description={tableDetailsQueryResult.table.description}
+          />
+        </div>
         <div className="flex flex-col gap-2 pt-6">
           <h4 className="text-sm font-semibold">
             Columns ({tableDetailsQueryResult.columns.length})
@@ -96,7 +99,7 @@ function Columns({ columns }: { columns: ColumnMetadata[] }) {
     (a, b) => a.ordinalPosition - b.ordinalPosition
   );
   return (
-    <ScrollArea className="h-[calc(100vh-20rem)] w-full">
+    <ScrollArea className="h-[calc(100vh-25rem)] w-full">
       <Table className="text-xs" noWrapper>
         <TableHeader className="bg-background sticky top-0 z-10">
           <TableRow>
@@ -121,10 +124,12 @@ function Columns({ columns }: { columns: ColumnMetadata[] }) {
                 </Badge>
               </TableCell>
               <TableCell className="max-w-[100px] truncate">
-                <EditableDescription description={column.description} />
+                <EditableColumnDescription description={column.description} />
               </TableCell>
               <TableCell className="max-w-[100px] truncate">
-                <EditableExampleValues exampleValues={column.exampleValues} />
+                <EditableColumnExampleValues
+                  exampleValues={column.exampleValues}
+                />
               </TableCell>
             </TableRow>
           ))}
@@ -134,7 +139,11 @@ function Columns({ columns }: { columns: ColumnMetadata[] }) {
   );
 }
 
-function EditableDescription({ description }: { description: string | null }) {
+function EditableColumnDescription({
+  description,
+}: {
+  description: string | null;
+}) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState<string>(description ?? '');
   const [draft, setDraft] = useState<string>(value);
@@ -193,7 +202,11 @@ function EditableDescription({ description }: { description: string | null }) {
   );
 }
 
-function EditableExampleValues({ exampleValues }: { exampleValues: string[] }) {
+function EditableColumnExampleValues({
+  exampleValues,
+}: {
+  exampleValues: string[];
+}) {
   const [open, setOpen] = useState(false);
   const [values, setValues] = useState<string[]>(exampleValues);
   const [draftValues, setDraftValues] = useState<string[]>(values);
@@ -295,5 +308,83 @@ function EditableExampleValues({ exampleValues }: { exampleValues: string[] }) {
         </div>
       </PopoverContent>
     </Popover>
+  );
+}
+
+function EditableTableDescription({
+  description,
+}: {
+  description: string | null;
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [value, setValue] = useState<string>(description ?? '');
+  const [draft, setDraft] = useState<string>(value);
+
+  const onSave = () => {
+    setValue(draft);
+    setIsEditing(false);
+  };
+
+  const onCancel = () => {
+    setDraft(value);
+    setIsEditing(false);
+  };
+
+  const hasValue = value.trim().length > 0;
+
+  if (isEditing) {
+    return (
+      <div className="flex flex-col gap-2">
+        <Textarea
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          placeholder="Add a description..."
+          className="min-h-[80px] text-xs"
+          autoFocus
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              onCancel();
+            }
+            if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+              onSave();
+            }
+          }}
+        />
+        <div className="flex justify-end gap-2">
+          <Button variant="secondary" size="sm" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button size="sm" onClick={onSave}>
+            Save
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <p
+      className="group cursor-pointer text-xs transition-colors"
+      onClick={() => setIsEditing(true)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          setIsEditing(true);
+        }
+      }}
+    >
+      {hasValue ? (
+        <span className="flex items-center gap-3">
+          <span className="truncate">{value}</span>
+          <Pencil className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
+        </span>
+      ) : (
+        <span className="text-muted-foreground hover:text-foreground">
+          Add a description
+        </span>
+      )}
+    </p>
   );
 }
