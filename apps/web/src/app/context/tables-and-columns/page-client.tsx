@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { EditContext } from './edit-context';
+import { ContextEditSection } from './context-edit-section';
 import {
   Select,
   SelectContent,
@@ -13,19 +13,22 @@ import { EmptySection } from '@/components/empty-section';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
-export function ContextSection({
+/**
+ * Client component for the tables and columns context page.
+ */
+export function PageClient({
   dataSourceConnections,
 }: {
   dataSourceConnections: { id: string; name: string }[];
 }) {
   if (dataSourceConnections.length === 0) {
-    return <NoDataSources />;
+    return <EmptyPage />;
   }
 
-  return <_ContextSection dataSourceConnections={dataSourceConnections} />;
+  return <PageWithConnections dataSourceConnections={dataSourceConnections} />;
 }
 
-function _ContextSection({
+function PageWithConnections({
   dataSourceConnections,
 }: {
   dataSourceConnections: { id: string; name: string }[];
@@ -64,7 +67,7 @@ function _ContextSection({
           </SelectContent>
         </Select>
       </div>
-      <EditContext
+      <ContextEditSection
         connectionId={selectedDataSourceConnectionId}
         connectionName={selectedDataSourceConnection.name}
       />
@@ -72,7 +75,7 @@ function _ContextSection({
   );
 }
 
-function NoDataSources() {
+function EmptyPage() {
   return (
     <EmptySection
       title="No data sources connected"

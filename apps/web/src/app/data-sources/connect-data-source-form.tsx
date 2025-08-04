@@ -31,7 +31,10 @@ interface ConnectionFormProps {
   showCancelButton?: boolean;
 }
 
-export function ConnectionForm({
+/**
+ * The form to connect a data source.
+ */
+export function ConnectDataSourceForm({
   dataSource,
   action,
   onSuccess,

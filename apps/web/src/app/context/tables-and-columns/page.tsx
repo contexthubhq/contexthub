@@ -1,7 +1,7 @@
 import React from 'react';
 import { PageHeader } from '@/components/layout/page-header';
 import { getDataSourceConnections } from '@/app/data-sources/get-data-source-connections';
-import { ContextSection } from './context-section';
+import { PageClient } from './page-client';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,7 +10,7 @@ export default async function ContextPage() {
   return (
     <div className="space-y-4">
       <PageHeader title="Table and column context" />
-      <ContextSection dataSourceConnections={dataSourceConnections} />
+      <PageClient dataSourceConnections={dataSourceConnections} />
     </div>
   );
 }
