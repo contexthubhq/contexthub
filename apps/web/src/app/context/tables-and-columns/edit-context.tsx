@@ -10,6 +10,7 @@ import { EmptySection } from '@/components/empty-section';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { EditTable } from './edit-table';
+import { Separator } from '@/components/ui/separator';
 
 interface SelectTablesProps {
   connectionId: string;
@@ -56,7 +57,7 @@ export function EditContext({
   }
 
   return (
-    <div className="grid grid-cols-4 gap-8">
+    <div className="grid grid-cols-4 gap-4">
       <div className="col-span-1 flex flex-col gap-4">
         <h3 className="text-md font-semibold">Tables</h3>
         <ScrollArea className="h-[calc(100vh-15rem)] w-full">
@@ -69,18 +70,19 @@ export function EditContext({
           />
         </ScrollArea>
       </div>
-      <div className="col-span-3">
+      <div className="col-span-3 border-l pl-4">
         {highlightedTableId ? (
-          <ScrollArea className="h-[calc(100vh-15rem)] w-full">
-            <EditTable
-              connectionId={connectionId}
-              fullyQualifiedTableName={highlightedTableId}
-            />
-          </ScrollArea>
+          <EditTable
+            connectionId={connectionId}
+            fullyQualifiedTableName={highlightedTableId}
+          />
         ) : (
-          <h3 className="text-md">
-            Select a table from the list to edit the context
-          </h3>
+          <div className="flex flex-col gap-2">
+            <h3 className="text-md font-semibold">Select a table</h3>
+            <p className="text-muted-foreground text-sm">
+              Select a table from the list to edit the context.
+            </p>
+          </div>
         )}
       </div>
     </div>
