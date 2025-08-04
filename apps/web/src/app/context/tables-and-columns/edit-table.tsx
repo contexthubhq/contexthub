@@ -74,11 +74,11 @@ export function EditTable({
         </h2>
       </div>
       <div>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-muted-foreground text-xs">
           {tableDetailsQueryResult.table.description ?? 'Add a description...'}
         </p>
         <div className="flex flex-col gap-2 pt-6">
-          <h4 className="text-md font-semibold">
+          <h4 className="text-sm font-semibold">
             Columns ({tableDetailsQueryResult.columns.length})
           </h4>
           <Columns columns={tableDetailsQueryResult.columns} />
@@ -94,7 +94,7 @@ function Columns({ columns }: { columns: ColumnMetadata[] }) {
   );
   return (
     <ScrollArea className="h-[calc(100vh-20rem)] w-full">
-      <Table className="text-sm" noWrapper>
+      <Table className="text-xs" noWrapper>
         <TableHeader className="bg-background sticky top-0 z-10">
           <TableRow>
             <TableHead className="max-w-[50px]">Name</TableHead>
@@ -112,7 +112,7 @@ function Columns({ columns }: { columns: ColumnMetadata[] }) {
               <TableCell className="max-w-[40px] truncate whitespace-nowrap">
                 <Badge
                   variant="outline"
-                  className="text-muted-foreground px-1.5 text-sm font-normal"
+                  className="text-muted-foreground px-1.5 text-xs font-normal"
                 >
                   {column.dataType.toLowerCase()}
                 </Badge>
