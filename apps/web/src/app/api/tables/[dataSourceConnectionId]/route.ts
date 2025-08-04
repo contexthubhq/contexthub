@@ -8,7 +8,6 @@ import {
 } from '@contexthub/data-sources-connections';
 import { NextRequest, NextResponse } from 'next/server';
 import { withErrorHandling } from '@/lib/with-error-handling';
-import { ApiError } from '@/lib/api-error';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,17 +17,9 @@ async function getTablesHandler(
 ): Promise<NextResponse<TablesQueryResult>> {
   const { dataSourceConnectionId } = await params;
 
-  if (!dataSourceConnectionId) {
-    throw ApiError.badRequest('Data source connection ID is required');
-  }
-
   const dataSourceConnection = await getDataSourceConnection({
     id: dataSourceConnectionId,
   });
-
-  if (!dataSourceConnection) {
-    throw ApiError.notFound('Data source connection not found');
-  }
 
   const dataSource = registry.createInstance({
     type: dataSourceConnection.type,

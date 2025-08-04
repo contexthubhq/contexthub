@@ -10,10 +10,6 @@ async function putSelectedTablesHandler(
 ): Promise<NextResponse<{ success: boolean }>> {
   const { dataSourceConnectionId } = await params;
 
-  if (!dataSourceConnectionId) {
-    throw ApiError.badRequest('Data source connection ID is required');
-  }
-
   let body;
   try {
     body = await request.json();
@@ -29,12 +25,11 @@ async function putSelectedTablesHandler(
     ),
   });
 
-  let bodyParsed;
-  try {
-    bodyParsed = bodySchema.parse(body);
-  } catch (error) {
-    throw ApiError.badRequest('Invalid request body format', error);
+  const bodyParsedResult = bodySchema.safeParse(body);
+  if (!bodyParsedResult.success) {
+    throw ApiError.badRequest('Invalid request body format');
   }
+  const bodyParsed = bodyParsedResult.data;
 
   await updateSelectedTables({
     connectionId: dataSourceConnectionId,

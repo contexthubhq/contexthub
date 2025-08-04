@@ -6,7 +6,9 @@ type ApiHandler<T = any> = (
   context: T
 ) => Promise<NextResponse>;
 
-export function withErrorHandling<T = any>(handler: ApiHandler<T>): ApiHandler<T> {
+export function withErrorHandling<T = any>(
+  handler: ApiHandler<T>
+): ApiHandler<T> {
   return async (request: NextRequest, context: T) => {
     try {
       return await handler(request, context);

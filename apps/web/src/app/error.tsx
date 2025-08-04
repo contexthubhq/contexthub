@@ -2,7 +2,13 @@
 
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import Link from 'next/link';
 
@@ -15,7 +21,7 @@ export default function Error({
 }) {
   useEffect(() => {
     console.error('Page error:', error);
-    
+
     // Log to external service in production
     if (process.env.NODE_ENV === 'production') {
       // TODO: Integrate with error logging service (e.g., Sentry)

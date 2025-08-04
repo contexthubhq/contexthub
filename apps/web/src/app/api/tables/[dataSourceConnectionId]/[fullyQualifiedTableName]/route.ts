@@ -22,22 +22,10 @@ async function getTableDetailsHandler(
   }
 ): Promise<NextResponse<TableDetailsQueryResult>> {
   const { dataSourceConnectionId, fullyQualifiedTableName } = await params;
-  
-  if (!dataSourceConnectionId) {
-    throw ApiError.badRequest('Data source connection ID is required');
-  }
-  
-  if (!fullyQualifiedTableName) {
-    throw ApiError.badRequest('Fully qualified table name is required');
-  }
 
   const dataSourceConnection = await getDataSourceConnection({
     id: dataSourceConnectionId,
   });
-  
-  if (!dataSourceConnection) {
-    throw ApiError.notFound('Data source connection not found');
-  }
 
   const dataSource = registry.createInstance({
     type: dataSourceConnection.type,
@@ -48,9 +36,9 @@ async function getTableDetailsHandler(
   const tableDefinition = tableDefinitions.find(
     (table) => table.fullyQualifiedTableName === fullyQualifiedTableName
   );
-  
+
   if (!tableDefinition) {
-    throw ApiError.notFound('Table not found');
+    throw ApiError.internal('Table not found');
   }
 
   const columnDefinitions = await dataSource.getColumnsList({
