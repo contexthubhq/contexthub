@@ -112,7 +112,7 @@ export function MetricsTable() {
                   {metric.exampleQueries.length === 1 ? 'query' : 'queries'}
                 </span>
               ) : (
-                <></>
+                null
               )}
             </TableCell>
             <TableCell>{metric.unitOfMeasure ?? ''}</TableCell>
