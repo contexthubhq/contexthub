@@ -2,7 +2,7 @@ import { useTablesQuery } from '@/api/use-tables-query';
 import { useUpdateSelectedTablesMutation } from '@/api/use-update-selected-tables-mutation';
 import { TableTree } from '@/components/table-tree';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AlertCircle, Loader2 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -136,9 +136,8 @@ export function TableSelectionSection({ connectionId }: SelectTablesProps) {
     return (
       <Alert variant="destructive" className="max-w-md">
         <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          Error loading tables: {tablesQueryError.message}
-        </AlertDescription>
+        <AlertTitle>Error loading tables</AlertTitle>
+        <AlertDescription>{tablesQueryError.message}</AlertDescription>
       </Alert>
     );
   }

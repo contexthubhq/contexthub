@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle, Pencil } from 'lucide-react';
 import { useTableDetailsQuery } from '@/api/use-table-details-query';
 import { ColumnMetadata } from '@contexthub/core';
@@ -58,9 +58,8 @@ export function TableEditSection({
     return (
       <Alert variant="destructive" className="max-w-md">
         <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          Error loading table details: {tableDetailsQueryError.message}
-        </AlertDescription>
+        <AlertTitle>Error loading table details</AlertTitle>
+        <AlertDescription>{tableDetailsQueryError.message}</AlertDescription>
       </Alert>
     );
   }

@@ -2,7 +2,7 @@
 
 import { useTablesQuery } from '@/api/use-tables-query';
 import { TableTree } from '@/components/table-tree';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useState } from 'react';
@@ -43,9 +43,8 @@ export function ContextEditSection({
     return (
       <Alert variant="destructive" className="max-w-md">
         <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          Error loading tables: {tablesQueryError.message}
-        </AlertDescription>
+        <AlertTitle>Error loading tables</AlertTitle>
+        <AlertDescription>{tablesQueryError.message}</AlertDescription>
       </Alert>
     );
   }
