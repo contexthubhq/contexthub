@@ -30,11 +30,11 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 p-3 rounded-full bg-destructive/10">
-            <AlertTriangle className="h-6 w-6 text-destructive" />
+          <div className="bg-destructive/10 mx-auto mb-4 rounded-full p-3">
+            <AlertTriangle className="text-destructive h-6 w-6" />
           </div>
           <CardTitle>Something went wrong</CardTitle>
           <CardDescription>
@@ -43,12 +43,12 @@ export default function Error({
         </CardHeader>
         <CardContent className="space-y-4">
           {process.env.NODE_ENV === 'development' && (
-            <div className="p-3 bg-muted rounded-md">
-              <p className="text-sm font-mono text-muted-foreground">
+            <div className="bg-muted rounded-md p-3">
+              <p className="text-muted-foreground font-mono text-sm">
                 {error.message}
               </p>
               {error.digest && (
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-muted-foreground mt-1 text-xs">
                   Error ID: {error.digest}
                 </p>
               )}
@@ -56,13 +56,13 @@ export default function Error({
           )}
           <div className="flex gap-2">
             <Button onClick={reset} variant="outline" className="flex-1">
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Try Again
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Try again
             </Button>
             <Button asChild className="flex-1">
               <Link href="/">
-                <Home className="h-4 w-4 mr-2" />
-                Go Home
+                <Home className="mr-2 h-4 w-4" />
+                Go home
               </Link>
             </Button>
           </div>
