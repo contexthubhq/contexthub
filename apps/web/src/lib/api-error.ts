@@ -1,8 +1,5 @@
 export class ApiError extends Error {
-  constructor(
-    message: string,
-    public status: number
-  ) {
+  constructor(message: string, public status: number) {
     super(message);
     this.name = 'ApiError';
   }
@@ -14,8 +11,8 @@ export class ApiError extends Error {
     );
   }
 
-  static badRequest(message: string, details?: unknown): ApiError {
-    return new ApiError(message, 400, details);
+  static badRequest(message: string): ApiError {
+    return new ApiError(message, 400);
   }
 
   static unauthorized(message: string = 'Unauthorized'): ApiError {
