@@ -1,10 +1,5 @@
 export class ApiError extends Error {
-  constructor(
-    message: string,
-    public status: number,
-    public code?: string,
-    public details?: unknown
-  ) {
+  constructor(message: string, public status: number) {
     super(message);
     this.name = 'ApiError';
   }
@@ -17,31 +12,29 @@ export class ApiError extends Error {
   }
 
   static badRequest(message: string, details?: unknown): ApiError {
-    return new ApiError(message, 400, 'BAD_REQUEST', details);
+    return new ApiError(message, 400);
   }
 
   static unauthorized(message: string = 'Unauthorized'): ApiError {
-    return new ApiError(message, 401, 'UNAUTHORIZED');
+    return new ApiError(message, 401);
   }
 
   static forbidden(message: string = 'Forbidden'): ApiError {
-    return new ApiError(message, 403, 'FORBIDDEN');
+    return new ApiError(message, 403);
   }
 
   static notFound(message: string = 'Resource not found'): ApiError {
-    return new ApiError(message, 404, 'NOT_FOUND');
+    return new ApiError(message, 404);
   }
 
   static internal(message: string = 'Internal server error'): ApiError {
-    return new ApiError(message, 500, 'INTERNAL_ERROR');
+    return new ApiError(message, 500);
   }
 
   toJSON() {
     return {
       message: this.message,
       status: this.status,
-      code: this.code,
-      details: this.details,
     };
   }
 }

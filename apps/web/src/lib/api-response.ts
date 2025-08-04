@@ -7,11 +7,7 @@ export function createErrorResponse(error: unknown): NextResponse {
   if (error instanceof ApiError) {
     return NextResponse.json(
       {
-        error: {
-          message: error.message,
-          code: error.code,
-          details: error.details,
-        },
+        message: error.message,
       },
       { status: error.status }
     );
@@ -19,16 +15,14 @@ export function createErrorResponse(error: unknown): NextResponse {
 
   if (error instanceof Error) {
     // Log unexpected errors but don't expose details in production
-    const message = process.env.NODE_ENV === 'development' 
-      ? error.message 
-      : 'An unexpected error occurred';
+    const message =
+      process.env.NODE_ENV === 'development'
+        ? error.message
+        : 'An unexpected error occurred';
 
     return NextResponse.json(
       {
-        error: {
-          message,
-          code: 'INTERNAL_ERROR',
-        },
+        message,
       },
       { status: 500 }
     );
@@ -36,15 +30,8 @@ export function createErrorResponse(error: unknown): NextResponse {
 
   return NextResponse.json(
     {
-      error: {
-        message: 'An unexpected error occurred',
-        code: 'INTERNAL_ERROR',
-      },
+      message: 'An unexpected error occurred',
     },
     { status: 500 }
   );
-}
-
-export function createSuccessResponse<T>(data: T, status: number = 200): NextResponse<T> {
-  return NextResponse.json(data, { status });
 }
