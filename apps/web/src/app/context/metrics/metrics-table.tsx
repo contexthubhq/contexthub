@@ -100,9 +100,7 @@ export function MetricsTable() {
             <TableCell>
               {metric.formula ? (
                 <Check className="size-4 text-muted-foreground" />
-              ) : (
-                null
-              )}
+              ) : null}
             </TableCell>
             <TableCell>{metric.tags.join(', ')}</TableCell>
             <TableCell>
@@ -111,9 +109,7 @@ export function MetricsTable() {
                   {metric.exampleQueries.length}{' '}
                   {metric.exampleQueries.length === 1 ? 'query' : 'queries'}
                 </span>
-              ) : (
-                null
-              )}
+              ) : null}
             </TableCell>
             <TableCell>{metric.unitOfMeasure ?? ''}</TableCell>
           </TableRow>
