@@ -59,7 +59,7 @@ export default function GlobalError({
               <div className="flex gap-2">
                 <Button onClick={reset} className="flex-1">
                   <RefreshCw className="mr-2 h-4 w-4" />
-                  Try Again
+                  Try again
                 </Button>
                 <Button
                   onClick={() => (window.location.href = '/')}
