@@ -6,6 +6,8 @@ import { getDataSourceConnections } from './get-data-source-connections';
 import { connectDataSource } from './connect-data-source';
 import { DataSourceDisplay } from './data-source-display';
 
+export const dynamic = 'force-dynamic';
+
 export default async function DataSourcesPage() {
   const availableDataSources = await getAvailableDataSources();
   const dataSourceConnections = await getDataSourceConnections();
