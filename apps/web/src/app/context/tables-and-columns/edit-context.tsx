@@ -10,7 +10,6 @@ import { EmptySection } from '@/components/empty-section';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { EditTable } from './edit-table';
-import { Separator } from '@/components/ui/separator';
 
 interface SelectTablesProps {
   connectionId: string;

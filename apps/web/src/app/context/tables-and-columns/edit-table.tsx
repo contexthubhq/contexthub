@@ -72,18 +72,18 @@ export function EditTable({
         <h2 className="text-md font-semibold">
           {tableDetailsQueryResult.table.tableName}
         </h2>
-        <p className="text-muted-foreground text-xs">
-          {tableDetailsQueryResult.table.fullyQualifiedTableName}
-        </p>
       </div>
-      <ScrollArea className="h-[calc(100vh-17rem)] w-full">
+      <div>
         <p className="text-muted-foreground text-sm">
-          {tableDetailsQueryResult.table.description ?? ''}
+          {tableDetailsQueryResult.table.description ?? 'Add a description...'}
         </p>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 pt-6">
+          <h4 className="text-md font-semibold">
+            Columns ({tableDetailsQueryResult.columns.length})
+          </h4>
           <Columns columns={tableDetailsQueryResult.columns} />
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 }
@@ -93,10 +93,9 @@ function Columns({ columns }: { columns: ColumnMetadata[] }) {
     (a, b) => a.ordinalPosition - b.ordinalPosition
   );
   return (
-    <div className="flex flex-col gap-2">
-      <h4 className="text-sm font-semibold">Columns ({columns.length})</h4>
-      <Table className="text-xs">
-        <TableHeader>
+    <ScrollArea className="h-[calc(100vh-20rem)] w-full">
+      <Table className="text-sm" noWrapper>
+        <TableHeader className="bg-background sticky top-0 z-10">
           <TableRow>
             <TableHead className="max-w-[50px]">Name</TableHead>
             <TableHead className="max-w-[50px]">Type</TableHead>
@@ -113,7 +112,7 @@ function Columns({ columns }: { columns: ColumnMetadata[] }) {
               <TableCell className="max-w-[40px] truncate whitespace-nowrap">
                 <Badge
                   variant="outline"
-                  className="text-muted-foreground px-1.5 text-xs font-normal"
+                  className="text-muted-foreground px-1.5 text-sm font-normal"
                 >
                   {column.dataType.toLowerCase()}
                 </Badge>
@@ -128,7 +127,7 @@ function Columns({ columns }: { columns: ColumnMetadata[] }) {
           ))}
         </TableBody>
       </Table>
-    </div>
+    </ScrollArea>
   );
 }
 
