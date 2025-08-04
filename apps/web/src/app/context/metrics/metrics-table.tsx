@@ -101,7 +101,7 @@ export function MetricsTable() {
               {metric.formula ? (
                 <Check className="size-4 text-muted-foreground" />
               ) : (
-                <></>
+                null
               )}
             </TableCell>
             <TableCell>{metric.tags.join(', ')}</TableCell>
