@@ -47,7 +47,7 @@ function _ContextSection({
   }
   return (
     <div className="flex flex-col gap-8">
-      <div className="max-w-sm">
+      <div className="max-w-xs">
         <Select
           value={selectedDataSourceConnectionId}
           onValueChange={setSelectedDataSourceConnectionId}

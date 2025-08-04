@@ -1,7 +1,7 @@
 'use client';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Pencil } from 'lucide-react';
 import { useTableDetailsQuery } from '@/api/use-table-details-query';
 import { ColumnMetadata } from '@contexthub/core';
 import {
@@ -22,6 +22,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { X } from 'lucide-react';
 import { useState } from 'react';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
 
 export function EditTable({
   connectionId,
@@ -40,7 +43,12 @@ export function EditTable({
   });
 
   if (isTableDetailsQueryLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-6 w-48" />
+        <Skeleton className="h-4 w-64" />
+      </div>
+    );
   }
 
   if (tableDetailsQueryError) {
@@ -64,15 +72,17 @@ export function EditTable({
         <h2 className="text-md font-semibold">
           {tableDetailsQueryResult.table.tableName}
         </h2>
-        <p className="text-muted-foreground text-xs">
-          {tableDetailsQueryResult.table.fullyQualifiedTableName}
-        </p>
       </div>
-      <p className="text-muted-foreground text-sm">
-        {tableDetailsQueryResult.table.description ?? ''}
-      </p>
-      <div className="flex flex-col gap-2">
-        <Columns columns={tableDetailsQueryResult.columns} />
+      <div>
+        <p className="text-muted-foreground text-xs">
+          {tableDetailsQueryResult.table.description ?? 'Add a description...'}
+        </p>
+        <div className="flex flex-col gap-2 pt-6">
+          <h4 className="text-sm font-semibold">
+            Columns ({tableDetailsQueryResult.columns.length})
+          </h4>
+          <Columns columns={tableDetailsQueryResult.columns} />
+        </div>
       </div>
     </div>
   );
@@ -83,10 +93,9 @@ function Columns({ columns }: { columns: ColumnMetadata[] }) {
     (a, b) => a.ordinalPosition - b.ordinalPosition
   );
   return (
-    <div className="flex flex-col gap-2">
-      <h4 className="text-sm font-semibold">Columns ({columns.length})</h4>
-      <Table className="text-xs">
-        <TableHeader>
+    <ScrollArea className="h-[calc(100vh-20rem)] w-full">
+      <Table className="text-xs" noWrapper>
+        <TableHeader className="bg-background sticky top-0 z-10">
           <TableRow>
             <TableHead className="max-w-[50px]">Name</TableHead>
             <TableHead className="max-w-[50px]">Type</TableHead>
@@ -97,23 +106,28 @@ function Columns({ columns }: { columns: ColumnMetadata[] }) {
         <TableBody>
           {orderedColumns.map((column) => (
             <TableRow key={column.columnName}>
-              <TableCell className="max-w-[50px] truncate whitespace-nowrap">
+              <TableCell className="max-w-[70px] truncate whitespace-nowrap">
                 {column.columnName}
               </TableCell>
-              <TableCell className="text-muted-foreground max-w-[50px] truncate whitespace-nowrap">
-                {column.dataType}
+              <TableCell className="max-w-[40px] truncate whitespace-nowrap">
+                <Badge
+                  variant="outline"
+                  className="text-muted-foreground px-1.5 text-xs font-normal"
+                >
+                  {column.dataType.toLowerCase()}
+                </Badge>
               </TableCell>
-              <TableCell className="text-muted-foreground max-w-[100px] truncate">
+              <TableCell className="max-w-[100px] truncate">
                 <EditableDescription description={column.description} />
               </TableCell>
-              <TableCell className="text-muted-foreground max-w-[100px] truncate">
+              <TableCell className="max-w-[100px] truncate">
                 <EditableExampleValues exampleValues={column.exampleValues} />
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-    </div>
+    </ScrollArea>
   );
 }
 
@@ -143,7 +157,10 @@ function EditableDescription({ description }: { description: string | null }) {
           className="group block w-full cursor-pointer truncate whitespace-nowrap text-left focus:outline-none"
         >
           {hasValue ? (
-            value
+            <span className="flex items-center gap-3">
+              <span className="truncate">{value}</span>
+              <Pencil className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
+            </span>
           ) : (
             <span className="text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
               Add description
@@ -213,7 +230,10 @@ function EditableExampleValues({ exampleValues }: { exampleValues: string[] }) {
           className="group block w-full cursor-pointer truncate whitespace-nowrap text-left focus:outline-none"
         >
           {hasValue ? (
-            values.join(', ')
+            <span className="flex items-center gap-3">
+              <span className="truncate">{values.join(', ')}</span>
+              <Pencil className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
+            </span>
           ) : (
             <span className="text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
               Add example values
