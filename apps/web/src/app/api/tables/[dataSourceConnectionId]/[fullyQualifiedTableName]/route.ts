@@ -2,31 +2,31 @@ import { TableDetailsQueryResult } from '@/types/table-details-query-result';
 import { ColumnMetadata, TableMetadata } from '@contexthub/core';
 import { registry } from '@contexthub/data-sources-all';
 import { getDataSourceConnection } from '@contexthub/data-sources-connections';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { withErrorHandling } from '@/lib/with-error-handling';
+import { ApiError } from '@/lib/api-error';
 
 export const dynamic = 'force-dynamic';
-
-type GetResponse =
-  | NextResponse<TableDetailsQueryResult>
-  | NextResponse<{ error: string }>;
 
 type GetParams = {
   dataSourceConnectionId: string;
   fullyQualifiedTableName: string;
 };
 
-export async function GET(
-  _request: Request,
+async function getTableDetailsHandler(
+  _request: NextRequest,
   {
     params,
   }: {
     params: Promise<GetParams>;
   }
-): Promise<GetResponse> {
+): Promise<NextResponse<TableDetailsQueryResult>> {
   const { dataSourceConnectionId, fullyQualifiedTableName } = await params;
+
   const dataSourceConnection = await getDataSourceConnection({
     id: dataSourceConnectionId,
   });
+
   const dataSource = registry.createInstance({
     type: dataSourceConnection.type,
     credentials: dataSourceConnection.credentials,
@@ -36,13 +36,9 @@ export async function GET(
   const tableDefinition = tableDefinitions.find(
     (table) => table.fullyQualifiedTableName === fullyQualifiedTableName
   );
+
   if (!tableDefinition) {
-    return NextResponse.json(
-      {
-        error: 'Table not found',
-      },
-      { status: 404 }
-    );
+    throw ApiError.internal('Table not found');
   }
 
   const columnDefinitions = await dataSource.getColumnsList({
@@ -68,3 +64,5 @@ export async function GET(
     columns,
   });
 }
+
+export const GET = withErrorHandling(getTableDetailsHandler);

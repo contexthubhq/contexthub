@@ -27,7 +27,7 @@ async function getTable({
 
   const data = await response.json();
   if (!response.ok) {
-    throw new Error('Failed to fetch table details.');
+    throw new Error(data.message || 'Failed to fetch table details.');
   }
 
   return tableDetailsQueryResultSchema.parse(data);
