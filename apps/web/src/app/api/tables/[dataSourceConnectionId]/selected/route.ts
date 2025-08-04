@@ -9,7 +9,7 @@ async function putSelectedTablesHandler(
   { params }: { params: Promise<{ dataSourceConnectionId: string }> }
 ): Promise<NextResponse<{ success: boolean }>> {
   const { dataSourceConnectionId } = await params;
-  
+
   if (!dataSourceConnectionId) {
     throw ApiError.badRequest('Data source connection ID is required');
   }
@@ -28,7 +28,7 @@ async function putSelectedTablesHandler(
       })
     ),
   });
-  
+
   let bodyParsed;
   try {
     bodyParsed = bodySchema.parse(body);

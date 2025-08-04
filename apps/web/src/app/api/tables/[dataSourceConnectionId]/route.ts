@@ -17,7 +17,7 @@ async function getTablesHandler(
   { params }: { params: Promise<{ dataSourceConnectionId: string }> }
 ): Promise<NextResponse<TablesQueryResult>> {
   const { dataSourceConnectionId } = await params;
-  
+
   if (!dataSourceConnectionId) {
     throw ApiError.badRequest('Data source connection ID is required');
   }

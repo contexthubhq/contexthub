@@ -16,8 +16,9 @@ async function updateSelectedTables({
       body: JSON.stringify({ selectedTables }),
     }
   );
+  const data = await response.json();
   if (!response.ok) {
-    throw new Error('Failed to update selected tables');
+    throw new Error(data.message || 'Failed to update selected tables');
   }
   return;
 }
