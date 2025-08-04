@@ -14,3 +14,11 @@ export {
   tableContextSchema,
   tableDefinitionSchema,
 } from './context-model/table-metadata.js';
+export {
+  type MetricDefinition,
+  metricDefinitionSchema,
+} from './context-model/metric-definition.js';
+export {
+  type ConceptDefinition,
+  conceptDefinitionSchema,
+} from './context-model/concept-definition.js';
