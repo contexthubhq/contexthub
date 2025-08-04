@@ -19,9 +19,14 @@ import {
 } from '@/components/ui/dialog';
 import { DataSourceInfo } from '@/types/data-source-info';
 import { ConnectDataSourceFormData } from '@/types/connect-data-source-form';
-import { ConnectionForm } from './connection-form';
+import { ConnectDataSourceForm } from './connect-data-source-form';
 import { toast } from 'sonner';
 
+/**
+ * The button to connect a data source.
+ *
+ * Opens a dialog to connect a data source.
+ */
 export function ConnectDataSourceButton({
   availableDataSources,
   action,
@@ -83,7 +88,7 @@ export function ConnectDataSourceButton({
                   {selectedDataSource.description}
                 </DialogDescription>
               </DialogHeader>
-              <ConnectionForm
+              <ConnectDataSourceForm
                 dataSource={selectedDataSource}
                 action={action}
                 onSuccess={handleSuccess}

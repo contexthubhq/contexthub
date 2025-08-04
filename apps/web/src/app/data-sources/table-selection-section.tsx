@@ -22,7 +22,11 @@ import { toast } from 'sonner';
 interface SelectTablesProps {
   connectionId: string;
 }
-export function SelectTables({ connectionId }: SelectTablesProps) {
+
+/**
+ * The section where the user can select which tables to publish.
+ */
+export function TableSelectionSection({ connectionId }: SelectTablesProps) {
   const {
     data: tablesQueryResult,
     isFetching: isTablesQueryFetching,

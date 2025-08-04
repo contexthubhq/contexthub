@@ -5,6 +5,9 @@ import { ConnectDataSourceFormData } from '@/types/connect-data-source-form';
 import { registry } from '@contexthub/data-sources-all';
 import { createDataSourceConnection } from '@contexthub/data-sources-connections';
 
+/**
+ * Server action to connect a data source.
+ */
 export async function connectDataSource({
   type,
   name,

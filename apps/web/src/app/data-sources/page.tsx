@@ -4,7 +4,7 @@ import { ConnectDataSourceButton } from './connect-data-source-button';
 import { getAvailableDataSources } from './get-available-data-sources';
 import { getDataSourceConnections } from './get-data-source-connections';
 import { connectDataSource } from './connect-data-source';
-import { DataSourceDisplay } from './data-source-display';
+import { PageClient } from './page-client';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,7 +20,7 @@ export default async function DataSourcesPage() {
           action={connectDataSource}
         />
       </PageHeader>
-      <DataSourceDisplay
+      <PageClient
         dataSourceConnections={dataSourceConnections}
         availableDataSources={availableDataSources}
         connectDataSource={connectDataSource}

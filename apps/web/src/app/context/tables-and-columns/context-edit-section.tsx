@@ -9,14 +9,17 @@ import { useState } from 'react';
 import { EmptySection } from '@/components/empty-section';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { EditTable } from './edit-table';
+import { TableEditSection } from './table-edit-section';
 
 interface SelectTablesProps {
   connectionId: string;
   connectionName: string;
 }
 
-export function EditContext({
+/**
+ * The section where the user can select which table to edit and edit the context.
+ */
+export function ContextEditSection({
   connectionId,
   connectionName,
 }: SelectTablesProps) {
@@ -71,7 +74,7 @@ export function EditContext({
       </div>
       <div className="col-span-3 border-l pl-4">
         {highlightedTableId ? (
-          <EditTable
+          <TableEditSection
             connectionId={connectionId}
             fullyQualifiedTableName={highlightedTableId}
           />

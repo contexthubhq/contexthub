@@ -14,9 +14,12 @@ import {
 import { DataSourceInfo } from '@/types/data-source-info';
 import { ConnectDataSourceFormData } from '@/types/connect-data-source-form';
 import { useState } from 'react';
-import { SelectTables } from './select-tables';
+import { TableSelectionSection } from './table-selection-section';
 
-export function DataSourceDisplay({
+/**
+ * Client component for the data sources page.
+ */
+export function PageClient({
   dataSourceConnections,
   availableDataSources,
   connectDataSource,
@@ -30,20 +33,18 @@ export function DataSourceDisplay({
   return (
     <div>
       {dataSourceConnections.length === 0 ? (
-        <EmptyDataSourceDisplay
+        <EmptyPage
           availableDataSources={availableDataSources}
           connectDataSource={connectDataSource}
         />
       ) : (
-        <DataSourceConnectionDisplay
-          dataSourceConnections={dataSourceConnections}
-        />
+        <PageWithConnections dataSourceConnections={dataSourceConnections} />
       )}
     </div>
   );
 }
 
-function DataSourceConnectionDisplay({
+function PageWithConnections({
   dataSourceConnections,
 }: {
   dataSourceConnections: { id: string; name: string }[];
@@ -70,12 +71,12 @@ function DataSourceConnectionDisplay({
           </SelectContent>
         </Select>
       </div>
-      <SelectTables connectionId={selectedDataSourceConnection} />
+      <TableSelectionSection connectionId={selectedDataSourceConnection} />
     </div>
   );
 }
 
-function EmptyDataSourceDisplay({
+function EmptyPage({
   availableDataSources,
   connectDataSource,
 }: {
