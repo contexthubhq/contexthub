@@ -19,12 +19,11 @@ import {
 } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { X } from 'lucide-react';
 import { useState } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
+import { EditableList } from '@/components/ui/editable-list';
 
 /**
  * The section where the user can edit context for a selected table.
@@ -209,20 +208,6 @@ function EditableColumnExampleValues({
   const [open, setOpen] = useState(false);
   const [values, setValues] = useState<string[]>(exampleValues);
   const [draftValues, setDraftValues] = useState<string[]>(values);
-  const [newValue, setNewValue] = useState<string>('');
-
-  const addValue = () => {
-    const trimmed = newValue.trim();
-    if (!trimmed) return;
-    if (!draftValues.includes(trimmed)) {
-      setDraftValues([...draftValues, trimmed]);
-    }
-    setNewValue('');
-  };
-
-  const removeValue = (valueToRemove: string) => {
-    setDraftValues(draftValues.filter((v) => v !== valueToRemove));
-  };
 
   const onSave = () => {
     setValues(draftValues);
@@ -256,54 +241,20 @@ function EditableColumnExampleValues({
           )}
         </span>
       </PopoverTrigger>
-      <PopoverContent className="w-96">
-        <div className="flex flex-col gap-4">
-          <div className="flex max-h-48 flex-col gap-2 overflow-auto">
-            {draftValues.map((v) => (
-              <div
-                key={v}
-                className="flex items-center justify-between gap-2 rounded border px-2 py-1 text-sm"
-              >
-                <span className="truncate">{v}</span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-5 w-5 p-0"
-                  onClick={() => removeValue(v)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-            {draftValues.length === 0 && (
-              <p className="text-muted-foreground text-sm italic">No values</p>
-            )}
-          </div>
-          <div className="flex gap-2">
-            <Input
-              value={newValue}
-              onChange={(e) => setNewValue(e.target.value)}
-              placeholder="New value"
-              className="flex-1"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  addValue();
-                }
-              }}
-            />
-            <Button size="sm" onClick={addValue} disabled={!newValue.trim()}>
-              Add
-            </Button>
-          </div>
-          <div className="flex justify-end gap-2 border-t pt-2">
-            <Button variant="secondary" size="sm" onClick={onCancel}>
-              Cancel
-            </Button>
-            <Button size="sm" onClick={onSave}>
-              Save
-            </Button>
-          </div>
+      <PopoverContent className="flex w-96 flex-col gap-4">
+        <h3 className="text-sm font-semibold">Example values</h3>
+        <EditableList
+          values={draftValues}
+          setValues={setDraftValues}
+          placeholder="New example value"
+        />
+        <div className="flex justify-end gap-2 border-t pt-2">
+          <Button variant="secondary" size="sm" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button size="sm" onClick={onSave}>
+            Save
+          </Button>
         </div>
       </PopoverContent>
     </Popover>

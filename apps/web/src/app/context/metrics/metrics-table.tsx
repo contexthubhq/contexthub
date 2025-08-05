@@ -10,6 +10,9 @@ import {
 } from '@/components/ui/table';
 import { MetricDefinition } from '@contexthub/core';
 import { Check } from 'lucide-react';
+import { MetricSheet } from './metric-sheet';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 const useMetricsQuery = () => {
   const metrics: MetricDefinition[] = [
@@ -72,49 +75,71 @@ const useMetricsQuery = () => {
 
 export function MetricsTable() {
   const { data } = useMetricsQuery();
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [selectedMetric, setSelectedMetric] = useState<
+    MetricDefinition | undefined
+  >(undefined);
+
+  const handleEditMetric = (metric: MetricDefinition) => {
+    setSelectedMetric(metric);
+    setIsSheetOpen(true);
+  };
+
+  const handleSubmit = (data: Omit<MetricDefinition, 'id'>) => {
+    setIsSheetOpen(false);
+    toast.success('Metric saved');
+  };
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Name</TableHead>
-          <TableHead>Description</TableHead>
-          <TableHead>Formula</TableHead>
-          <TableHead>Tags</TableHead>
-          <TableHead>Example queries</TableHead>
-          <TableHead>Unit of measure</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {data.metrics.map((metric) => (
-          <TableRow
-            key={metric.id}
-            onClick={() => {}}
-            role="button"
-            className="hover:bg-muted cursor-pointer"
-          >
-            <TableCell>{metric.name}</TableCell>
-            <TableCell className="max-w-[200px] truncate">
-              {metric.description ?? ''}
-            </TableCell>
-            <TableCell>
-              {metric.formula ? (
-                <Check className="size-4 text-muted-foreground" />
-              ) : null}
-            </TableCell>
-            <TableCell>{metric.tags.join(', ')}</TableCell>
-            <TableCell>
-              {metric.exampleQueries.length > 0 ? (
-                <span className="text-muted-foreground italic">
-                  {metric.exampleQueries.length}{' '}
-                  {metric.exampleQueries.length === 1 ? 'query' : 'queries'}
-                </span>
-              ) : null}
-            </TableCell>
-            <TableCell>{metric.unitOfMeasure ?? ''}</TableCell>
+    <>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Description</TableHead>
+            <TableHead>Formula</TableHead>
+            <TableHead>Tags</TableHead>
+            <TableHead>Example queries</TableHead>
+            <TableHead>Unit of measure</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {data.metrics.map((metric) => (
+            <TableRow
+              key={metric.id}
+              onClick={() => handleEditMetric(metric)}
+              role="button"
+              className="hover:bg-muted cursor-pointer"
+            >
+              <TableCell>{metric.name}</TableCell>
+              <TableCell className="max-w-[200px] truncate">
+                {metric.description ?? ''}
+              </TableCell>
+              <TableCell>
+                {metric.formula ? (
+                  <Check className="size-4 text-muted-foreground" />
+                ) : null}
+              </TableCell>
+              <TableCell>{metric.tags.join(', ')}</TableCell>
+              <TableCell>
+                {metric.exampleQueries.length > 0 ? (
+                  <span className="text-muted-foreground italic">
+                    {metric.exampleQueries.length}{' '}
+                    {metric.exampleQueries.length === 1 ? 'query' : 'queries'}
+                  </span>
+                ) : null}
+              </TableCell>
+              <TableCell>{metric.unitOfMeasure ?? ''}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      <MetricSheet
+        metric={selectedMetric}
+        open={isSheetOpen}
+        onOpenChange={setIsSheetOpen}
+        onSubmit={handleSubmit}
+      />
+    </>
   );
 }
