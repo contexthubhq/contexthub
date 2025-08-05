@@ -86,7 +86,6 @@ export function MetricsTable() {
   };
 
   const handleSubmit = (data: Omit<MetricDefinition, 'id'>) => {
-    setIsSheetOpen(false);
     toast.success('Metric saved');
   };
 
