@@ -51,12 +51,15 @@ export function ConnectDataSourceSheet({
   loadingText = 'Connecting...',
 }: ConnectionFormProps) {
   // Build a dynamic zod schema based on the required fields coming from the backend
-  const credentialFieldSchema = dataSource.fields.reduce((acc, field) => {
-    acc[field.name] = field.isRequired
-      ? z.string().nonempty(`${field.name} is required`)
-      : z.string().optional();
-    return acc;
-  }, {} as Record<string, z.ZodTypeAny>);
+  const credentialFieldSchema = dataSource.fields.reduce(
+    (acc, field) => {
+      acc[field.name] = field.isRequired
+        ? z.string().nonempty(`${field.name} is required`)
+        : z.string().optional();
+      return acc;
+    },
+    {} as Record<string, z.ZodTypeAny>
+  );
 
   const connectDataSourceSchema = z.object({
     name: z.string().nonempty('Name is required'),
@@ -64,10 +67,13 @@ export function ConnectDataSourceSheet({
   });
 
   // Initialize all credential fields with empty strings to prevent controlled/uncontrolled issues
-  const initialCredentials = dataSource.fields.reduce((acc, field) => {
-    acc[field.name] = '';
-    return acc;
-  }, {} as Record<string, string>);
+  const initialCredentials = dataSource.fields.reduce(
+    (acc, field) => {
+      acc[field.name] = '';
+      return acc;
+    },
+    {} as Record<string, string>
+  );
   const defaultValues: LocalFormInputs = {
     name: '',
     credentials: initialCredentials,
