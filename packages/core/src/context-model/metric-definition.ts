@@ -1,35 +1,37 @@
 import { z } from 'zod';
 
+const nonEmptyString = z.string().trim().min(1);
+
 export const metricDefinitionSchema = z.object({
   /**
    * Unique identifier for the metric.
    */
-  id: z.string().min(1),
+  id: nonEmptyString,
   /**
    * The name of the metric. For example, "Monthly Recurring Revenue",
    * "Customer Acquisition Cost".
    */
-  name: z.string().min(1),
+  name: nonEmptyString,
   /**
    * The detailed description of the metric.
    */
-  description: z.string().min(1).nullable(),
+  description: nonEmptyString.nullable(),
   /**
    * SQL-like formula or a natural language description of the metric calculation.
    */
-  formula: z.string().min(1).nullable(),
+  formula: nonEmptyString.nullable(),
   /**
    * Tags used for categorization.
    */
-  tags: z.array(z.string().min(1)),
+  tags: z.array(nonEmptyString),
   /**
    * Example SQL queries or natural language queries.
    */
-  exampleQueries: z.array(z.string().min(1)),
+  exampleQueries: z.array(nonEmptyString),
   /**
    * The unit of measure of the metric. For example: "USD", "Count", "Percentage", etc.
    */
-  unitOfMeasure: z.string().min(1).nullable(),
+  unitOfMeasure: nonEmptyString.nullable(),
 });
 
 export type MetricDefinition = z.infer<typeof metricDefinitionSchema>;
