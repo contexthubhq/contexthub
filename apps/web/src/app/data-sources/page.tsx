@@ -18,6 +18,7 @@ export default async function DataSourcesPage() {
         <ConnectDataSourceButton
           availableDataSources={availableDataSources}
           action={connectDataSource}
+          alignPopover="end"
         />
       </PageHeader>
       <PageClient

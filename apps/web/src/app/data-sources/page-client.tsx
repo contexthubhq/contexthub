@@ -94,6 +94,7 @@ function EmptyPage({
         <ConnectDataSourceButton
           availableDataSources={availableDataSources}
           action={connectDataSource}
+          alignPopover="end"
         />
         <Button variant="outline" asChild>
           <Link

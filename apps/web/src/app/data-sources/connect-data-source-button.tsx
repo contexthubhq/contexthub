@@ -1,19 +1,26 @@
 'use client';
 
-import { ChevronDown } from 'lucide-react';
+import { CheckIcon, ChevronDown, ChevronsUpDownIcon } from 'lucide-react';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { DataSourceInfo } from '@/types/data-source-info';
 import { ConnectDataSourceFormData } from '@/types/connect-data-source-form';
 import { ConnectDataSourceSheet } from './connect-data-source-sheet';
 import { toast } from 'sonner';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
 
 /**
  * The button to connect a data source.
@@ -23,20 +30,23 @@ import { toast } from 'sonner';
 export function ConnectDataSourceButton({
   availableDataSources,
   action,
+  alignPopover,
 }: {
   availableDataSources: DataSourceInfo[];
   action: (data: ConnectDataSourceFormData) => Promise<{
     success: boolean;
     error?: string;
   }>;
+  alignPopover?: 'start' | 'end';
 }) {
   const [selectedDataSource, setSelectedDataSource] =
     useState<DataSourceInfo | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isSelectOpen, setIsSelectOpen] = useState(false);
 
   const handleDataSourceSelect = (dataSource: DataSourceInfo) => {
     setSelectedDataSource(dataSource);
-    setIsModalOpen(true);
+    setIsSheetOpen(true);
   };
 
   const handleSubmit = async (data: ConnectDataSourceFormData) => {
@@ -47,37 +57,45 @@ export function ConnectDataSourceButton({
       toast.error(result.error ?? 'Unknown error');
     }
     setSelectedDataSource(null);
-    setIsModalOpen(false);
+    setIsSheetOpen(false);
   };
 
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+      <Popover open={isSelectOpen} onOpenChange={setIsSelectOpen}>
+        <PopoverTrigger asChild>
           <Button>
             Connect
             <ChevronDown className="h-4 w-4" />
           </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          {availableDataSources.map((dataSource) => (
-            <DropdownMenuItem
-              key={dataSource.type}
-              onClick={() => handleDataSourceSelect(dataSource)}
-              className="cursor-pointer"
-            >
-              {dataSource.name}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
-
+        </PopoverTrigger>
+        <PopoverContent className="w-[200px] p-0" align={alignPopover}>
+          <Command>
+            <CommandInput placeholder="Search data source..." />
+            <CommandList>
+              <CommandEmpty>No data source found.</CommandEmpty>
+              <CommandGroup>
+                {availableDataSources.map((dataSource) => (
+                  <CommandItem
+                    key={dataSource.type}
+                    value={dataSource.type}
+                    onSelect={() => handleDataSourceSelect(dataSource)}
+                    className="cursor-pointer"
+                  >
+                    {dataSource.name}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
       {selectedDataSource && (
         <ConnectDataSourceSheet
           dataSource={selectedDataSource}
           onSubmit={handleSubmit}
-          open={isModalOpen}
-          onOpenChange={setIsModalOpen}
+          open={isSheetOpen}
+          onOpenChange={setIsSheetOpen}
           submitButtonText="Connect"
           loadingText="Connecting..."
         />
