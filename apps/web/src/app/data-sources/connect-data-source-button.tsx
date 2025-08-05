@@ -10,16 +10,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { DataSourceInfo } from '@/types/data-source-info';
 import { ConnectDataSourceFormData } from '@/types/connect-data-source-form';
-import { ConnectDataSourceForm } from './connect-data-source-form';
+import { ConnectDataSourceSheet } from './connect-data-source-sheet';
 import { toast } from 'sonner';
 
 /**
@@ -46,14 +39,15 @@ export function ConnectDataSourceButton({
     setIsModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+  const handleSubmit = async (data: ConnectDataSourceFormData) => {
+    const result = await action(data);
+    if (result.success) {
+      toast.success('Data source connected successfully');
+    } else {
+      toast.error(result.error ?? 'Unknown error');
+    }
     setSelectedDataSource(null);
-  };
-
-  const handleSuccess = () => {
-    handleCloseModal();
-    toast.success('Data source connected successfully');
+    setIsModalOpen(false);
   };
 
   return (
@@ -78,28 +72,16 @@ export function ConnectDataSourceButton({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent>
-          {selectedDataSource && (
-            <>
-              <DialogHeader>
-                <DialogTitle>Connect {selectedDataSource.name}</DialogTitle>
-                <DialogDescription>
-                  {selectedDataSource.description}
-                </DialogDescription>
-              </DialogHeader>
-              <ConnectDataSourceForm
-                dataSource={selectedDataSource}
-                action={action}
-                onSuccess={handleSuccess}
-                onCancel={handleCloseModal}
-                submitButtonText="Connect"
-                loadingText="Connecting..."
-              />
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+      {selectedDataSource && (
+        <ConnectDataSourceSheet
+          dataSource={selectedDataSource}
+          onSubmit={handleSubmit}
+          open={isModalOpen}
+          onOpenChange={setIsModalOpen}
+          submitButtonText="Connect"
+          loadingText="Connecting..."
+        />
+      )}
     </>
   );
 }

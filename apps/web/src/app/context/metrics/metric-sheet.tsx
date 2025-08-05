@@ -40,7 +40,7 @@ export function MetricSheet({
   onOpenChange,
 }: {
   metric?: MetricDefinition;
-  onSubmit: (data: MetricDefinitionWithoutId) => void;
+  onSubmit: (data: MetricDefinitionWithoutId) => void | Promise<void>;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
@@ -48,6 +48,7 @@ export function MetricSheet({
 
   const form = useForm<MetricDefinitionWithoutId>({
     resolver: zodResolver(metricDefinitionSchemaWithoutId),
+    mode: 'onChange',
     defaultValues: {
       name: metric?.name ?? '',
       description: metric?.description ?? null,
@@ -64,19 +65,11 @@ export function MetricSheet({
     }
   }, [metric, form]);
 
-  const handleValidSubmit = (data: MetricDefinitionWithoutId) => {
-    onSubmit(data);
-    onOpenChange(false);
-  };
-
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleValidSubmit)}
-            className="contents"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="contents">
             <SheetHeader>
               <SheetTitle>{title}</SheetTitle>
             </SheetHeader>
@@ -190,9 +183,18 @@ export function MetricSheet({
             </SheetBody>
             <SheetFooter>
               <SheetClose asChild>
-                <Button variant="outline">Cancel</Button>
+                <Button variant="outline" onClick={() => form.reset()}>
+                  Cancel
+                </Button>
               </SheetClose>
-              <Button type="submit" disabled={form.formState.isSubmitting}>
+              <Button
+                type="submit"
+                disabled={
+                  form.formState.isSubmitting ||
+                  !form.formState.isValid ||
+                  !form.formState.isDirty
+                }
+              >
                 {form.formState.isSubmitting ? 'Submitting...' : 'Submit'}
               </Button>
             </SheetFooter>
