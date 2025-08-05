@@ -85,8 +85,12 @@ export function MetricsTable() {
     setIsSheetOpen(true);
   };
 
-  const handleSubmit = (data: Omit<MetricDefinition, 'id'>) => {
+  const handleSubmit = async (data: Omit<MetricDefinition, 'id'>) => {
+    // Sleep for 1 second to simulate a save
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     toast.success('Metric saved');
+    setIsSheetOpen(false);
+    setSelectedMetric(undefined);
   };
 
   return (
