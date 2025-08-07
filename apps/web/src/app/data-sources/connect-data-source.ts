@@ -49,6 +49,7 @@ export async function connectDataSource({
     };
   } catch (error) {
     console.error('Failed to create data source credentials:', error);
+    revalidatePath('/data-sources');
 
     return {
       success: false,
