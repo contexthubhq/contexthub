@@ -15,6 +15,8 @@ import { DataSourceInfo } from '@/types/data-source-info';
 import { ConnectDataSourceFormData } from '@/types/connect-data-source-form';
 import { useState } from 'react';
 import { TableSelectionSection } from './table-selection-section';
+import { EditDataSourceConnectionButton } from './edit-data-source-connection-button';
+import { DataSourceConnection } from '@contexthub/data-sources-connections';
 
 /**
  * Client component for the data sources page.
@@ -24,7 +26,7 @@ export function PageClient({
   availableDataSources,
   connectDataSource,
 }: {
-  dataSourceConnections: { id: string; name: string }[];
+  dataSourceConnections: DataSourceConnection[];
   availableDataSources: DataSourceInfo[];
   connectDataSource: (
     data: ConnectDataSourceFormData
@@ -38,7 +40,11 @@ export function PageClient({
           connectDataSource={connectDataSource}
         />
       ) : (
-        <PageWithConnections dataSourceConnections={dataSourceConnections} />
+        <PageWithConnections
+          dataSourceConnections={dataSourceConnections}
+          availableDataSources={availableDataSources}
+          connectDataSource={connectDataSource}
+        />
       )}
     </div>
   );
@@ -46,18 +52,30 @@ export function PageClient({
 
 function PageWithConnections({
   dataSourceConnections,
+  availableDataSources,
+  connectDataSource,
 }: {
-  dataSourceConnections: { id: string; name: string }[];
+  dataSourceConnections: DataSourceConnection[];
+  availableDataSources: DataSourceInfo[];
+  connectDataSource: (
+    data: ConnectDataSourceFormData
+  ) => Promise<{ success: boolean; error?: string | undefined }>;
 }) {
   // Note: We expect there to be at least one data source connection if this component is rendered.
-  const [selectedDataSourceConnection, setSelectedDataSourceConnection] =
+  const [selectedDataSourceConnectionId, setSelectedDataSourceConnectionId] =
     useState(dataSourceConnections[0].id);
+  const selectedDataSourceConnection = dataSourceConnections.find(
+    (connection) => connection.id === selectedDataSourceConnectionId
+  )!;
+  const selectedDataSourceInfo = availableDataSources.find(
+    (dataSource) => dataSource.type === selectedDataSourceConnection.type
+  )!;
   return (
     <div className="flex flex-col gap-8">
-      <div className="max-w-sm">
+      <div className="flex max-w-xs flex-row gap-2">
         <Select
-          value={selectedDataSourceConnection}
-          onValueChange={setSelectedDataSourceConnection}
+          value={selectedDataSourceConnectionId}
+          onValueChange={setSelectedDataSourceConnectionId}
         >
           <SelectTrigger>
             <SelectValue />
@@ -70,8 +88,13 @@ function PageWithConnections({
             ))}
           </SelectContent>
         </Select>
+        <EditDataSourceConnectionButton
+          dataSourceConnection={selectedDataSourceConnection}
+          dataSourceInfo={selectedDataSourceInfo}
+          action={connectDataSource}
+        />
       </div>
-      <TableSelectionSection connectionId={selectedDataSourceConnection} />
+      <TableSelectionSection connectionId={selectedDataSourceConnectionId} />
     </div>
   );
 }

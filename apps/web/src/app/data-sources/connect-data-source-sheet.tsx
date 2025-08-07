@@ -3,6 +3,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -18,7 +19,7 @@ import { Input } from '@/components/ui/input';
 import { DataSourceInfo } from '@/types/data-source-info';
 import { ConnectDataSourceFormData } from '@/types/connect-data-source-form';
 
-type LocalFormInputs = Omit<ConnectDataSourceFormData, 'type'>;
+type LocalFormInputs = Omit<ConnectDataSourceFormData, 'type' | 'id'>;
 
 import {
   Sheet,
@@ -32,6 +33,14 @@ import {
 
 interface ConnectionFormProps {
   dataSource: DataSourceInfo;
+  /**
+   * Optional initial values for the form. When provided the sheet will behave
+   * like an "edit connection" dialog instead of a "connect" dialog. The
+   * object can contain an optional `id` field which will be forwarded in the
+   * submit payload so that callers can distinguish between create and update
+   * operations.
+   */
+  initialValues?: Partial<Omit<ConnectDataSourceFormData, 'type'>>;
   onSubmit: (data: ConnectDataSourceFormData) => void | Promise<void>;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -49,6 +58,7 @@ export function ConnectDataSourceSheet({
   onOpenChange,
   submitButtonText = 'Connect',
   loadingText = 'Connecting...',
+  initialValues,
 }: ConnectionFormProps) {
   // Build a dynamic zod schema based on the required fields coming from the backend
   const credentialFieldSchema = dataSource.fields.reduce(
@@ -69,13 +79,16 @@ export function ConnectDataSourceSheet({
   // Initialize all credential fields with empty strings to prevent controlled/uncontrolled issues
   const initialCredentials = dataSource.fields.reduce(
     (acc, field) => {
-      acc[field.name] = '';
+      // Prefer a value coming from initialValues (if provided) otherwise use empty string
+      const providedValue = initialValues?.credentials?.[field.name];
+      acc[field.name] = providedValue ?? '';
       return acc;
     },
     {} as Record<string, string>
   );
+
   const defaultValues: LocalFormInputs = {
-    name: '',
+    name: initialValues?.name ?? '',
     credentials: initialCredentials,
   };
 
@@ -85,13 +98,22 @@ export function ConnectDataSourceSheet({
     defaultValues,
   });
 
+  // Sync form with new initial values or when the sheet is opened for a different data source
+  useEffect(() => {
+    form.reset(defaultValues);
+  }, [dataSource, initialValues]);
+
   const handleSubmit = (data: LocalFormInputs) => {
     // Returning the promise (if any) ensures `isSubmitting` is accurate in RHF state
     return onSubmit({
       ...data,
       type: dataSource.type,
+      id: initialValues?.id,
     });
   };
+
+  // Detect if we are in "update" mode
+  const isUpdate = Boolean(initialValues);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -99,7 +121,9 @@ export function ConnectDataSourceSheet({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="contents">
             <SheetHeader>
-              <SheetTitle>Connect {dataSource.name}</SheetTitle>
+              <SheetTitle>
+                {isUpdate ? 'Update' : 'Connect'} {dataSource.name}
+              </SheetTitle>
             </SheetHeader>
             <SheetBody>
               <div className="pb-4">
@@ -126,7 +150,7 @@ export function ConnectDataSourceSheet({
                   <FormField
                     key={dataSourceField.name}
                     control={form.control}
-                    name={`credentials.${dataSourceField.name}`}
+                    name={`credentials.${dataSourceField.name}` as const}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel required={dataSourceField.isRequired}>
@@ -177,7 +201,9 @@ export function ConnectDataSourceSheet({
                   form.formState.isSubmitting || !form.formState.isValid
                 }
               >
-                {form.formState.isSubmitting ? loadingText : submitButtonText}
+                {form.formState.isSubmitting
+                  ? loadingText
+                  : (submitButtonText ?? (isUpdate ? 'Save' : 'Connect'))}
               </Button>
             </SheetFooter>
           </form>

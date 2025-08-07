@@ -1,8 +1,6 @@
 import { z } from 'zod';
 import { prisma } from '@contexthub/database';
-import { type DataSourceConnection } from './types.js';
-
-const credentialsSchema = z.record(z.string(), z.string());
+import { credentialsSchema, type DataSourceConnection } from './types.js';
 
 export async function getDataSourceConnection({
   id,
