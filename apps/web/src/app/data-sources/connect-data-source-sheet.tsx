@@ -61,12 +61,15 @@ export function ConnectDataSourceSheet({
   initialValues,
 }: ConnectionFormProps) {
   // Build a dynamic zod schema based on the required fields coming from the backend
-  const credentialFieldSchema = dataSource.fields.reduce((acc, field) => {
-    acc[field.name] = field.isRequired
-      ? z.string().nonempty(`${field.name} is required`)
-      : z.string().optional();
-    return acc;
-  }, {} as Record<string, z.ZodTypeAny>);
+  const credentialFieldSchema = dataSource.fields.reduce(
+    (acc, field) => {
+      acc[field.name] = field.isRequired
+        ? z.string().nonempty(`${field.name} is required`)
+        : z.string().optional();
+      return acc;
+    },
+    {} as Record<string, z.ZodTypeAny>
+  );
 
   const connectDataSourceSchema = z.object({
     name: z.string().nonempty('Name is required'),
@@ -74,12 +77,15 @@ export function ConnectDataSourceSheet({
   });
 
   // Initialize all credential fields with empty strings to prevent controlled/uncontrolled issues
-  const initialCredentials = dataSource.fields.reduce((acc, field) => {
-    // Prefer a value coming from initialValues (if provided) otherwise use empty string
-    const providedValue = initialValues?.credentials?.[field.name];
-    acc[field.name] = providedValue ?? '';
-    return acc;
-  }, {} as Record<string, string>);
+  const initialCredentials = dataSource.fields.reduce(
+    (acc, field) => {
+      // Prefer a value coming from initialValues (if provided) otherwise use empty string
+      const providedValue = initialValues?.credentials?.[field.name];
+      acc[field.name] = providedValue ?? '';
+      return acc;
+    },
+    {} as Record<string, string>
+  );
 
   const defaultValues: LocalFormInputs = {
     name: initialValues?.name ?? '',
@@ -197,7 +203,7 @@ export function ConnectDataSourceSheet({
               >
                 {form.formState.isSubmitting
                   ? loadingText
-                  : submitButtonText ?? (isUpdate ? 'Save' : 'Connect')}
+                  : (submitButtonText ?? (isUpdate ? 'Save' : 'Connect'))}
               </Button>
             </SheetFooter>
           </form>
