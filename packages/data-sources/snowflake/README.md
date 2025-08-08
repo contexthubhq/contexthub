@@ -80,7 +80,6 @@ You can find your account identifier by clicking the “View account details” 
 
 <img width="1511" height="830" alt="image (3)" src="https://github.com/user-attachments/assets/e5041157-dccc-4109-b013-411591df6396" />
 
-
 …where you will find the account identifier:
 
 <img width="1505" height="827" alt="image (5)" src="https://github.com/user-attachments/assets/df52921e-db8d-47b6-8010-4cfec3cb9d45" />
