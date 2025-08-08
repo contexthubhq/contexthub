@@ -60,16 +60,16 @@ GRANT USAGE ON DATABASE identifier($source_database) TO ROLE identifier($context
 GRANT USAGE ON ALL SCHEMAS IN DATABASE identifier($source_database) TO ROLE identifier($contexthub_role);
 
 -- Grant read access to source database
-GRANT SELECT ON ALL TABLES IN DATABASE identifier($source_database) TO identifier($contexthub_role);
-GRANT SELECT ON ALL VIEWS IN DATABASE identifier($source_database) TO identifier($contexthub_role);
-GRANT SELECT ON ALL MATERIALIZED VIEWS IN DATABASE identifier($source_database) TO identifier($contexthub_role);
-GRANT SELECT ON ALL EXTERNAL TABLES IN DATABASE identifier($source_database) TO identifier($contexthub_role);
+GRANT SELECT ON ALL TABLES IN DATABASE identifier($source_database) TO ROLE identifier($contexthub_role);
+GRANT SELECT ON ALL VIEWS IN DATABASE identifier($source_database) TO ROLE identifier($contexthub_role);
+GRANT SELECT ON ALL MATERIALIZED VIEWS IN DATABASE identifier($source_database) TO ROLE identifier($contexthub_role);
+GRANT SELECT ON ALL EXTERNAL TABLES IN DATABASE identifier($source_database) TO ROLE identifier($contexthub_role);
 
 -- Grant access to future tables, views, etc.
-GRANT SELECT ON FUTURE TABLES IN DATABASE identifier($source_database) TO identifier($contexthub_role);
-GRANT SELECT ON FUTURE VIEWS IN DATABASE identifier($source_database) TO identifier($contexthub_role);
-GRANT SELECT ON FUTURE MATERIALIZED VIEWS IN DATABASE identifier($source_database) TO identifier($contexthub_role);
-GRANT SELECT ON FUTURE EXTERNAL TABLES IN DATABASE identifier($source_database) TO identifier($contexthub_role);
+GRANT SELECT ON FUTURE TABLES IN DATABASE identifier($source_database) TO ROLE identifier($contexthub_role);
+GRANT SELECT ON FUTURE VIEWS IN DATABASE identifier($source_database) TO ROLE identifier($contexthub_role);
+GRANT SELECT ON FUTURE MATERIALIZED VIEWS IN DATABASE identifier($source_database) TO ROLE identifier($contexthub_role);
+GRANT SELECT ON FUTURE EXTERNAL TABLES IN DATABASE identifier($source_database) TO ROLE identifier($contexthub_role);
 
 commit;
 ```
