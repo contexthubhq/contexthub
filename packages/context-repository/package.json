@@ -1,0 +1,25 @@
+{
+  "name": "@contexthub/context-repository",
+  "type": "module",
+  "description": "Context repository package for ContextHub",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "build": "tsc",
+    "test-cli": "node dist/cli.js"
+  },
+  "dependencies": {
+    "@contexthub/core": "workspace:*",
+    "@contexthub/database": "workspace:*",
+    "zod": "3.25.66"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "@types/node": "24.1.0"
+  }
+}

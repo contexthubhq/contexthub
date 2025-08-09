@@ -37,6 +37,32 @@ model SelectedTable {
   connection DataSourceConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
 
   @@unique([connectionId, fullyQualifiedName])
-
   @@map("selected_tables")
+}
+
+model ContextRevision {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  parentId String?
+  parent   ContextRevision? @relation("Parent", fields: [parentId], references: [id], onDelete: Cascade)
+  children ContextRevision[] @relation("Parent")
+
+  content Json
+
+  branches ContextBranch[]
+
+  @@map("context_revisions")
+}
+
+model ContextBranch {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt @default(now())
+
+  revisionId String
+  revision   ContextRevision @relation(fields: [revisionId], references: [id], onDelete: Cascade)
+
+  @@map("context_branches")
 }
