@@ -11,7 +11,7 @@
   "scripts": {
     "type-check": "tsc --noEmit",
     "build": "tsc",
-    "test": "tsc && node --test",
+    "test": "node --test",
     "test-cli": "node dist/cli.js"
   },
   "dependencies": {
