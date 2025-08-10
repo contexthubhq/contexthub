@@ -1,5 +1,3 @@
-import { it, describe } from 'node:test';
-import assert from 'node:assert/strict';
 import { TableContext } from '@contexthub/core';
 import { InMemoryContextWorkingCopy } from './in-memory-context-working-copy.js';
 
@@ -20,18 +18,18 @@ describe('InMemoryContextWorkingCopy', () => {
     });
 
     const diff = await base.diff(head);
-    assert.equal(diff.table.added.length, 0);
-    assert.equal(diff.table.removed.length, 0);
-    assert.equal(diff.table.modified.length, 0);
-    assert.equal(diff.column.added.length, 0);
-    assert.equal(diff.column.removed.length, 0);
-    assert.equal(diff.column.modified.length, 0);
-    assert.equal(diff.metric.added.length, 0);
-    assert.equal(diff.metric.removed.length, 0);
-    assert.equal(diff.metric.modified.length, 0);
-    assert.equal(diff.concept.added.length, 0);
-    assert.equal(diff.concept.removed.length, 0);
-    assert.equal(diff.concept.modified.length, 0);
+    expect(diff.table.added.length).toBe(0);
+    expect(diff.table.removed.length).toBe(0);
+    expect(diff.table.modified.length).toBe(0);
+    expect(diff.column.added.length).toBe(0);
+    expect(diff.column.removed.length).toBe(0);
+    expect(diff.column.modified.length).toBe(0);
+    expect(diff.metric.added.length).toBe(0);
+    expect(diff.metric.removed.length).toBe(0);
+    expect(diff.metric.modified.length).toBe(0);
+    expect(diff.concept.added.length).toBe(0);
+    expect(diff.concept.removed.length).toBe(0);
+    expect(diff.concept.modified.length).toBe(0);
   });
 
   it('diff detects added, removed, and modified entities across kinds', async () => {
@@ -86,25 +84,25 @@ describe('InMemoryContextWorkingCopy', () => {
 
     const diff = await base.diff(head);
     // Not participating:
-    assert.equal(diff.table.added.length, 0);
-    assert.equal(diff.table.removed.length, 0);
-    assert.equal(diff.table.modified.length, 0);
-    assert.equal(diff.concept.added.length, 0);
-    assert.equal(diff.concept.removed.length, 0);
-    assert.equal(diff.concept.modified.length, 0);
+    expect(diff.table.added.length).toBe(0);
+    expect(diff.table.removed.length).toBe(0);
+    expect(diff.table.modified.length).toBe(0);
+    expect(diff.concept.added.length).toBe(0);
+    expect(diff.concept.removed.length).toBe(0);
+    expect(diff.concept.modified.length).toBe(0);
     // Participating:
     // Column
-    assert.equal(diff.column.added.length, 0);
-    assert.equal(diff.column.removed.length, 0);
-    assert.equal(diff.column.modified.length, 1);
-    assert.equal(diff.column.modified[0].before.description, 'C1 base');
-    assert.equal(diff.column.modified[0].after.description, 'C1 changed');
+    expect(diff.column.added.length).toBe(0);
+    expect(diff.column.removed.length).toBe(0);
+    expect(diff.column.modified.length).toBe(1);
+    expect(diff.column.modified[0].before.description).toBe('C1 base');
+    expect(diff.column.modified[0].after.description).toBe('C1 changed');
     // Metric
-    assert.equal(diff.metric.added.length, 1);
-    assert.equal(diff.metric.added[0].id, 'm2');
-    assert.equal(diff.metric.removed.length, 1);
-    assert.equal(diff.metric.removed[0].id, 'm1');
-    assert.equal(diff.metric.modified.length, 0);
+    expect(diff.metric.added.length).toBe(1);
+    expect(diff.metric.added[0].id).toBe('m2');
+    expect(diff.metric.removed.length).toBe(1);
+    expect(diff.metric.removed[0].id).toBe('m1');
+    expect(diff.metric.modified.length).toBe(0);
   });
 
   it('adds tables', async () => {
@@ -118,7 +116,7 @@ describe('InMemoryContextWorkingCopy', () => {
       dataSourceConnectionId: 'ds',
       fullyQualifiedTableName: 'public.t1',
     });
-    assert.equal(table?.description, 'base');
+    expect(table?.description).toBe('base');
   });
 
   it('removes tables', async () => {
@@ -132,13 +130,12 @@ describe('InMemoryContextWorkingCopy', () => {
       dataSourceConnectionId: 'ds',
       fullyQualifiedTableName: 'public.t1',
     });
-    assert.equal(
+    expect(
       await workingCopy.getTable({
         dataSourceConnectionId: 'ds',
         fullyQualifiedTableName: 'public.t1',
-      }),
-      undefined
-    );
+      })
+    ).toBeUndefined();
   });
   it('updates tables', async () => {
     const workingCopy = new InMemoryContextWorkingCopy();
@@ -156,7 +153,7 @@ describe('InMemoryContextWorkingCopy', () => {
       dataSourceConnectionId: 'ds',
       fullyQualifiedTableName: 'public.t1',
     });
-    assert.equal(table?.description, 'changed');
+    expect(table?.description).toBe('changed');
   });
 
   it('adds metrics', async () => {
@@ -172,8 +169,8 @@ describe('InMemoryContextWorkingCopy', () => {
     const metric = await workingCopy.getMetric({
       id,
     });
-    assert.equal(metric?.name, 'Metric 1');
-    assert.equal(metric?.description, 'M1 base');
+    expect(metric?.name).toBe('Metric 1');
+    expect(metric?.description).toBe('M1 base');
   });
 
   it('removes metrics', async () => {
@@ -189,12 +186,11 @@ describe('InMemoryContextWorkingCopy', () => {
     await workingCopy.removeMetric({
       id,
     });
-    assert.equal(
+    expect(
       await workingCopy.getMetric({
         id,
-      }),
-      undefined
-    );
+      })
+    ).toBeUndefined();
   });
 
   it('updates metrics', async () => {
@@ -219,7 +215,7 @@ describe('InMemoryContextWorkingCopy', () => {
     const metric = await workingCopy.getMetric({
       id,
     });
-    assert.equal(metric?.name, 'Metric 1');
-    assert.equal(metric?.description, 'M1 changed');
+    expect(metric?.name).toBe('Metric 1');
+    expect(metric?.description).toBe('M1 changed');
   });
 });
