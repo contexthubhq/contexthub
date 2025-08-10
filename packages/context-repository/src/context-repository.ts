@@ -13,13 +13,17 @@ export interface ContextRepository {
   commit(params: {
     workingCopy: ContextWorkingCopy;
     branchName: string;
-  }): Promise<void>;
+  }): Promise<{ revisionId: string }>;
   /**
    * Lists the available branches.
    */
   listBranches(): Promise<string[]>;
   /**
    * Creates a new branch from the source branch.
+   *
+   * @param params - The parameters for the create branch operation.
+   * @param params.newBranchName - The name of the new branch.
+   * @param params.sourceBranchName - The name of the branch to branch from.
    */
   createBranch(params: {
     newBranchName: string;
@@ -27,6 +31,12 @@ export interface ContextRepository {
   }): Promise<void>;
   /**
    * Merges a branch into the target branch.
+   *
+   * @param params - The parameters for the merge operation.
+   * @param params.sourceBranchName - The name of the branch to merge from. For example,
+   * agent's change proposals.
+   * @param params.targetBranchName - The name of the branch to merge into. Most likely
+   * the main branch.
    */
   merge(params: {
     sourceBranchName: string;

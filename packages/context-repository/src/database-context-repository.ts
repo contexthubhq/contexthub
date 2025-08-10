@@ -20,7 +20,7 @@ const snapshotContentSchema = z.object({
 });
 
 export class DatabaseContextRepository implements ContextRepository {
-  async getRevision({
+  private async getTipOfBranch({
     branchName,
   }: {
     branchName: string;
@@ -35,12 +35,13 @@ export class DatabaseContextRepository implements ContextRepository {
     }
     return { revisionId: branch.revisionId };
   }
+
   async checkout({
     branchName,
   }: {
     branchName: string;
   }): Promise<ContextWorkingCopy> {
-    const { revisionId } = await this.getRevision({
+    const { revisionId } = await this.getTipOfBranch({
       branchName,
     });
     const revision = await prisma.contextRevision.findUnique({
@@ -54,14 +55,15 @@ export class DatabaseContextRepository implements ContextRepository {
     const content = snapshotContentSchema.parse(revision.content);
     return new InMemoryContextWorkingCopy(content);
   }
+
   async commit({
     workingCopy,
     branchName,
   }: {
     workingCopy: ContextWorkingCopy;
     branchName: string;
-  }): Promise<void> {
-    const { revisionId } = await this.getRevision({ branchName });
+  }): Promise<{ revisionId: string }> {
+    const { revisionId } = await this.getTipOfBranch({ branchName });
     const [tables, columns, metrics, concepts] = await Promise.all([
       workingCopy.repo('table').list(),
       workingCopy.repo('column').list(),
@@ -84,11 +86,14 @@ export class DatabaseContextRepository implements ContextRepository {
       },
       data: { revisionId: newRevision.id },
     });
+    return { revisionId: newRevision.id };
   }
+
   async listBranches(): Promise<string[]> {
     const branches = await prisma.contextBranch.findMany();
     return branches.map((branch) => branch.name);
   }
+
   async createBranch({
     newBranchName,
     sourceBranchName,
@@ -96,7 +101,7 @@ export class DatabaseContextRepository implements ContextRepository {
     newBranchName: string;
     sourceBranchName: string;
   }): Promise<void> {
-    const { revisionId } = await this.getRevision({
+    const { revisionId } = await this.getTipOfBranch({
       branchName: sourceBranchName,
     });
     await prisma.contextBranch.create({
@@ -106,6 +111,7 @@ export class DatabaseContextRepository implements ContextRepository {
       },
     });
   }
+
   async merge({
     sourceBranchName,
     targetBranchName,
@@ -113,25 +119,51 @@ export class DatabaseContextRepository implements ContextRepository {
     sourceBranchName: string;
     targetBranchName: string;
   }): Promise<void> {
-    // Only allow fast-forward merge.
-    const { revisionId: sourceRevisionId } = await this.getRevision({
+    const { revisionId: sourceRevisionId } = await this.getTipOfBranch({
       branchName: sourceBranchName,
     });
-    const { revisionId: targetRevisionId } = await this.getRevision({
+    const { revisionId: targetRevisionId } = await this.getTipOfBranch({
       branchName: targetBranchName,
     });
-    const sourceRevision = await prisma.contextRevision.findUnique({
-      where: { id: sourceRevisionId },
-      select: {
-        parentId: true,
-      },
+    const isAncestor = await isAncestorOf({
+      ancestorRevisionId: targetRevisionId,
+      descendantRevisionId: sourceRevisionId,
     });
-    if (sourceRevision?.parentId !== targetRevisionId) {
-      throw new Error('Cannot merge non-fast-forward branch');
+    if (!isAncestor) {
+      throw new Error(
+        `Only fast-forward merge is allowed. Tip of ${targetBranchName} is not an ancestor of ${sourceBranchName}.`
+      );
     }
     await prisma.contextBranch.update({
       where: { name: targetBranchName },
       data: { revisionId: sourceRevisionId },
     });
   }
+}
+
+async function isAncestorOf({
+  ancestorRevisionId,
+  descendantRevisionId,
+}: {
+  ancestorRevisionId: string;
+  descendantRevisionId: string;
+}): Promise<boolean> {
+  let currentRevisionId: string | null = descendantRevisionId;
+  while (currentRevisionId !== null) {
+    if (currentRevisionId === ancestorRevisionId) {
+      return true;
+    }
+    const revision: { parentId: string | null } | null =
+      await prisma.contextRevision.findUnique({
+        where: { id: currentRevisionId },
+        select: {
+          parentId: true,
+        },
+      });
+    if (!revision) {
+      throw new Error(`Revision ${currentRevisionId} not found`);
+    }
+    currentRevisionId = revision.parentId;
+  }
+  return false;
 }
