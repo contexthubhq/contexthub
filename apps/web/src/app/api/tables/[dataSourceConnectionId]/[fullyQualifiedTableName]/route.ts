@@ -83,7 +83,15 @@ async function getTableDetailsHandler(
       (column) =>
         column.dataSourceConnectionId === dataSourceConnectionId &&
         column.columnName === columnDefinition.columnName
-    );
+  // Build a map from columnName to columnContext for fast lookup
+  const columnContextMap = new Map<string, typeof columnContexts[0]>();
+  for (const column of columnContexts) {
+    columnContextMap.set(column.columnName, column);
+  }
+
+  const columns: ColumnMetadata[] = [];
+  for (const columnDefinition of columnDefinitions) {
+    const columnContext = columnContextMap.get(columnDefinition.columnName);
     if (!columnContext) {
       columns.push({
         ...columnDefinition,
