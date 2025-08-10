@@ -175,7 +175,8 @@ function computeEntityChanges<T>(
   const removed: Array<T> = [];
   const modified: Array<{ before: T; after: T }> = [];
 
-  for (const [key, headItem] of headMap) {
+  for (const headItem of head) {
+    const key = keyFn(headItem);
     if (!baseMap.has(key)) {
       added.push(headItem);
       continue;
@@ -186,7 +187,8 @@ function computeEntityChanges<T>(
     }
   }
 
-  for (const [key, baseItem] of baseMap) {
+  for (const baseItem of base) {
+    const key = keyFn(baseItem);
     if (!headMap.has(key)) {
       removed.push(baseItem);
     }

@@ -8,6 +8,8 @@ import { getDataSourceConnection } from '@contexthub/data-sources-connections';
 import { NextRequest, NextResponse } from 'next/server';
 import { withErrorHandling } from '@/lib/with-error-handling';
 import { ApiError } from '@/lib/api-error';
+import { DatabaseContextRepository } from '@contexthub/context-repository';
+import { getContextRepository } from '@/lib/get-context-repository';
 
 export const dynamic = 'force-dynamic';
 
@@ -48,21 +50,56 @@ async function getTableDetailsHandler(
     fullyQualifiedTableName,
   });
 
-  // TODO: Get context from context store.
-  const table: TableMetadata = {
-    ...tableDefinition,
+  const repository = getContextRepository();
+  const workingCopy = await repository.checkout({
+    branchName: repository.mainBranchName,
+  });
+  const tableContext = await workingCopy.getTable({
     dataSourceConnectionId,
-    description: null,
-  };
-
-  const columns: ColumnMetadata[] = columnDefinitions.map(
-    (columnDefinition) => ({
-      ...columnDefinition,
+    fullyQualifiedTableName,
+  });
+  let table: TableMetadata;
+  if (tableContext) {
+    table = {
+      ...tableDefinition,
+      ...tableContext,
+    };
+  } else {
+    table = {
+      ...tableDefinition,
       dataSourceConnectionId,
       description: null,
-      exampleValues: [],
-    })
+    };
+  }
+
+  const columnContexts = (await workingCopy.listColumns()).filter(
+    (column) =>
+      column.dataSourceConnectionId === dataSourceConnectionId &&
+      column.fullyQualifiedTableName === fullyQualifiedTableName
   );
+
+  const columns: ColumnMetadata[] = [];
+  for (const columnDefinition of columnDefinitions) {
+    const columnContext = columnContexts.find(
+      (column) =>
+        column.dataSourceConnectionId === dataSourceConnectionId &&
+        column.fullyQualifiedTableName === fullyQualifiedTableName &&
+        column.columnName === columnDefinition.columnName
+    );
+    if (!columnContext) {
+      columns.push({
+        ...columnDefinition,
+        dataSourceConnectionId,
+        description: null,
+        exampleValues: [],
+      });
+    } else {
+      columns.push({
+        ...columnDefinition,
+        ...columnContext,
+      });
+    }
+  }
 
   return NextResponse.json({
     table,

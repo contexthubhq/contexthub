@@ -57,6 +57,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@contexthub/context-repository':
+        specifier: workspace:*
+        version: link:../../packages/context-repository
       '@contexthub/core':
         specifier: workspace:*
         version: link:../../packages/core
