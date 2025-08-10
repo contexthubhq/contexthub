@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { EditableList } from '@/components/ui/editable-list';
-import { Metric } from '@contexthub/core';
+import { Metric, NewMetric, newMetricSchema } from '@contexthub/core';
 import {
   Sheet,
   SheetBody,
@@ -23,7 +23,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
-import { NewMetric, newMetricSchema } from '@/types/metrics';
 
 export function MetricSheet({
   metric,

@@ -8,12 +8,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Metric } from '@contexthub/core';
+import { Metric, NewMetric } from '@contexthub/core';
 import { Check } from 'lucide-react';
 import { MetricSheet } from './metric-sheet';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { NewMetric } from '@/types/metrics';
 
 const useMetricsQuery = () => {
   const metrics: Metric[] = [
