@@ -52,34 +52,3 @@ export const columnDefinitionSchema = z.object({
 });
 
 export type ColumnDefinition = z.infer<typeof columnDefinitionSchema>;
-
-/**
- * Natural language context for a column that allows LLMs to understand what's
- * in the column and how to use it in a query.
- */
-export const columnContextSchema = z.object({
-  /**
-   * Column description. This is a free-form text field that can be used to
-   * describe business context and other information about the column.
-   * This will be exposed through the MCP and will help LLMs understand how
-   * to use the column in a query.
-   */
-  description: z.string().nullable(),
-  /**
-   * Example values for the column. This is a list of values that can be used
-   * to help LLMs understand the column.
-   */
-  exampleValues: z.array(z.string()),
-});
-
-export type ColumnContext = z.infer<typeof columnContextSchema>;
-
-/**
- * Metadata for a column that includes both system-defined and natural language
- * context.
- */
-export const columnMetadataSchema = columnDefinitionSchema.extend(
-  columnContextSchema.shape
-);
-
-export type ColumnMetadata = z.infer<typeof columnMetadataSchema>;

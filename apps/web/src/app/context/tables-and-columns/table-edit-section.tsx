@@ -3,7 +3,6 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle, Pencil } from 'lucide-react';
 import { useTableDetailsQuery } from '@/api/use-table-details-query';
-import { ColumnMetadata } from '@contexthub/core';
 import {
   Table,
   TableBody,
@@ -24,6 +23,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { EditableList } from '@/components/ui/editable-list';
+import { ColumnMetadata } from '@/types/table-details-query-result';
 
 /**
  * The section where the user can edit context for a selected table.

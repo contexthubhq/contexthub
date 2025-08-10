@@ -11,6 +11,10 @@ import type { ContextSource } from '@contexthub/context-sources';
  */
 export interface GenerateTableContextInput {
   /**
+   * The id of the data source connection this context is associated with.
+   */
+  dataSourceConnectionId: string;
+  /**
    * The table definition to generate context for
    */
   table: TableDefinition;
@@ -25,6 +29,10 @@ export interface GenerateTableContextInput {
  * Input for generating column context
  */
 export interface GenerateColumnContextInput {
+  /**
+   * The id of the data source connection this context is associated with.
+   */
+  dataSourceConnectionId: string;
   /**
    * The column definition to generate context for
    */
