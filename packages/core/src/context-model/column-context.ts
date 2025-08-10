@@ -5,8 +5,17 @@ import { z } from 'zod';
  * in the column and how to use it in a query.
  */
 export const columnContextSchema = z.object({
+  /**
+   * The id of the data source connection this context is associated with.
+   */
   dataSourceConnectionId: z.string(),
+  /**
+   * The fully qualified name of the table this context is associated with.
+   */
   fullyQualifiedTableName: z.string(),
+  /**
+   * The name of the column this context is associated with.
+   */
   columnName: z.string(),
   /**
    * Column description. This is a free-form text field that can be used to

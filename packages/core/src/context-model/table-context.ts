@@ -5,7 +5,13 @@ import { z } from 'zod';
  * in the table and how to use it in a query.
  */
 export const tableContextSchema = z.object({
+  /**
+   * The id of the data source connection this context is associated with.
+   */
   dataSourceConnectionId: z.string(),
+  /**
+   * The fully qualified name of the table this context is associated with.
+   */
   fullyQualifiedTableName: z.string(),
   /**
    * Table description. This is a free-form text field that can be used to
