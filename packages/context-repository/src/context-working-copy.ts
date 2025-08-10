@@ -13,6 +13,25 @@ export interface ContextWorkingCopyDiff {
   concept: EntityChanges<'concept'>;
 }
 
+/**
+ * The working copy of the entire context.
+ *
+ * The working copy can be queried, edited, and diffed, but in order to persist the
+ * changes to a repository, you must call the `commit` method of the repository.
+ *
+ * Example:
+ * ```ts
+ * const workingCopy = await repository.checkout(repository.mainBranchName);
+ * const tables = await workingCopy.repo('table').list();
+ * const table = tables[0];
+ * table.name = 'new-name';
+ * await workingCopy.repo('table').upsert(table);
+ * await repository.commit({
+ *   workingCopy,
+ *   branchName: repository.mainBranchName,
+ * });
+ * ```
+ */
 export interface ContextWorkingCopy {
   /**
    * Returns a repository for the given entity kind.

@@ -1,13 +1,20 @@
 import { ContextWorkingCopy } from './context-working-copy.js';
 
+/**
+ * A repository for storing context.
+ *
+ * The interface is structured like a version control system. The underlying implementation
+ * can be a database, or Git, or any other system that allows for revisions and branches.
+ */
 export interface ContextRepository {
   readonly mainBranchName: string;
   /**
-   * Gets the HEAD working copy of the branch.
+   * Gets a working copy of the tip revision of the branch.
    */
   checkout(params: { branchName: string }): Promise<ContextWorkingCopy>;
   /**
-   * Commits the working copy to the target branch creating a new revision.
+   * Commits the working copy to the target branch creating a new revision and updating
+   * the branch to point to the new revision.
    */
   commit(params: {
     workingCopy: ContextWorkingCopy;
@@ -20,9 +27,8 @@ export interface ContextRepository {
   /**
    * Creates a new branch from the source branch.
    *
-   * @param params - The parameters for the create branch operation.
-   * @param params.newBranchName - The name of the new branch.
-   * @param params.sourceBranchName - The name of the branch to branch from.
+   * @param newBranchName - The name of the new branch.
+   * @param sourceBranchName - The name of the branch to branch from.
    */
   createBranch(params: {
     newBranchName: string;

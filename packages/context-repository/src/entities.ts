@@ -6,6 +6,11 @@ import {
 } from '@contexthub/core';
 import z from 'zod';
 
+/**
+ * The schema for a table context in the repository.
+ *
+ * It adds identifying information to the table context.
+ */
 export const tableContextInRepositorySchema = tableContextSchema.extend({
   dataSourceConnectionId: z.string(),
   fullyQualifiedTableName: z.string(),
@@ -15,6 +20,11 @@ export type TableContextInRepository = z.infer<
   typeof tableContextInRepositorySchema
 >;
 
+/**
+ * The schema for a column context in the repository.
+ *
+ * It adds identifying information to the column context.
+ */
 export const columnContextInRepositorySchema = columnContextSchema.extend({
   dataSourceConnectionId: z.string(),
   fullyQualifiedTableName: z.string(),
@@ -30,12 +40,12 @@ export type EntityKind = 'table' | 'column' | 'metric' | 'concept';
 export type EntityOf<K extends EntityKind> = K extends 'table'
   ? TableContextInRepository
   : K extends 'column'
-    ? ColumnContextInRepository
-    : K extends 'metric'
-      ? MetricDefinition
-      : K extends 'concept'
-        ? ConceptDefinition
-        : never;
+  ? ColumnContextInRepository
+  : K extends 'metric'
+  ? MetricDefinition
+  : K extends 'concept'
+  ? ConceptDefinition
+  : never;
 
 export function getEntityId<K extends EntityKind>({
   kind,
