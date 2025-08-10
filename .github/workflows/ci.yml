@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  lint-and-typecheck:
+  lint-format-typecheck-test:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
@@ -26,8 +26,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Check formatting
-        run: pnpm run format:check
+        run: pnpm format:check
       - name: Run linting
-        run: pnpm run lint
+        run: pnpm lint
       - name: Type check
-        run: pnpm run check-types
+        run: pnpm check-types
+      - name: Run tests
+        run: pnpm test
