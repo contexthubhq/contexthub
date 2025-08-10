@@ -80,7 +80,6 @@ export class OpenAIAgentContextEngine implements ContextEngine {
       TableContext,
       'dataSourceConnectionId' | 'fullyQualifiedTableName'
     > = {
-      kind: 'table',
       description:
         finalContext || accumulatedContext || 'No context could be generated.',
     };

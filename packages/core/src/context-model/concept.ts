@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
 export const conceptSchema = z.object({
-  kind: z.literal('concept'),
   /**
    * Unique identifier for the concept.
    */
@@ -30,3 +29,9 @@ export const conceptSchema = z.object({
 });
 
 export type Concept = z.infer<typeof conceptSchema>;
+
+export const newConceptSchema = conceptSchema.omit({
+  id: true,
+});
+
+export type NewConcept = z.infer<typeof newConceptSchema>;

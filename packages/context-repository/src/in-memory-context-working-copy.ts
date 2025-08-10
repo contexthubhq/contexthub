@@ -2,20 +2,23 @@ import { ContextWorkingCopy } from './context-working-copy.js';
 import {
   ColumnContext,
   Concept,
-  ContextEntity,
   Metric,
+  NewConcept,
+  NewMetric,
   TableContext,
 } from '@contexthub/core';
-import { EntityOf, getEntityId } from './entities.js';
 import type {
-  ContextWorkingCopyDiff,
-  EntityChanges,
+  ColumnIdentifier,
+  ConceptIdentifier,
+  MetricIdentifier,
+  TableIdentifier,
 } from './context-working-copy.js';
 
 export class InMemoryContextWorkingCopy implements ContextWorkingCopy {
-  private data: {
-    [K in ContextEntity['kind']]: Map<string, EntityOf<K>>;
-  };
+  private tables: Map<string, TableContext> = new Map();
+  private columns: Map<string, ColumnContext> = new Map();
+  private metrics: Map<string, Metric> = new Map();
+  private concepts: Map<string, Concept> = new Map();
 
   constructor(initialData?: {
     table?: TableContext[];
@@ -23,112 +26,203 @@ export class InMemoryContextWorkingCopy implements ContextWorkingCopy {
     metric?: Metric[];
     concept?: Concept[];
   }) {
-    this.data = {
-      table: new Map(
-        initialData?.table?.map((entity) => [getEntityId(entity), entity])
-      ),
-      column: new Map(
-        initialData?.column?.map((entity) => [getEntityId(entity), entity])
-      ),
-      metric: new Map(
-        initialData?.metric?.map((entity) => [getEntityId(entity), entity])
-      ),
-      concept: new Map(
-        initialData?.concept?.map((entity) => [getEntityId(entity), entity])
-      ),
-    };
+    for (const table of initialData?.table ?? []) {
+      this.tables.set(getTableKey(table), table);
+    }
+    for (const column of initialData?.column ?? []) {
+      this.columns.set(getColumnKey(column), column);
+    }
+    for (const metric of initialData?.metric ?? []) {
+      this.metrics.set(metric.id, metric);
+    }
+    for (const concept of initialData?.concept ?? []) {
+      this.concepts.set(concept.id, concept);
+    }
   }
 
-  repo<K extends ContextEntity['kind']>(kind: K) {
-    const store = this.data[kind];
+  async listTables(): Promise<TableContext[]> {
+    return Array.from(this.tables.values());
+  }
+
+  async listColumns(): Promise<ColumnContext[]> {
+    return Array.from(this.columns.values());
+  }
+
+  async listMetrics(): Promise<Metric[]> {
+    return Array.from(this.metrics.values());
+  }
+
+  async listConcepts(): Promise<Concept[]> {
+    return Array.from(this.concepts.values());
+  }
+
+  async getTable(table: TableIdentifier): Promise<TableContext | undefined> {
+    return this.tables.get(getTableKey(table));
+  }
+
+  async getColumn(
+    column: ColumnIdentifier
+  ): Promise<ColumnContext | undefined> {
+    return this.columns.get(getColumnKey(column));
+  }
+
+  async getMetric(metric: MetricIdentifier): Promise<Metric | undefined> {
+    return this.metrics.get(metric.id);
+  }
+
+  async getConcept(concept: ConceptIdentifier): Promise<Concept | undefined> {
+    return this.concepts.get(concept.id);
+  }
+
+  async upsertTable(table: TableContext): Promise<void> {
+    this.tables.set(getTableKey(table), table);
+  }
+
+  async upsertColumn(column: ColumnContext): Promise<void> {
+    this.columns.set(getColumnKey(column), column);
+  }
+
+  async createMetric(metric: NewMetric): Promise<MetricIdentifier> {
+    const id = makeId();
+    this.metrics.set(id, { ...metric, id });
+    return { id };
+  }
+
+  async createConcept(concept: NewConcept): Promise<ConceptIdentifier> {
+    const id = makeId();
+    this.concepts.set(id, { ...concept, id });
+    return { id };
+  }
+
+  async updateMetric(metric: Metric): Promise<void> {
+    this.metrics.set(metric.id, metric);
+  }
+
+  async updateConcept(concept: Concept): Promise<void> {
+    this.concepts.set(concept.id, concept);
+  }
+
+  async removeTable(table: TableIdentifier): Promise<void> {
+    this.tables.delete(getTableKey(table));
+  }
+
+  async removeColumn(column: ColumnIdentifier): Promise<void> {
+    this.columns.delete(getColumnKey(column));
+  }
+
+  async removeMetric(metric: MetricIdentifier): Promise<void> {
+    this.metrics.delete(metric.id);
+  }
+
+  async removeConcept(concept: ConceptIdentifier): Promise<void> {
+    this.concepts.delete(concept.id);
+  }
+
+  async diff(to: ContextWorkingCopy) {
+    const [baseTables, baseColumns, baseMetrics, baseConcepts] =
+      await Promise.all([
+        this.listTables(),
+        this.listColumns(),
+        this.listMetrics(),
+        this.listConcepts(),
+      ]);
+
+    const [headTables, headColumns, headMetrics, headConcepts] =
+      await Promise.all([
+        to.listTables(),
+        to.listColumns(),
+        to.listMetrics(),
+        to.listConcepts(),
+      ]);
+
     return {
-      list: async (): Promise<EntityOf<K>[]> => [...store.values()],
-      get: async (id: string): Promise<EntityOf<K> | null> => {
-        return store.get(id) ?? null;
-      },
-      upsert: async (entity: EntityOf<K>): Promise<void> => {
-        const newEntityId = getEntityId(entity);
-        store.set(newEntityId, entity);
-      },
-      remove: async (id: string): Promise<void> => {
-        store.delete(id);
-      },
+      table: computeEntityChanges(baseTables, headTables, getTableKey),
+      column: computeEntityChanges(baseColumns, headColumns, getColumnKey),
+      metric: computeEntityChanges(baseMetrics, headMetrics, (m) => m.id),
+      concept: computeEntityChanges(baseConcepts, headConcepts, (c) => c.id),
     };
   }
+}
 
-  private static deepEqual(a: unknown, b: unknown): boolean {
-    if (a === b) return true;
-    try {
-      return JSON.stringify(a) === JSON.stringify(b);
-    } catch {
-      return false;
+function makeId(): string {
+  return crypto.randomUUID();
+}
+
+function getTableKey(table: TableIdentifier): string {
+  return `${table.dataSourceConnectionId}:${table.fullyQualifiedTableName}`;
+}
+
+function getColumnKey(column: ColumnIdentifier): string {
+  return `${column.dataSourceConnectionId}:${column.fullyQualifiedTableName}:${column.columnName}`;
+}
+
+function computeEntityChanges<T>(
+  base: Array<T>,
+  head: Array<T>,
+  keyFn: (item: T) => string
+): {
+  added: Array<T>;
+  removed: Array<T>;
+  modified: Array<{ before: T; after: T }>;
+} {
+  const baseMap = new Map<string, T>();
+  const headMap = new Map<string, T>();
+
+  for (const item of base) baseMap.set(keyFn(item), item);
+  for (const item of head) headMap.set(keyFn(item), item);
+
+  const added: Array<T> = [];
+  const removed: Array<T> = [];
+  const modified: Array<{ before: T; after: T }> = [];
+
+  for (const [key, headItem] of headMap) {
+    if (!baseMap.has(key)) {
+      added.push(headItem);
+      continue;
+    }
+    const baseItem = baseMap.get(key)!;
+    if (!deepEqual(baseItem as unknown as any, headItem as unknown as any)) {
+      modified.push({ before: baseItem, after: headItem });
     }
   }
 
-  private static arrayToMap<K extends ContextEntity['kind']>(
-    entities: EntityOf<K>[]
-  ): Map<string, EntityOf<K>> {
-    return new Map(entities.map((entity) => [getEntityId(entity), entity]));
-  }
-
-  private static computeEntityChanges<K extends ContextEntity['kind']>(
-    fromMap: Map<string, EntityOf<K>>,
-    toMap: Map<string, EntityOf<K>>
-  ): EntityChanges<EntityOf<K>> {
-    const added: EntityOf<K>[] = [];
-    const removed: EntityOf<K>[] = [];
-    const modified: Array<{ before: EntityOf<K>; after: EntityOf<K> }> = [];
-
-    // Added
-    for (const [id, toEntity] of toMap.entries()) {
-      if (!fromMap.has(id)) {
-        added.push(toEntity);
-      }
+  for (const [key, baseItem] of baseMap) {
+    if (!headMap.has(key)) {
+      removed.push(baseItem);
     }
+  }
 
-    // Removed and Modified
-    for (const [id, fromEntity] of fromMap.entries()) {
-      const toEntity = toMap.get(id);
-      if (!toEntity) {
-        removed.push(fromEntity);
-        continue;
-      }
-      if (!InMemoryContextWorkingCopy.deepEqual(fromEntity, toEntity)) {
-        modified.push({ before: fromEntity, after: toEntity });
-      }
+  return { added, removed, modified };
+}
+
+function deepEqual(a: any, b: any): boolean {
+  if (a === b) return true;
+  if (a === null || b === null) return a === b;
+  const typeA = typeof a;
+  const typeB = typeof b;
+  if (typeA !== typeB) return false;
+
+  if (Array.isArray(a)) {
+    if (!Array.isArray(b)) return false;
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i += 1) {
+      if (!deepEqual(a[i], b[i])) return false;
     }
-
-    return { added, removed, modified };
+    return true;
   }
 
-  async diff(to: ContextWorkingCopy): Promise<ContextWorkingCopyDiff> {
-    const [toTables, toColumns, toMetrics, toConcepts] = await Promise.all([
-      to.repo('table').list(),
-      to.repo('column').list(),
-      to.repo('metric').list(),
-      to.repo('concept').list(),
-    ]);
-
-    const table = InMemoryContextWorkingCopy.computeEntityChanges(
-      this.data.table,
-      InMemoryContextWorkingCopy.arrayToMap(toTables)
-    );
-
-    const column = InMemoryContextWorkingCopy.computeEntityChanges(
-      this.data.column,
-      InMemoryContextWorkingCopy.arrayToMap(toColumns)
-    );
-
-    const metric = InMemoryContextWorkingCopy.computeEntityChanges(
-      this.data.metric,
-      InMemoryContextWorkingCopy.arrayToMap(toMetrics)
-    );
-
-    const concept = InMemoryContextWorkingCopy.computeEntityChanges(
-      this.data.concept,
-      InMemoryContextWorkingCopy.arrayToMap(toConcepts)
-    );
-
-    return { table, column, metric, concept };
+  if (typeA === 'object') {
+    const aKeys = Object.keys(a).sort();
+    const bKeys = Object.keys(b).sort();
+    if (aKeys.length !== bKeys.length) return false;
+    for (let i = 0; i < aKeys.length; i += 1) {
+      if (aKeys[i] !== bKeys[i]) return false;
+    }
+    for (const key of aKeys) {
+      if (!deepEqual(a[key], b[key])) return false;
+    }
+    return true;
   }
+
+  return false;
 }

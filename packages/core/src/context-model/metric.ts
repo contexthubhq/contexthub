@@ -3,7 +3,6 @@ import { z } from 'zod';
 const nonEmptyString = z.string().trim().min(1);
 
 export const metricSchema = z.object({
-  kind: z.literal('metric'),
   /**
    * Unique identifier for the metric.
    */
@@ -36,3 +35,9 @@ export const metricSchema = z.object({
 });
 
 export type Metric = z.infer<typeof metricSchema>;
+
+export const newMetricSchema = metricSchema.omit({
+  id: true,
+});
+
+export type NewMetric = z.infer<typeof newMetricSchema>;

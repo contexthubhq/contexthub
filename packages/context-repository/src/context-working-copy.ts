@@ -1,11 +1,13 @@
 import {
   ColumnContext,
   Concept,
-  ContextEntity,
   Metric,
+  NewConcept,
+  NewMetric,
   TableContext,
 } from '@contexthub/core';
-import type { EntityOf } from './entities.js';
+
+type ContextEntity = TableContext | ColumnContext | Metric | Concept;
 
 export type EntityChanges<T extends ContextEntity> = {
   added: Array<T>;
@@ -19,6 +21,25 @@ export interface ContextWorkingCopyDiff {
   metric: EntityChanges<Metric>;
   concept: EntityChanges<Concept>;
 }
+
+export type TableIdentifier = {
+  dataSourceConnectionId: string;
+  fullyQualifiedTableName: string;
+};
+
+export type ColumnIdentifier = {
+  dataSourceConnectionId: string;
+  fullyQualifiedTableName: string;
+  columnName: string;
+};
+
+export type MetricIdentifier = {
+  id: string;
+};
+
+export type ConceptIdentifier = {
+  id: string;
+};
 
 /**
  * The working copy of the entire context.
@@ -40,19 +61,33 @@ export interface ContextWorkingCopyDiff {
  * ```
  */
 export interface ContextWorkingCopy {
-  /**
-   * Returns a repository for the given entity kind.
-   *
-   * @param kind - The kind of entity to get a repository for.
-   */
-  repo<K extends ContextEntity['kind']>(
-    kind: K
-  ): {
-    list(): Promise<EntityOf<K>[]>;
-    get(id: string): Promise<EntityOf<K> | null>;
-    upsert(entity: EntityOf<K>): Promise<void>;
-    remove(id: string): Promise<void>;
-  };
+  // List
+  listTables(): Promise<TableContext[]>;
+  listColumns(): Promise<ColumnContext[]>;
+  listMetrics(): Promise<Metric[]>;
+  listConcepts(): Promise<Concept[]>;
+
+  // Get
+  getTable(table: TableIdentifier): Promise<TableContext | undefined>;
+  getColumn(column: ColumnIdentifier): Promise<ColumnContext | undefined>;
+  getMetric(metric: MetricIdentifier): Promise<Metric | undefined>;
+  getConcept(concept: ConceptIdentifier): Promise<Concept | undefined>;
+
+  // Upsert
+  upsertTable(table: TableContext): Promise<void>;
+  upsertColumn(column: ColumnContext): Promise<void>;
+
+  createMetric(metric: NewMetric): Promise<MetricIdentifier>;
+  createConcept(concept: NewConcept): Promise<ConceptIdentifier>;
+  updateMetric(metric: Metric): Promise<void>;
+  updateConcept(concept: Concept): Promise<void>;
+
+  // Remove
+  removeTable(table: TableIdentifier): Promise<void>;
+  removeColumn(column: ColumnIdentifier): Promise<void>;
+  removeMetric(metric: MetricIdentifier): Promise<void>;
+  removeConcept(concept: ConceptIdentifier): Promise<void>;
+
   /**
    * Computes the diff from the current working copy to the passed working copy.
    *

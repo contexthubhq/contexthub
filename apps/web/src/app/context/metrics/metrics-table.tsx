@@ -18,7 +18,6 @@ import { NewMetric } from '@/types/metrics';
 const useMetricsQuery = () => {
   const metrics: Metric[] = [
     {
-      kind: 'metric',
       id: '1',
       name: 'Customer Lifetime Value',
       description:
@@ -36,7 +35,6 @@ const useMetricsQuery = () => {
       unitOfMeasure: 'USD',
     },
     {
-      kind: 'metric',
       id: '2',
       name: 'Monthly Recurring Revenue',
       description:
@@ -51,7 +49,6 @@ const useMetricsQuery = () => {
       unitOfMeasure: 'USD',
     },
     {
-      kind: 'metric',
       id: '3',
       name: 'Customer Acquisition Cost',
       description: 'The cost to acquire a new customer',

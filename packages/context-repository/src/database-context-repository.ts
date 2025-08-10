@@ -68,10 +68,10 @@ export class DatabaseContextRepository implements ContextRepository {
   }): Promise<{ revisionId: string }> {
     const { revisionId } = await this.getTipOfBranch({ branchName });
     const [tables, columns, metrics, concepts] = await Promise.all([
-      workingCopy.repo('table').list(),
-      workingCopy.repo('column').list(),
-      workingCopy.repo('metric').list(),
-      workingCopy.repo('concept').list(),
+      workingCopy.listTables(),
+      workingCopy.listColumns(),
+      workingCopy.listMetrics(),
+      workingCopy.listConcepts(),
     ]);
     const content: z.infer<typeof revisionContentSchema> = {
       table: tables,

@@ -11,7 +11,7 @@
   "scripts": {
     "type-check": "tsc --noEmit",
     "build": "tsc",
-    "test": "node --test",
+    "test": "node --test ./dist/**/*.test.js",
     "test-cli": "node dist/cli.js"
   },
   "dependencies": {
@@ -20,7 +20,7 @@
     "zod": "3.25.66"
   },
   "devDependencies": {
-    "typescript": "^5.8.3",
-    "@types/node": "24.1.0"
+    "@types/node": "24.1.0",
+    "typescript": "^5.8.3"
   }
 }

@@ -5,7 +5,6 @@ import { z } from 'zod';
  * in the column and how to use it in a query.
  */
 export const columnContextSchema = z.object({
-  kind: z.literal('column'),
   dataSourceConnectionId: z.string(),
   fullyQualifiedTableName: z.string(),
   columnName: z.string(),

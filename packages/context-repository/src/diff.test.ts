@@ -1,12 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { TableContext } from '@contexthub/core';
 import { InMemoryContextWorkingCopy } from './in-memory-context-working-copy.js';
-import type { EntityOf } from './entities.js';
 
 test('diff returns empty changes for identical working copies', async () => {
-  const tables: EntityOf<'table'>[] = [
+  const tables: TableContext[] = [
     {
-      kind: 'table',
       dataSourceConnectionId: 'ds',
       fullyQualifiedTableName: 'public.t1',
       description: 'base',
@@ -38,7 +37,6 @@ test('diff detects added, removed, and modified entities across kinds', async ()
   const base = new InMemoryContextWorkingCopy({
     column: [
       {
-        kind: 'column',
         dataSourceConnectionId: 'ds',
         fullyQualifiedTableName: 'public.t1',
         columnName: 'c1',
@@ -48,7 +46,6 @@ test('diff detects added, removed, and modified entities across kinds', async ()
     ],
     metric: [
       {
-        kind: 'metric',
         id: 'm1',
         name: 'Metric 1',
         description: 'M1 base',
@@ -64,7 +61,6 @@ test('diff detects added, removed, and modified entities across kinds', async ()
     column: [
       // Modify c1: change description
       {
-        kind: 'column',
         dataSourceConnectionId: 'ds',
         fullyQualifiedTableName: 'public.t1',
         columnName: 'c1',
@@ -76,7 +72,6 @@ test('diff detects added, removed, and modified entities across kinds', async ()
       // Remove m1
       // Add m2
       {
-        kind: 'metric',
         id: 'm2',
         name: 'Metric 2',
         description: 'M2 new',

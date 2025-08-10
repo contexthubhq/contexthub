@@ -52,7 +52,6 @@ async function getTableDetailsHandler(
   const table: TableMetadata = {
     ...tableDefinition,
     dataSourceConnectionId,
-    kind: 'table',
     description: null,
   };
 
@@ -60,7 +59,6 @@ async function getTableDetailsHandler(
     (columnDefinition) => ({
       ...columnDefinition,
       dataSourceConnectionId,
-      kind: 'column',
       description: null,
       exampleValues: [],
     })

@@ -15,9 +15,15 @@ export {
   type ColumnContext,
   columnContextSchema,
 } from './context-model/column-context.js';
-export { type Metric, metricSchema } from './context-model/metric.js';
-export { type Concept, conceptSchema } from './context-model/concept.js';
 export {
-  type ContextEntity,
-  contextEntitySchema,
-} from './context-model/context-entity.js';
+  type Metric,
+  metricSchema,
+  newMetricSchema,
+  type NewMetric,
+} from './context-model/metric.js';
+export {
+  type Concept,
+  conceptSchema,
+  newConceptSchema,
+  type NewConcept,
+} from './context-model/concept.js';
