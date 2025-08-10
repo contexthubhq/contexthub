@@ -82,7 +82,6 @@ async function getTableDetailsHandler(
     const columnContext = columnContexts.find(
       (column) =>
         column.dataSourceConnectionId === dataSourceConnectionId &&
-        column.fullyQualifiedTableName === fullyQualifiedTableName &&
         column.columnName === columnDefinition.columnName
     );
     if (!columnContext) {
