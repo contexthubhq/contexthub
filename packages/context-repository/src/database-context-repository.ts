@@ -11,10 +11,10 @@ import {
 } from '@contexthub/core';
 
 const revisionContentSchema = z.object({
-  table: z.array(tableContextSchema),
-  column: z.array(columnContextSchema),
-  metric: z.array(metricSchema),
-  concept: z.array(conceptSchema),
+  table: z.array(tableContextSchema).optional(),
+  column: z.array(columnContextSchema).optional(),
+  metric: z.array(metricSchema).optional(),
+  concept: z.array(conceptSchema).optional(),
 });
 
 export class DatabaseContextRepository implements ContextRepository {
