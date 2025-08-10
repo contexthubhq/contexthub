@@ -45,10 +45,10 @@ model ContextRevision {
   createdAt DateTime @default(now())
 
   parentId String?
-  parent   ContextRevision? @relation("Parent", fields: [parentId], references: [id], onDelete: Cascade)
+  parent   ContextRevision?  @relation("Parent", fields: [parentId], references: [id], onDelete: Restrict)
   children ContextRevision[] @relation("Parent")
 
-  content Json
+  content Json @db.JsonB
 
   branches ContextBranch[]
 
@@ -59,7 +59,7 @@ model ContextBranch {
   id        String   @id @default(cuid())
   name      String   @unique
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   revisionId String
   revision   ContextRevision @relation(fields: [revisionId], references: [id], onDelete: Cascade)

@@ -23,7 +23,7 @@ CREATE TABLE "context_branches" (
 CREATE UNIQUE INDEX "context_branches_name_key" ON "context_branches"("name");
 
 -- AddForeignKey
-ALTER TABLE "context_revisions" ADD CONSTRAINT "context_revisions_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "context_revisions"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "context_revisions" ADD CONSTRAINT "context_revisions_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "context_revisions"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "context_branches" ADD CONSTRAINT "context_branches_revisionId_fkey" FOREIGN KEY ("revisionId") REFERENCES "context_revisions"("id") ON DELETE CASCADE ON UPDATE CASCADE;
