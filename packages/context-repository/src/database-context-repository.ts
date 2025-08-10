@@ -20,6 +20,8 @@ const snapshotContentSchema = z.object({
 });
 
 export class DatabaseContextRepository implements ContextRepository {
+  readonly mainBranchName = 'main';
+
   private async getTipOfBranch({
     branchName,
   }: {

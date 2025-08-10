@@ -1,8 +1,7 @@
 import { ContextWorkingCopy } from './context-working-copy.js';
 
-export const MAIN_BRANCH_NAME = 'main';
-
 export interface ContextRepository {
+  readonly mainBranchName: string;
   /**
    * Gets the HEAD working copy of the branch.
    */
