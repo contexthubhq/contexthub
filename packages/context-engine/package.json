@@ -9,7 +9,7 @@
     }
   },
   "scripts": {
-    "type-check": "tsc --noEmit",
+    "check-types": "tsc --noEmit",
     "build": "tsc",
     "test:agent": "tsx src/test-openai-agent-context-engine.ts"
   },

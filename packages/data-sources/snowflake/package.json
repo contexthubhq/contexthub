@@ -12,7 +12,7 @@
     "snowflake-test-cli": "./dist/cli.js"
   },
   "scripts": {
-    "type-check": "tsc --noEmit",
+    "check-types": "tsc --noEmit",
     "build": "tsc",
     "test-cli": "node dist/cli.js"
   },
