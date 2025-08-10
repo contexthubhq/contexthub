@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withErrorHandling } from '@/lib/with-error-handling';
 import { ApiError } from '@/lib/api-error';
 import { getContextRepository } from '@/lib/get-context-repository';
+import { ColumnContext } from '@contexthub/core';
 
 export const dynamic = 'force-dynamic';
 
@@ -77,14 +78,7 @@ async function getTableDetailsHandler(
       column.fullyQualifiedTableName === fullyQualifiedTableName
   );
 
-  const columns: ColumnMetadata[] = [];
-  for (const columnDefinition of columnDefinitions) {
-    const columnContext = columnContexts.find(
-      (column) =>
-        column.dataSourceConnectionId === dataSourceConnectionId &&
-        column.columnName === columnDefinition.columnName
-  // Build a map from columnName to columnContext for fast lookup
-  const columnContextMap = new Map<string, typeof columnContexts[0]>();
+  const columnContextMap = new Map<string, ColumnContext>();
   for (const column of columnContexts) {
     columnContextMap.set(column.columnName, column);
   }
