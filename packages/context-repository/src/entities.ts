@@ -30,12 +30,12 @@ export type EntityKind = 'table' | 'column' | 'metric' | 'concept';
 export type EntityOf<K extends EntityKind> = K extends 'table'
   ? TableContextInRepository
   : K extends 'column'
-  ? ColumnContextInRepository
-  : K extends 'metric'
-  ? MetricDefinition
-  : K extends 'concept'
-  ? ConceptDefinition
-  : never;
+    ? ColumnContextInRepository
+    : K extends 'metric'
+      ? MetricDefinition
+      : K extends 'concept'
+        ? ConceptDefinition
+        : never;
 
 export function getEntityId<K extends EntityKind>({
   kind,
