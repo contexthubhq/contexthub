@@ -200,9 +200,6 @@ importers:
       '@contexthub/database':
         specifier: workspace:*
         version: link:../database
-      tsx:
-        specifier: ^4.20.3
-        version: 4.20.3
       zod:
         specifier: 3.25.66
         version: 3.25.66
