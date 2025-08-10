@@ -59,6 +59,7 @@ async function testOpenAIAgentContextEngine() {
 
       // Generate context
       const result = await contextEngine.generateTableContext({
+        dataSourceConnectionId: 'ds1',
         table: testTable,
         contextSources: contextSources,
       });
