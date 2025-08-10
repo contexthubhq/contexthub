@@ -110,22 +110,22 @@ export class InMemoryContextWorkingCopy implements ContextWorkingCopy {
     ]);
 
     const table = InMemoryContextWorkingCopy.computeEntityChanges(
-      this.data.table as Map<string, EntityOf<'table'>>,
+      this.data.table,
       InMemoryContextWorkingCopy.arrayToMap(toTables)
     );
 
     const column = InMemoryContextWorkingCopy.computeEntityChanges(
-      this.data.column as Map<string, EntityOf<'column'>>,
+      this.data.column,
       InMemoryContextWorkingCopy.arrayToMap(toColumns)
     );
 
     const metric = InMemoryContextWorkingCopy.computeEntityChanges(
-      this.data.metric as Map<string, EntityOf<'metric'>>,
+      this.data.metric,
       InMemoryContextWorkingCopy.arrayToMap(toMetrics)
     );
 
     const concept = InMemoryContextWorkingCopy.computeEntityChanges(
-      this.data.concept as Map<string, EntityOf<'concept'>>,
+      this.data.concept,
       InMemoryContextWorkingCopy.arrayToMap(toConcepts)
     );
 

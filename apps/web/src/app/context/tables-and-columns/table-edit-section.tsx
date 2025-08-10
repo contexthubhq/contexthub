@@ -23,7 +23,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { EditableList } from '@/components/ui/editable-list';
-import { ColumnContext, ColumnDefinition } from '@contexthub/core';
+import { ColumnMetadata } from '@/types/table-details-query-result';
 
 /**
  * The section where the user can edit context for a selected table.
@@ -92,11 +92,7 @@ export function TableEditSection({
   );
 }
 
-function Columns({
-  columns,
-}: {
-  columns: (ColumnContext & ColumnDefinition)[];
-}) {
+function Columns({ columns }: { columns: ColumnMetadata[] }) {
   const orderedColumns = columns.sort(
     (a, b) => a.ordinalPosition - b.ordinalPosition
   );

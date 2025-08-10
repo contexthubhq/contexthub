@@ -10,7 +10,7 @@ import {
   tableContextSchema,
 } from '@contexthub/core';
 
-const snapshotContentSchema = z.object({
+const revisionContentSchema = z.object({
   table: z.array(tableContextSchema),
   column: z.array(columnContextSchema),
   metric: z.array(metricSchema),
@@ -55,7 +55,7 @@ export class DatabaseContextRepository implements ContextRepository {
     if (!revision) {
       throw new Error(`Revision ${revisionId} not found`);
     }
-    const content = snapshotContentSchema.parse(revision.content);
+    const content = revisionContentSchema.parse(revision.content);
     return new InMemoryContextWorkingCopy(content);
   }
 
@@ -73,7 +73,7 @@ export class DatabaseContextRepository implements ContextRepository {
       workingCopy.repo('metric').list(),
       workingCopy.repo('concept').list(),
     ]);
-    const content: z.infer<typeof snapshotContentSchema> = {
+    const content: z.infer<typeof revisionContentSchema> = {
       table: tables,
       column: columns,
       metric: metrics,
