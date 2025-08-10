@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { EditableList } from '@/components/ui/editable-list';
-import { MetricDefinition, metricDefinitionSchema } from '@contexthub/core';
+import { type Metric, metricSchema } from '@contexthub/core';
 import {
   Sheet,
   SheetBody,
@@ -25,29 +25,21 @@ import {
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 
-const metricDefinitionSchemaWithoutId = metricDefinitionSchema.omit({
-  id: true,
-});
-
-type MetricDefinitionWithoutId = z.infer<
-  typeof metricDefinitionSchemaWithoutId
->;
-
 export function MetricSheet({
   metric,
   onSubmit,
   open,
   onOpenChange,
 }: {
-  metric?: MetricDefinition;
-  onSubmit: (data: MetricDefinitionWithoutId) => void | Promise<void>;
+  metric?: Metric;
+  onSubmit: (data: Metric) => void | Promise<void>;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
   const title = metric ? 'Edit Metric' : 'Create Metric';
 
-  const form = useForm<MetricDefinitionWithoutId>({
-    resolver: zodResolver(metricDefinitionSchemaWithoutId),
+  const form = useForm<Metric>({
+    resolver: zodResolver(metricSchema),
     mode: 'onChange',
     defaultValues: {
       name: metric?.name ?? '',

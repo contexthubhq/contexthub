@@ -1,10 +1,11 @@
 import { z } from 'zod';
 
-export const conceptDefinitionSchema = z.object({
+export const conceptSchema = z.object({
+  kind: z.literal('concept'),
   /**
    * Unique identifier for the concept.
    */
-  id: z.string(),
+  id: z.string().optional(),
   /**
    * The name of the concept. For example, "Customer",
    * "Product", "Order", "Transaction", etc.
@@ -28,4 +29,4 @@ export const conceptDefinitionSchema = z.object({
   exampleValues: z.array(z.string()),
 });
 
-export type ConceptDefinition = z.infer<typeof conceptDefinitionSchema>;
+export type Concept = z.infer<typeof conceptSchema>;

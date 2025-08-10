@@ -1,77 +1,27 @@
-import {
-  MetricDefinition,
-  ConceptDefinition,
-  tableContextSchema,
-  columnContextSchema,
-} from '@contexthub/core';
-import z from 'zod';
+import { ContextEntity } from '@contexthub/core';
 
-/**
- * The schema for a table context in the repository.
- *
- * It adds identifying information to the table context.
- */
-export const tableContextInRepositorySchema = tableContextSchema.extend({
-  dataSourceConnectionId: z.string(),
-  fullyQualifiedTableName: z.string(),
-});
-
-export type TableContextInRepository = z.infer<
-  typeof tableContextInRepositorySchema
->;
-
-/**
- * The schema for a column context in the repository.
- *
- * It adds identifying information to the column context.
- */
-export const columnContextInRepositorySchema = columnContextSchema.extend({
-  dataSourceConnectionId: z.string(),
-  fullyQualifiedTableName: z.string(),
-  columnName: z.string(),
-});
-
-export type ColumnContextInRepository = z.infer<
-  typeof columnContextInRepositorySchema
->;
-
-export type EntityKind = 'table' | 'column' | 'metric' | 'concept';
-
-export type EntityOf<K extends EntityKind> = K extends 'table'
-  ? TableContextInRepository
-  : K extends 'column'
-  ? ColumnContextInRepository
-  : K extends 'metric'
-  ? MetricDefinition
-  : K extends 'concept'
-  ? ConceptDefinition
-  : never;
-
-export function getEntityId<K extends EntityKind>({
-  kind,
-  entity,
-}: {
-  kind: K;
-  entity: EntityOf<K>;
-}): string {
-  switch (kind) {
+export function getEntityId(entity: ContextEntity): string {
+  switch (entity.kind) {
     case 'table':
-      const table = entity as TableContextInRepository;
-      return `${table.dataSourceConnectionId}:${table.fullyQualifiedTableName}`;
+      return `${entity.dataSourceConnectionId}:${entity.fullyQualifiedTableName}`;
     case 'column':
-      const column = entity as ColumnContextInRepository;
-      return `${column.dataSourceConnectionId}:${column.fullyQualifiedTableName}:${column.columnName}`;
+      return `${entity.dataSourceConnectionId}:${entity.fullyQualifiedTableName}:${entity.columnName}`;
     case 'metric':
-      const metric = entity as MetricDefinition;
-      return `${metric.id}`;
+      return `${entity.id}`;
     case 'concept':
-      const concept = entity as ConceptDefinition;
-      return `${concept.id}`;
+      return `${entity.id}`;
     default: {
-      assertNever(kind);
+      assertNever(entity);
     }
   }
 }
+
+export type EntityOf<K extends ContextEntity['kind']> = Extract<
+  ContextEntity,
+  { kind: K }
+>;
+
+export type KindOf<T extends ContextEntity> = T['kind'];
 
 function assertNever(x: never): never {
   return x;

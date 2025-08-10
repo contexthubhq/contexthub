@@ -1,16 +1,23 @@
-import { EntityKind, EntityOf } from './entities.js';
+import {
+  ColumnContext,
+  Concept,
+  ContextEntity,
+  Metric,
+  TableContext,
+} from '@contexthub/core';
+import type { EntityOf } from './entities.js';
 
-export type EntityChanges<K extends EntityKind> = {
-  added: Array<EntityOf<K>>;
-  removed: Array<EntityOf<K>>;
-  modified: Array<{ before: EntityOf<K>; after: EntityOf<K> }>;
+export type EntityChanges<T extends ContextEntity> = {
+  added: Array<T>;
+  removed: Array<T>;
+  modified: Array<{ before: T; after: T }>;
 };
 
 export interface ContextWorkingCopyDiff {
-  table: EntityChanges<'table'>;
-  column: EntityChanges<'column'>;
-  metric: EntityChanges<'metric'>;
-  concept: EntityChanges<'concept'>;
+  table: EntityChanges<TableContext>;
+  column: EntityChanges<ColumnContext>;
+  metric: EntityChanges<Metric>;
+  concept: EntityChanges<Concept>;
 }
 
 /**
@@ -38,31 +45,12 @@ export interface ContextWorkingCopy {
    *
    * @param kind - The kind of entity to get a repository for.
    */
-  repo<K extends EntityKind>(
+  repo<K extends ContextEntity['kind']>(
     kind: K
   ): {
-    /**
-     * Lists all entities of the given kind.
-     */
     list(): Promise<EntityOf<K>[]>;
-    /**
-     * Gets an entity by its id.
-     *
-     * @param id - The id of the entity to get.
-     */
     get(id: string): Promise<EntityOf<K> | null>;
-    /**
-     * Upserts an entity.
-     *
-     * @param entity - The entity to upsert. If the id is present, the entity is updated.
-     * If the id is not present, the entity is added.
-     */
     upsert(entity: EntityOf<K>): Promise<void>;
-    /**
-     * Removes an entity by its id.
-     *
-     * @param id - The id of the entity to remove.
-     */
     remove(id: string): Promise<void>;
   };
   /**

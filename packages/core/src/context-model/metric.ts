@@ -2,11 +2,12 @@ import { z } from 'zod';
 
 const nonEmptyString = z.string().trim().min(1);
 
-export const metricDefinitionSchema = z.object({
+export const metricSchema = z.object({
+  kind: z.literal('metric'),
   /**
    * Unique identifier for the metric.
    */
-  id: nonEmptyString,
+  id: nonEmptyString.optional(),
   /**
    * The name of the metric. For example, "Monthly Recurring Revenue",
    * "Customer Acquisition Cost".
@@ -34,4 +35,4 @@ export const metricDefinitionSchema = z.object({
   unitOfMeasure: nonEmptyString.nullable(),
 });
 
-export type MetricDefinition = z.infer<typeof metricDefinitionSchema>;
+export type Metric = z.infer<typeof metricSchema>;

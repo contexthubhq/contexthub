@@ -1,9 +1,14 @@
 import { z } from 'zod';
-import { columnMetadataSchema, tableMetadataSchema } from '@contexthub/core';
+import {
+  columnContextSchema,
+  tableContextSchema,
+  columnDefinitionSchema,
+  tableDefinitionSchema,
+} from '@contexthub/core';
 
 export const tableDetailsQueryResultSchema = z.object({
-  table: tableMetadataSchema,
-  columns: z.array(columnMetadataSchema),
+  table: tableContextSchema.merge(tableDefinitionSchema),
+  columns: z.array(columnContextSchema.merge(columnDefinitionSchema)),
 });
 
 export type TableDetailsQueryResult = z.infer<

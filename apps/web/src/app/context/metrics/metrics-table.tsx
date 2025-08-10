@@ -8,15 +8,16 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { MetricDefinition } from '@contexthub/core';
+import { Metric } from '@contexthub/core';
 import { Check } from 'lucide-react';
 import { MetricSheet } from './metric-sheet';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
 const useMetricsQuery = () => {
-  const metrics: MetricDefinition[] = [
+  const metrics: Metric[] = [
     {
+      kind: 'metric',
       id: '1',
       name: 'Customer Lifetime Value',
       description:
@@ -34,6 +35,7 @@ const useMetricsQuery = () => {
       unitOfMeasure: 'USD',
     },
     {
+      kind: 'metric',
       id: '2',
       name: 'Monthly Recurring Revenue',
       description:
@@ -48,6 +50,7 @@ const useMetricsQuery = () => {
       unitOfMeasure: 'USD',
     },
     {
+      kind: 'metric',
       id: '3',
       name: 'Customer Acquisition Cost',
       description: 'The cost to acquire a new customer',
@@ -76,16 +79,16 @@ const useMetricsQuery = () => {
 export function MetricsTable() {
   const { data } = useMetricsQuery();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [selectedMetric, setSelectedMetric] = useState<
-    MetricDefinition | undefined
-  >(undefined);
+  const [selectedMetric, setSelectedMetric] = useState<Metric | undefined>(
+    undefined
+  );
 
-  const handleEditMetric = (metric: MetricDefinition) => {
+  const handleEditMetric = (metric: Metric) => {
     setSelectedMetric(metric);
     setIsSheetOpen(true);
   };
 
-  const handleSubmit = async (data: Omit<MetricDefinition, 'id'>) => {
+  const handleSubmit = async (data: Metric) => {
     // Sleep for 1 second to simulate a save
     await new Promise((resolve) => setTimeout(resolve, 1000));
     toast.success('Metric saved');

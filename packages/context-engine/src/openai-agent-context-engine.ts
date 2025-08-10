@@ -77,6 +77,7 @@ export class OpenAIAgentContextEngine implements ContextEngine {
 
     // Parse the final response into table context
     const context: TableContext = {
+      kind: 'table',
       description:
         finalContext || accumulatedContext || 'No context could be generated.',
     };
@@ -95,7 +96,9 @@ export class OpenAIAgentContextEngine implements ContextEngine {
     table: TableDefinition,
     previousContext: string
   ): string {
-    return `You are a database expert. Based on the available tools and any previous context information, provide additional insights about what the table "${table.tableName}" in schema "${table.tableSchema}" is used for.
+    return `You are a database expert. Based on the available tools and any previous context information, provide additional insights about what the table "${
+      table.tableName
+    }" in schema "${table.tableSchema}" is used for.
 
 Table Information:
 - Table Name: ${table.tableName}
@@ -124,7 +127,9 @@ Provide clear, concise additional information based on the tools available. If t
     table: TableDefinition,
     accumulatedContext: string
   ): string {
-    return `You are a database expert. Synthesize the following accumulated context information into a clear, comprehensive description of what the table "${table.tableName}" in schema "${table.tableSchema}" is used for.
+    return `You are a database expert. Synthesize the following accumulated context information into a clear, comprehensive description of what the table "${
+      table.tableName
+    }" in schema "${table.tableSchema}" is used for.
 
 Table Information:
 - Table Name: ${table.tableName}

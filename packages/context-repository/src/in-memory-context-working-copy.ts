@@ -1,62 +1,64 @@
 import { ContextWorkingCopy } from './context-working-copy.js';
-import { EntityKind, EntityOf, getEntityId } from './entities.js';
+import {
+  ColumnContext,
+  Concept,
+  ContextEntity,
+  Metric,
+  TableContext,
+} from '@contexthub/core';
+import { EntityOf, getEntityId } from './entities.js';
 
 export class InMemoryContextWorkingCopy implements ContextWorkingCopy {
-  private data: { [K in EntityKind]: Map<string, EntityOf<K>> };
+  private data: {
+    [K in ContextEntity['kind']]: Map<string, EntityOf<K>>;
+  };
 
   constructor(initialData?: {
-    table?: EntityOf<'table'>[];
-    column?: EntityOf<'column'>[];
-    metric?: EntityOf<'metric'>[];
-    concept?: EntityOf<'concept'>[];
+    table?: TableContext[];
+    column?: ColumnContext[];
+    metric?: Metric[];
+    concept?: Concept[];
   }) {
     this.data = {
       table: new Map(
-        initialData?.table?.map((entity) => [
-          getEntityId({ kind: 'table', entity }),
-          entity,
-        ])
+        initialData?.table?.map((entity) => [getEntityId(entity), entity])
       ),
       column: new Map(
-        initialData?.column?.map((entity) => [
-          getEntityId({ kind: 'column', entity }),
-          entity,
-        ])
+        initialData?.column?.map((entity) => [getEntityId(entity), entity])
       ),
       metric: new Map(
-        initialData?.metric?.map((entity) => [
-          getEntityId({ kind: 'metric', entity }),
-          entity,
-        ])
+        initialData?.metric?.map((entity) => [getEntityId(entity), entity])
       ),
       concept: new Map(
-        initialData?.concept?.map((entity) => [
-          getEntityId({ kind: 'concept', entity }),
-          entity,
-        ])
+        initialData?.concept?.map((entity) => [getEntityId(entity), entity])
       ),
     };
   }
 
-  repo<K extends EntityKind>(kind: K) {
-    const store = this.data[kind];
+  repo<T extends ContextEntity>(kind: T['kind']) {
+    const store = this.data[kind] as Map<string, T>;
     return {
-      list: async () => [...store.values()],
-      get: async (id: string) => {
+      list: async (): Promise<T[]> => [...store.values()],
+      get: async (id: string): Promise<T | null> => {
         return store.get(id) ?? null;
       },
-      upsert: async (entity: EntityOf<K>) => {
-        const newEntityId = getEntityId({ kind, entity });
+      upsert: async (entity: T): Promise<void> => {
+        const newEntityId = getEntityId(entity);
         store.set(newEntityId, entity);
       },
-      remove: async (id: string) => {
+      remove: async (id: string): Promise<void> => {
         store.delete(id);
       },
     };
   }
 
   async diff(other: ContextWorkingCopy) {
-    const kinds: EntityKind[] = ['table', 'column', 'metric', 'concept'];
+    const kinds: ContextEntity['kind'][] = [
+      'table',
+      'column',
+      'metric',
+      'concept',
+    ];
 
     const result = {
       table: { added: [], removed: [], modified: [] },
@@ -68,21 +70,15 @@ export class InMemoryContextWorkingCopy implements ContextWorkingCopy {
     await Promise.all(
       kinds.map(async (kind) => {
         const [thisList, otherList] = await Promise.all([
-          this.repo(kind as any).list(),
-          other.repo(kind as any).list(),
+          this.repo(kind).list(),
+          other.repo(kind).list(),
         ]);
 
-        const thisMap = new Map<string, EntityOf<any>>(
-          thisList.map((entity) => [
-            getEntityId({ kind: kind as any, entity }),
-            entity,
-          ])
+        const thisMap = new Map<string, EntityOf<typeof kind>>(
+          thisList.map((entity) => [getEntityId(entity), entity])
         );
-        const otherMap = new Map<string, EntityOf<any>>(
-          otherList.map((entity) => [
-            getEntityId({ kind: kind as any, entity }),
-            entity,
-          ])
+        const otherMap = new Map<string, EntityOf<typeof kind>>(
+          otherList.map((entity) => [getEntityId(entity), entity])
         );
 
         // Added: present in other, not in this

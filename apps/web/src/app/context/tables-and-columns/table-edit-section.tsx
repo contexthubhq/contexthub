@@ -3,7 +3,6 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle, Pencil } from 'lucide-react';
 import { useTableDetailsQuery } from '@/api/use-table-details-query';
-import { ColumnMetadata } from '@contexthub/core';
 import {
   Table,
   TableBody,
@@ -24,6 +23,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { EditableList } from '@/components/ui/editable-list';
+import { ColumnContext, ColumnDefinition } from '@contexthub/core';
 
 /**
  * The section where the user can edit context for a selected table.
@@ -92,7 +92,11 @@ export function TableEditSection({
   );
 }
 
-function Columns({ columns }: { columns: ColumnMetadata[] }) {
+function Columns({
+  columns,
+}: {
+  columns: (ColumnContext & ColumnDefinition)[];
+}) {
   const orderedColumns = columns.sort(
     (a, b) => a.ordinalPosition - b.ordinalPosition
   );

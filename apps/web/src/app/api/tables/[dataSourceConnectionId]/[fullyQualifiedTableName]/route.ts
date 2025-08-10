@@ -1,5 +1,10 @@
 import { TableDetailsQueryResult } from '@/types/table-details-query-result';
-import { ColumnMetadata, TableMetadata } from '@contexthub/core';
+import {
+  ColumnContext,
+  TableContext,
+  ColumnDefinition,
+  TableDefinition,
+} from '@contexthub/core';
 import { registry } from '@contexthub/data-sources-all';
 import { getDataSourceConnection } from '@contexthub/data-sources-connections';
 import { NextRequest, NextResponse } from 'next/server';
@@ -46,14 +51,16 @@ async function getTableDetailsHandler(
   });
 
   // TODO: Get context from context store.
-  const table: TableMetadata = {
+  const table: TableContext & TableDefinition = {
     ...tableDefinition,
+    kind: 'table',
     description: null,
   };
 
-  const columns: ColumnMetadata[] = columnDefinitions.map(
+  const columns: (ColumnContext & ColumnDefinition)[] = columnDefinitions.map(
     (columnDefinition) => ({
       ...columnDefinition,
+      kind: 'column',
       description: null,
       exampleValues: [],
     })

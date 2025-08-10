@@ -4,19 +4,17 @@ import { z } from 'zod';
 import { InMemoryContextWorkingCopy } from './in-memory-context-working-copy.js';
 import { ContextRepository } from './context-repository.js';
 import {
-  columnContextInRepositorySchema,
-  tableContextInRepositorySchema,
-} from './entities.js';
-import {
-  conceptDefinitionSchema,
-  metricDefinitionSchema,
+  columnContextSchema,
+  conceptSchema,
+  metricSchema,
+  tableContextSchema,
 } from '@contexthub/core';
 
 const snapshotContentSchema = z.object({
-  table: z.array(tableContextInRepositorySchema),
-  column: z.array(columnContextInRepositorySchema),
-  metric: z.array(metricDefinitionSchema),
-  concept: z.array(conceptDefinitionSchema),
+  table: z.array(tableContextSchema),
+  column: z.array(columnContextSchema),
+  metric: z.array(metricSchema),
+  concept: z.array(conceptSchema),
 });
 
 export class DatabaseContextRepository implements ContextRepository {
