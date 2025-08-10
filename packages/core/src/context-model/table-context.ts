@@ -6,8 +6,8 @@ import { z } from 'zod';
  */
 export const tableContextSchema = z.object({
   kind: z.literal('table'),
-  dataSourceConnectionId: z.string().optional(),
-  fullyQualifiedTableName: z.string().optional(),
+  dataSourceConnectionId: z.string(),
+  fullyQualifiedTableName: z.string(),
   /**
    * Table description. This is a free-form text field that can be used to
    * describe business context and other information about the table.

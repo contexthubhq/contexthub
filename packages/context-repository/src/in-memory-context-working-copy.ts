@@ -7,6 +7,10 @@ import {
   TableContext,
 } from '@contexthub/core';
 import { EntityOf, getEntityId } from './entities.js';
+import type {
+  ContextWorkingCopyDiff,
+  EntityChanges,
+} from './context-working-copy.js';
 
 export class InMemoryContextWorkingCopy implements ContextWorkingCopy {
   private data: {
@@ -35,14 +39,14 @@ export class InMemoryContextWorkingCopy implements ContextWorkingCopy {
     };
   }
 
-  repo<T extends ContextEntity>(kind: T['kind']) {
-    const store = this.data[kind] as Map<string, T>;
+  repo<K extends ContextEntity['kind']>(kind: K) {
+    const store = this.data[kind];
     return {
-      list: async (): Promise<T[]> => [...store.values()],
-      get: async (id: string): Promise<T | null> => {
+      list: async (): Promise<EntityOf<K>[]> => [...store.values()],
+      get: async (id: string): Promise<EntityOf<K> | null> => {
         return store.get(id) ?? null;
       },
-      upsert: async (entity: T): Promise<void> => {
+      upsert: async (entity: EntityOf<K>): Promise<void> => {
         const newEntityId = getEntityId(entity);
         store.set(newEntityId, entity);
       },
@@ -52,78 +56,79 @@ export class InMemoryContextWorkingCopy implements ContextWorkingCopy {
     };
   }
 
-  async diff(other: ContextWorkingCopy) {
-    const kinds: ContextEntity['kind'][] = [
-      'table',
-      'column',
-      'metric',
-      'concept',
-    ];
+  private static deepEqual(a: unknown, b: unknown): boolean {
+    if (a === b) return true;
+    try {
+      return JSON.stringify(a) === JSON.stringify(b);
+    } catch {
+      return false;
+    }
+  }
 
-    const result = {
-      table: { added: [], removed: [], modified: [] },
-      column: { added: [], removed: [], modified: [] },
-      metric: { added: [], removed: [], modified: [] },
-      concept: { added: [], removed: [], modified: [] },
-    } as any;
+  private static arrayToMap<K extends ContextEntity['kind']>(
+    entities: EntityOf<K>[]
+  ): Map<string, EntityOf<K>> {
+    return new Map(entities.map((entity) => [getEntityId(entity), entity]));
+  }
 
-    await Promise.all(
-      kinds.map(async (kind) => {
-        const [thisList, otherList] = await Promise.all([
-          this.repo(kind).list(),
-          other.repo(kind).list(),
-        ]);
+  private static computeEntityChanges<K extends ContextEntity['kind']>(
+    fromMap: Map<string, EntityOf<K>>,
+    toMap: Map<string, EntityOf<K>>
+  ): EntityChanges<EntityOf<K>> {
+    const added: EntityOf<K>[] = [];
+    const removed: EntityOf<K>[] = [];
+    const modified: Array<{ before: EntityOf<K>; after: EntityOf<K> }> = [];
 
-        const thisMap = new Map<string, EntityOf<typeof kind>>(
-          thisList.map((entity) => [getEntityId(entity), entity])
-        );
-        const otherMap = new Map<string, EntityOf<typeof kind>>(
-          otherList.map((entity) => [getEntityId(entity), entity])
-        );
+    // Added
+    for (const [id, toEntity] of toMap.entries()) {
+      if (!fromMap.has(id)) {
+        added.push(toEntity);
+      }
+    }
 
-        // Added: present in other, not in this
-        for (const [id, after] of otherMap.entries()) {
-          if (!thisMap.has(id)) {
-            (result[kind] as any).added.push(after);
-          }
-        }
+    // Removed and Modified
+    for (const [id, fromEntity] of fromMap.entries()) {
+      const toEntity = toMap.get(id);
+      if (!toEntity) {
+        removed.push(fromEntity);
+        continue;
+      }
+      if (!InMemoryContextWorkingCopy.deepEqual(fromEntity, toEntity)) {
+        modified.push({ before: fromEntity, after: toEntity });
+      }
+    }
 
-        // Removed: present in this, not in other
-        for (const [id, before] of thisMap.entries()) {
-          if (!otherMap.has(id)) {
-            (result[kind] as any).removed.push(before);
-          }
-        }
+    return { added, removed, modified };
+  }
 
-        // Modified: present in both but deep-unequal
-        for (const [id, before] of thisMap.entries()) {
-          const after = otherMap.get(id);
-          if (after && !deepEqual(before, after)) {
-            (result[kind] as any).modified.push({ before, after });
-          }
-        }
-      })
+  async diff(to: ContextWorkingCopy): Promise<ContextWorkingCopyDiff> {
+    const [toTables, toColumns, toMetrics, toConcepts] = await Promise.all([
+      to.repo('table').list(),
+      to.repo('column').list(),
+      to.repo('metric').list(),
+      to.repo('concept').list(),
+    ]);
+
+    const table = InMemoryContextWorkingCopy.computeEntityChanges(
+      this.data.table as Map<string, EntityOf<'table'>>,
+      InMemoryContextWorkingCopy.arrayToMap(toTables)
     );
 
-    return result;
-  }
-}
+    const column = InMemoryContextWorkingCopy.computeEntityChanges(
+      this.data.column as Map<string, EntityOf<'column'>>,
+      InMemoryContextWorkingCopy.arrayToMap(toColumns)
+    );
 
-function deepEqual(a: unknown, b: unknown): boolean {
-  if (a === b) return true;
-  if (
-    typeof a !== 'object' ||
-    a === null ||
-    typeof b !== 'object' ||
-    b === null
-  ) {
-    return false;
-  }
-  // Handle arrays and plain objects via JSON stable stringification.
-  // For our repository entities which are plain data, this is acceptable.
-  try {
-    return JSON.stringify(a) === JSON.stringify(b);
-  } catch {
-    return false;
+    const metric = InMemoryContextWorkingCopy.computeEntityChanges(
+      this.data.metric as Map<string, EntityOf<'metric'>>,
+      InMemoryContextWorkingCopy.arrayToMap(toMetrics)
+    );
+
+    const concept = InMemoryContextWorkingCopy.computeEntityChanges(
+      this.data.concept as Map<string, EntityOf<'concept'>>,
+      InMemoryContextWorkingCopy.arrayToMap(toConcepts)
+    );
+
+    return { table, column, metric, concept };
   }
 }

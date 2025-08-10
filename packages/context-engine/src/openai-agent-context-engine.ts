@@ -76,7 +76,10 @@ export class OpenAIAgentContextEngine implements ContextEngine {
     );
 
     // Parse the final response into table context
-    const context: TableContext = {
+    const context: Omit<
+      TableContext,
+      'dataSourceConnectionId' | 'fullyQualifiedTableName'
+    > = {
       kind: 'table',
       description:
         finalContext || accumulatedContext || 'No context could be generated.',

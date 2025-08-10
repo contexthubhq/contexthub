@@ -13,6 +13,7 @@ import { Check } from 'lucide-react';
 import { MetricSheet } from './metric-sheet';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { NewMetric } from '@/types/metrics';
 
 const useMetricsQuery = () => {
   const metrics: Metric[] = [
@@ -88,7 +89,7 @@ export function MetricsTable() {
     setIsSheetOpen(true);
   };
 
-  const handleSubmit = async (data: Metric) => {
+  const handleSubmit = async (data: NewMetric | Metric) => {
     // Sleep for 1 second to simulate a save
     await new Promise((resolve) => setTimeout(resolve, 1000));
     toast.success('Metric saved');

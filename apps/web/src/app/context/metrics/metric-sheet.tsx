@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { EditableList } from '@/components/ui/editable-list';
-import { type Metric, metricSchema } from '@contexthub/core';
+import { Metric } from '@contexthub/core';
 import {
   Sheet,
   SheetBody,
@@ -24,6 +23,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
+import { NewMetric, newMetricSchema } from '@/types/metrics';
 
 export function MetricSheet({
   metric,
@@ -32,14 +32,14 @@ export function MetricSheet({
   onOpenChange,
 }: {
   metric?: Metric;
-  onSubmit: (data: Metric) => void | Promise<void>;
+  onSubmit: (data: NewMetric | Metric) => void | Promise<void>;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
   const title = metric ? 'Edit Metric' : 'Create Metric';
 
-  const form = useForm<Metric>({
-    resolver: zodResolver(metricSchema),
+  const form = useForm<NewMetric>({
+    resolver: zodResolver(newMetricSchema),
     mode: 'onChange',
     defaultValues: {
       name: metric?.name ?? '',
@@ -61,7 +61,12 @@ export function MetricSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="contents">
+          <form
+            onSubmit={form.handleSubmit((data) =>
+              onSubmit(metric ? { ...metric, ...data } : data)
+            )}
+            className="contents"
+          >
             <SheetHeader>
               <SheetTitle>{title}</SheetTitle>
             </SheetHeader>

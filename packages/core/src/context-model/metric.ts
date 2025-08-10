@@ -7,7 +7,7 @@ export const metricSchema = z.object({
   /**
    * Unique identifier for the metric.
    */
-  id: nonEmptyString.optional(),
+  id: nonEmptyString,
   /**
    * The name of the metric. For example, "Monthly Recurring Revenue",
    * "Customer Acquisition Cost".

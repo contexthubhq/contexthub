@@ -5,7 +5,7 @@ export {
 export {
   tableDefinitionSchema,
   type TableDefinition,
-} from './context-model/table-metadata.js';
+} from './context-model/table-definition.js';
 
 export {
   type TableContext,

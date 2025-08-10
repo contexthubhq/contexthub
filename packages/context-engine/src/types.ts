@@ -53,7 +53,10 @@ export interface TableContextResult {
   /**
    * Generated table context
    */
-  context: TableContext;
+  context: Omit<
+    TableContext,
+    'dataSourceConnectionId' | 'fullyQualifiedTableName'
+  >;
 
   /**
    * Sources used to generate this context
@@ -73,5 +76,8 @@ export interface ColumnContextResult {
   /**
    * Generated column context
    */
-  context: ColumnContext;
+  context: Omit<
+    ColumnContext,
+    'dataSourceConnectionId' | 'fullyQualifiedTableName' | 'columnName'
+  >;
 }

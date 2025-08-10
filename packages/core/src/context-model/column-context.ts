@@ -6,9 +6,9 @@ import { z } from 'zod';
  */
 export const columnContextSchema = z.object({
   kind: z.literal('column'),
-  dataSourceConnectionId: z.string().optional(),
-  fullyQualifiedTableName: z.string().optional(),
-  columnName: z.string().optional(),
+  dataSourceConnectionId: z.string(),
+  fullyQualifiedTableName: z.string(),
+  columnName: z.string(),
   /**
    * Column description. This is a free-form text field that can be used to
    * describe business context and other information about the column.

@@ -5,7 +5,7 @@ export const conceptSchema = z.object({
   /**
    * Unique identifier for the concept.
    */
-  id: z.string().optional(),
+  id: z.string(),
   /**
    * The name of the concept. For example, "Customer",
    * "Product", "Order", "Transaction", etc.
