@@ -22,6 +22,9 @@ const snapshotContentSchema = z.object({
 export class DatabaseContextRepository implements ContextRepository {
   readonly mainBranchName = 'main';
 
+  /**
+   * Gets the tip revision of a branch.
+   */
   private async getTipOfBranch({
     branchName,
   }: {
@@ -127,6 +130,15 @@ export class DatabaseContextRepository implements ContextRepository {
     const { revisionId: targetRevisionId } = await this.getTipOfBranch({
       branchName: targetBranchName,
     });
+    // Currently, we only allow fast-forward merges.
+    // In a fast-forward merge, the tip of the target branch is an ancestor of the tip of the source branch.
+    // Therefore, we can simply update the target branch to point to the tip of the source branch.
+    // Example:
+    // sourceBranch: A -> B -> C, the branch points to C.
+    // targetBranch: A -> B, the branch points to B.
+    // Now we check that the tip of the target branch (B) is an ancestor of the tip of the source branch (C).
+    // After the merge, the target branch will be updated to the tip of the source branch:
+    // targetBranch: A -> B -> C, the branch points to C.
     const isAncestor = await isAncestorOf({
       ancestorRevisionId: targetRevisionId,
       descendantRevisionId: sourceRevisionId,
