@@ -26,6 +26,7 @@ import { EditableList } from '@/components/ui/editable-list';
 import { Column } from '@/types/table-details-query-result';
 import { TableContext } from '@contexthub/core';
 import { useUpsertTableContextMutation } from '@/api/use-upsert-table-context-mutation';
+import { useUpsertColumnContextMutation } from '@/api/use-upsert-column-context-mutation';
 
 /**
  * The section where the user can edit context for a selected table.
@@ -168,14 +169,10 @@ function Columns({ columns }: { columns: Column[] }) {
                 </Badge>
               </TableCell>
               <TableCell className="max-w-[100px] truncate">
-                <EditableColumnDescription
-                  description={column.columnContext?.description}
-                />
+                <EditableColumnDescription column={column} />
               </TableCell>
               <TableCell className="max-w-[100px] truncate">
-                <EditableColumnExampleValues
-                  exampleValues={column.columnContext?.exampleValues ?? []}
-                />
+                <EditableColumnExampleValues column={column} />
               </TableCell>
             </TableRow>
           ))}
@@ -185,22 +182,54 @@ function Columns({ columns }: { columns: Column[] }) {
   );
 }
 
-function EditableColumnDescription({
-  description,
-}: {
-  description: string | null;
-}) {
+function EditableColumnDescription({ column }: { column: Column }) {
   const [open, setOpen] = useState(false);
-  const [value, setValue] = useState<string>(description ?? '');
-  const [draft, setDraft] = useState<string>(value);
+  const initialDescription = column.columnContext?.description ?? '';
+  const [value, setValue] = useState<string>(initialDescription);
+  const [draft, setDraft] = useState<string>(initialDescription);
+  const [localError, setLocalError] = useState<string | null>(null);
 
-  const onSave = () => {
-    setValue(draft);
+  const {
+    mutateAsync: upsertColumnContext,
+    isPending,
+    error,
+  } = useUpsertColumnContextMutation();
+
+  useEffect(() => {
+    const next = column.columnContext?.description ?? '';
+    setValue(next);
+    if (!open) setDraft(next);
+  }, [column.columnContext?.description]);
+
+  const onSave = async () => {
+    setLocalError(null);
+    const previous = value;
+    const next = draft;
+    // optimistic UI
+    setValue(next);
     setOpen(false);
+    try {
+      await upsertColumnContext({
+        columnContext: {
+          dataSourceConnectionId: column.columnContext.dataSourceConnectionId,
+          fullyQualifiedTableName: column.columnContext.fullyQualifiedTableName,
+          columnName: column.columnContext.columnName,
+          description: next.trim().length > 0 ? next : null,
+          exampleValues: column.columnContext.exampleValues ?? [],
+        },
+      });
+    } catch (e) {
+      // revert on error
+      setValue(previous);
+      setOpen(true);
+      const message = e instanceof Error ? e.message : 'Failed to save';
+      setLocalError(message);
+    }
   };
 
   const onCancel = () => {
     setDraft(value);
+    setLocalError(null);
     setOpen(false);
   };
 
@@ -233,13 +262,40 @@ function EditableColumnDescription({
             onChange={(e) => setDraft(e.target.value)}
             placeholder="Add description..."
             className="min-h-[120px]"
+            aria-busy={isPending}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') {
+                onCancel();
+              }
+              if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                e.preventDefault();
+                void onSave();
+              }
+            }}
           />
+          {(localError || error) && (
+            <div className="text-destructive text-xs">
+              {localError || error?.message}
+            </div>
+          )}
           <div className="flex justify-end gap-2">
-            <Button variant="secondary" size="sm" onClick={onCancel}>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={onCancel}
+              disabled={isPending}
+            >
               Cancel
             </Button>
-            <Button size="sm" onClick={onSave}>
-              Save
+            <Button size="sm" onClick={onSave} disabled={isPending}>
+              {isPending ? (
+                <span className="inline-flex items-center gap-1">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  Saving
+                </span>
+              ) : (
+                'Save'
+              )}
             </Button>
           </div>
         </div>
@@ -248,22 +304,54 @@ function EditableColumnDescription({
   );
 }
 
-function EditableColumnExampleValues({
-  exampleValues,
-}: {
-  exampleValues: string[];
-}) {
+function EditableColumnExampleValues({ column }: { column: Column }) {
   const [open, setOpen] = useState(false);
-  const [values, setValues] = useState<string[]>(exampleValues);
-  const [draftValues, setDraftValues] = useState<string[]>(values);
+  const initialValues = column.columnContext?.exampleValues ?? [];
+  const [values, setValues] = useState<string[]>(initialValues);
+  const [draftValues, setDraftValues] = useState<string[]>(initialValues);
+  const [localError, setLocalError] = useState<string | null>(null);
 
-  const onSave = () => {
-    setValues(draftValues);
+  const {
+    mutateAsync: upsertColumnContext,
+    isPending,
+    error,
+  } = useUpsertColumnContextMutation();
+
+  useEffect(() => {
+    const next = column.columnContext?.exampleValues ?? [];
+    setValues(next);
+    if (!open) setDraftValues(next);
+  }, [column.columnContext?.exampleValues]);
+
+  const onSave = async () => {
+    setLocalError(null);
+    const previous = values;
+    const next = draftValues;
+    // optimistic UI
+    setValues(next);
     setOpen(false);
+    try {
+      await upsertColumnContext({
+        columnContext: {
+          dataSourceConnectionId: column.columnContext.dataSourceConnectionId,
+          fullyQualifiedTableName: column.columnContext.fullyQualifiedTableName,
+          columnName: column.columnContext.columnName,
+          description: column.columnContext.description ?? null,
+          exampleValues: next,
+        },
+      });
+    } catch (e) {
+      // revert on error
+      setValues(previous);
+      setOpen(true);
+      const message = e instanceof Error ? e.message : 'Failed to save';
+      setLocalError(message);
+    }
   };
 
   const onCancel = () => {
     setDraftValues(values);
+    setLocalError(null);
     setOpen(false);
   };
 
@@ -296,12 +384,29 @@ function EditableColumnExampleValues({
           setValues={setDraftValues}
           placeholder="New example value"
         />
+        {(localError || error) && (
+          <div className="text-destructive text-xs">
+            {localError || error?.message}
+          </div>
+        )}
         <div className="flex justify-end gap-2 border-t pt-2">
-          <Button variant="secondary" size="sm" onClick={onCancel}>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={onCancel}
+            disabled={isPending}
+          >
             Cancel
           </Button>
-          <Button size="sm" onClick={onSave}>
-            Save
+          <Button size="sm" onClick={onSave} disabled={isPending}>
+            {isPending ? (
+              <span className="inline-flex items-center gap-1">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                Saving
+              </span>
+            ) : (
+              'Save'
+            )}
           </Button>
         </div>
       </PopoverContent>
