@@ -7,6 +7,8 @@ import {
 import { registry } from '@contexthub/data-sources-all';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
+import { getContextRepository } from '@contexthub/context-repository';
+import type { TableContext } from '@contexthub/core';
 
 export function registerListTables(server: McpServer) {
   server.registerTool(
@@ -42,6 +44,31 @@ export function registerListTables(server: McpServer) {
         const filteredTables = tables.filter((table) =>
           selectedTablesSet.has(table.fullyQualifiedTableName)
         );
+        const repository = getContextRepository();
+        const workingCopy = await repository.checkout({
+          branchName: repository.mainBranchName,
+        });
+        const tableContexts = await workingCopy.listTables();
+        const tableContextMap = new Map<string, TableContext>();
+        for (const tableContext of tableContexts) {
+          if (tableContext.dataSourceConnectionId !== dataSourceId) {
+            continue;
+          }
+          tableContextMap.set(
+            tableContext.fullyQualifiedTableName,
+            tableContext
+          );
+        }
+        const tablesWithContext = filteredTables.map((table) => {
+          const tableContext = tableContextMap.get(
+            table.fullyQualifiedTableName
+          );
+          return {
+            ...table,
+            ...tableContext,
+          };
+        });
+
         console.log(
           '✅ [list-tables] Success, response length:',
           filteredTables.length
@@ -50,7 +77,7 @@ export function registerListTables(server: McpServer) {
           content: [
             {
               type: 'text',
-              text: JSON.stringify(filteredTables),
+              text: JSON.stringify(tablesWithContext),
             },
           ],
         };

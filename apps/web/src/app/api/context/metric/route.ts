@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withErrorHandling } from '@/lib/with-error-handling';
 import { ApiError } from '@/lib/api-error';
 import { Metric, metricSchema, newMetricSchema } from '@contexthub/core';
-import { getContextRepository } from '@/lib/get-context-repository';
+import { getContextRepository } from '@contexthub/context-repository';
 
 async function putMetricHandler(
   request: NextRequest
