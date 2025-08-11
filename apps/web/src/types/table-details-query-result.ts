@@ -6,19 +6,23 @@ import {
   tableDefinitionSchema,
 } from '@contexthub/core';
 
-export const tableMetadataSchema = tableContextSchema.merge(
-  tableDefinitionSchema
-);
-export type TableMetadata = z.infer<typeof tableMetadataSchema>;
+export const tableSchema = z.object({
+  tableDefinition: tableDefinitionSchema,
+  tableContext: tableContextSchema,
+});
 
-export const columnMetadataSchema = columnContextSchema.merge(
-  columnDefinitionSchema
-);
-export type ColumnMetadata = z.infer<typeof columnMetadataSchema>;
+export type Table = z.infer<typeof tableSchema>;
+
+export const columnSchema = z.object({
+  columnDefinition: columnDefinitionSchema,
+  columnContext: columnContextSchema,
+});
+
+export type Column = z.infer<typeof columnSchema>;
 
 export const tableDetailsQueryResultSchema = z.object({
-  table: tableMetadataSchema,
-  columns: z.array(columnMetadataSchema),
+  table: tableSchema,
+  columns: z.array(columnSchema),
 });
 
 export type TableDetailsQueryResult = z.infer<

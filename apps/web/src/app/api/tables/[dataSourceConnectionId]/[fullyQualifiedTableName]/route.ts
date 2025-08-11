@@ -1,7 +1,7 @@
 import {
-  ColumnMetadata,
   TableDetailsQueryResult,
-  TableMetadata,
+  Table,
+  Column,
 } from '@/types/table-details-query-result';
 import { registry } from '@contexthub/data-sources-all';
 import { getDataSourceConnection } from '@contexthub/data-sources-connections';
@@ -58,19 +58,14 @@ async function getTableDetailsHandler(
     dataSourceConnectionId,
     fullyQualifiedTableName,
   });
-  let table: TableMetadata;
-  if (tableContext) {
-    table = {
-      ...tableDefinition,
-      ...tableContext,
-    };
-  } else {
-    table = {
-      ...tableDefinition,
+  const table: Table = {
+    tableDefinition,
+    tableContext: {
       dataSourceConnectionId,
-      description: null,
-    };
-  }
+      fullyQualifiedTableName,
+      description: tableContext?.description ?? null,
+    },
+  };
 
   const columnContexts = (await workingCopy.listColumns()).filter(
     (column) =>
@@ -83,22 +78,20 @@ async function getTableDetailsHandler(
     columnContextMap.set(column.columnName, column);
   }
 
-  const columns: ColumnMetadata[] = [];
+  const columns: Column[] = [];
   for (const columnDefinition of columnDefinitions) {
     const columnContext = columnContextMap.get(columnDefinition.columnName);
-    if (!columnContext) {
-      columns.push({
-        ...columnDefinition,
+    const column: Column = {
+      columnDefinition,
+      columnContext: {
         dataSourceConnectionId,
-        description: null,
-        exampleValues: [],
-      });
-    } else {
-      columns.push({
-        ...columnDefinition,
-        ...columnContext,
-      });
-    }
+        fullyQualifiedTableName,
+        columnName: columnDefinition.columnName,
+        description: columnContext?.description ?? null,
+        exampleValues: columnContext?.exampleValues ?? [],
+      },
+    };
+    columns.push(column);
   }
 
   return NextResponse.json({

@@ -1,7 +1,7 @@
 'use client';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle, Pencil } from 'lucide-react';
+import { AlertCircle, Pencil, Loader2 } from 'lucide-react';
 import { useTableDetailsQuery } from '@/api/use-table-details-query';
 import {
   Table,
@@ -18,12 +18,14 @@ import {
 } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { EditableList } from '@/components/ui/editable-list';
-import { ColumnMetadata } from '@/types/table-details-query-result';
+import { Column } from '@/types/table-details-query-result';
+import { TableContext } from '@contexthub/core';
+import { useUpsertTableContextMutation } from '@/api/use-upsert-table-context-mutation';
 
 /**
  * The section where the user can edit context for a selected table.
@@ -71,16 +73,13 @@ export function TableEditSection({
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
         <h2 className="text-md font-semibold">
-          {tableDetailsQueryResult.table.tableName}
+          {tableDetailsQueryResult.table.tableDefinition.tableName}
         </h2>
       </div>
       <div className="flex flex-col gap-3">
-        <div className="flex flex-col gap-2">
-          <h4 className="text-sm font-semibold">Table description</h4>
-          <EditableTableDescription
-            description={tableDetailsQueryResult.table.description}
-          />
-        </div>
+        <EditableTableContext
+          tableContext={tableDetailsQueryResult.table.tableContext}
+        />
         <div className="flex flex-col gap-2 pt-6">
           <h4 className="text-sm font-semibold">
             Columns ({tableDetailsQueryResult.columns.length})
@@ -92,9 +91,56 @@ export function TableEditSection({
   );
 }
 
-function Columns({ columns }: { columns: ColumnMetadata[] }) {
+function EditableTableContext({
+  tableContext,
+}: {
+  tableContext: TableContext;
+}) {
+  const {
+    mutateAsync: upsertTableContext,
+    isPending,
+    error,
+  } = useUpsertTableContextMutation();
+
+  const [currentDescription, setCurrentDescription] = useState<string | null>(
+    tableContext.description ?? null
+  );
+
+  const handleSaveDescription = async (description: string | null) => {
+    const previous = currentDescription;
+    // optimistic UI
+    setCurrentDescription(description);
+    try {
+      await upsertTableContext({
+        tableContext: {
+          dataSourceConnectionId: tableContext.dataSourceConnectionId,
+          fullyQualifiedTableName: tableContext.fullyQualifiedTableName,
+          description: description ?? null,
+        },
+      });
+    } catch {
+      // revert on error
+      setCurrentDescription(previous ?? null);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      <h4 className="text-sm font-semibold">Table description</h4>
+      <EditableTableDescription
+        description={currentDescription}
+        onSave={handleSaveDescription}
+        isSaving={isPending}
+        error={error}
+      />
+    </div>
+  );
+}
+
+function Columns({ columns }: { columns: Column[] }) {
   const orderedColumns = columns.sort(
-    (a, b) => a.ordinalPosition - b.ordinalPosition
+    (a, b) =>
+      a.columnDefinition.ordinalPosition - b.columnDefinition.ordinalPosition
   );
   return (
     <ScrollArea className="h-[calc(100vh-25rem)] w-full">
@@ -109,24 +155,26 @@ function Columns({ columns }: { columns: ColumnMetadata[] }) {
         </TableHeader>
         <TableBody>
           {orderedColumns.map((column) => (
-            <TableRow key={column.columnName}>
+            <TableRow key={column.columnDefinition.columnName}>
               <TableCell className="max-w-[70px] truncate whitespace-nowrap">
-                {column.columnName}
+                {column.columnDefinition.columnName}
               </TableCell>
               <TableCell className="max-w-[40px] truncate whitespace-nowrap">
                 <Badge
                   variant="outline"
                   className="text-muted-foreground px-1.5 text-xs font-normal"
                 >
-                  {column.dataType.toLowerCase()}
+                  {column.columnDefinition.dataType.toLowerCase()}
                 </Badge>
               </TableCell>
               <TableCell className="max-w-[100px] truncate">
-                <EditableColumnDescription description={column.description} />
+                <EditableColumnDescription
+                  description={column.columnContext?.description}
+                />
               </TableCell>
               <TableCell className="max-w-[100px] truncate">
                 <EditableColumnExampleValues
-                  exampleValues={column.exampleValues}
+                  exampleValues={column.columnContext?.exampleValues ?? []}
                 />
               </TableCell>
             </TableRow>
@@ -263,24 +311,41 @@ function EditableColumnExampleValues({
 
 function EditableTableDescription({
   description,
+  onSave,
+  isSaving = false,
+  error = null,
 }: {
   description: string | null;
+  onSave: (description: string | null) => Promise<void> | void;
+  isSaving?: boolean;
+  error?: Error | null;
 }) {
   const [isEditing, setIsEditing] = useState(false);
-  const [value, setValue] = useState<string>(description ?? '');
-  const [draft, setDraft] = useState<string>(value);
+  const [draft, setDraft] = useState<string>(description ?? '');
+  const [localError, setLocalError] = useState<string | null>(null);
 
-  const onSave = () => {
-    setValue(draft);
-    setIsEditing(false);
+  useEffect(() => {
+    setDraft(description ?? '');
+  }, [description]);
+
+  const handleSave = async () => {
+    setLocalError(null);
+    try {
+      await onSave(draft.trim().length > 0 ? draft : null);
+      setIsEditing(false);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Failed to save';
+      setLocalError(message);
+    }
   };
 
   const onCancel = () => {
-    setDraft(value);
+    setDraft(description ?? '');
+    setLocalError(null);
     setIsEditing(false);
   };
 
-  const hasValue = value.trim().length > 0;
+  const hasValue = !!(description && description.trim().length > 0);
 
   if (isEditing) {
     return (
@@ -291,22 +356,46 @@ function EditableTableDescription({
           placeholder="Add a description..."
           className="min-h-[80px] text-xs"
           autoFocus
+          aria-busy={isSaving}
           onKeyDown={(e) => {
             if (e.key === 'Escape') {
               onCancel();
             }
             if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-              onSave();
+              e.preventDefault();
+              void handleSave();
             }
           }}
         />
-        <div className="flex justify-end gap-2">
-          <Button variant="secondary" size="sm" onClick={onCancel}>
-            Cancel
-          </Button>
-          <Button size="sm" onClick={onSave}>
-            Save
-          </Button>
+        {(localError || error) && (
+          <div className="text-destructive text-xs">
+            {localError || error?.message}
+          </div>
+        )}
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-muted-foreground text-[11px]">
+            Press ⌘/Ctrl+Enter to save
+          </span>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={onCancel}
+              disabled={isSaving}
+            >
+              Cancel
+            </Button>
+            <Button size="sm" onClick={handleSave} disabled={isSaving}>
+              {isSaving ? (
+                <span className="inline-flex items-center gap-1">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  Saving
+                </span>
+              ) : (
+                'Save'
+              )}
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -318,16 +407,10 @@ function EditableTableDescription({
       onClick={() => setIsEditing(true)}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          setIsEditing(true);
-        }
-      }}
     >
       {hasValue ? (
         <span className="flex items-center gap-3">
-          <span className="truncate">{value}</span>
+          <span className="truncate">{description}</span>
           <Pencil className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
         </span>
       ) : (
