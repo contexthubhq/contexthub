@@ -23,7 +23,9 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { EditableList } from '@/components/ui/editable-list';
-import { ColumnMetadata } from '@/types/table-details-query-result';
+import { Column } from '@/types/table-details-query-result';
+import { TableContext } from '@contexthub/core';
+import { useUpsertTableContextMutation } from '@/api/use-upsert-table-context-mutation';
 
 /**
  * The section where the user can edit context for a selected table.
@@ -71,16 +73,13 @@ export function TableEditSection({
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
         <h2 className="text-md font-semibold">
-          {tableDetailsQueryResult.table.tableName}
+          {tableDetailsQueryResult.table.tableDefinition.tableName}
         </h2>
       </div>
       <div className="flex flex-col gap-3">
-        <div className="flex flex-col gap-2">
-          <h4 className="text-sm font-semibold">Table description</h4>
-          <EditableTableDescription
-            description={tableDetailsQueryResult.table.description}
-          />
-        </div>
+        <EditableTableContext
+          tableContext={tableDetailsQueryResult.table.tableContext}
+        />
         <div className="flex flex-col gap-2 pt-6">
           <h4 className="text-sm font-semibold">
             Columns ({tableDetailsQueryResult.columns.length})
@@ -92,9 +91,35 @@ export function TableEditSection({
   );
 }
 
-function Columns({ columns }: { columns: ColumnMetadata[] }) {
+function EditableTableContext({
+  tableContext,
+}: {
+  tableContext: TableContext;
+}) {
+  const { mutate: upsertTableContext } = useUpsertTableContextMutation();
+  return (
+    <div className="flex flex-col gap-2">
+      <h4 className="text-sm font-semibold">Table description</h4>
+      <EditableTableDescription
+        description={tableContext.description}
+        setDescription={(description) => {
+          upsertTableContext({
+            tableContext: {
+              dataSourceConnectionId: tableContext.dataSourceConnectionId,
+              fullyQualifiedTableName: tableContext.fullyQualifiedTableName,
+              description: description ?? null,
+            },
+          });
+        }}
+      />
+    </div>
+  );
+}
+
+function Columns({ columns }: { columns: Column[] }) {
   const orderedColumns = columns.sort(
-    (a, b) => a.ordinalPosition - b.ordinalPosition
+    (a, b) =>
+      a.columnDefinition.ordinalPosition - b.columnDefinition.ordinalPosition
   );
   return (
     <ScrollArea className="h-[calc(100vh-25rem)] w-full">
@@ -109,24 +134,26 @@ function Columns({ columns }: { columns: ColumnMetadata[] }) {
         </TableHeader>
         <TableBody>
           {orderedColumns.map((column) => (
-            <TableRow key={column.columnName}>
+            <TableRow key={column.columnDefinition.columnName}>
               <TableCell className="max-w-[70px] truncate whitespace-nowrap">
-                {column.columnName}
+                {column.columnDefinition.columnName}
               </TableCell>
               <TableCell className="max-w-[40px] truncate whitespace-nowrap">
                 <Badge
                   variant="outline"
                   className="text-muted-foreground px-1.5 text-xs font-normal"
                 >
-                  {column.dataType.toLowerCase()}
+                  {column.columnDefinition.dataType.toLowerCase()}
                 </Badge>
               </TableCell>
               <TableCell className="max-w-[100px] truncate">
-                <EditableColumnDescription description={column.description} />
+                <EditableColumnDescription
+                  description={column.columnContext?.description}
+                />
               </TableCell>
               <TableCell className="max-w-[100px] truncate">
                 <EditableColumnExampleValues
-                  exampleValues={column.exampleValues}
+                  exampleValues={column.columnContext?.exampleValues ?? []}
                 />
               </TableCell>
             </TableRow>
@@ -263,24 +290,25 @@ function EditableColumnExampleValues({
 
 function EditableTableDescription({
   description,
+  setDescription,
 }: {
   description: string | null;
+  setDescription: (description: string | null) => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
-  const [value, setValue] = useState<string>(description ?? '');
-  const [draft, setDraft] = useState<string>(value);
+  const [draft, setDraft] = useState<string>(description ?? '');
 
   const onSave = () => {
-    setValue(draft);
+    setDescription(draft.trim().length > 0 ? draft : null);
     setIsEditing(false);
   };
 
   const onCancel = () => {
-    setDraft(value);
+    setDraft(description ?? '');
     setIsEditing(false);
   };
 
-  const hasValue = value.trim().length > 0;
+  const hasValue = draft.trim().length > 0;
 
   if (isEditing) {
     return (
@@ -327,7 +355,7 @@ function EditableTableDescription({
     >
       {hasValue ? (
         <span className="flex items-center gap-3">
-          <span className="truncate">{value}</span>
+          <span className="truncate">{description}</span>
           <Pencil className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
         </span>
       ) : (
