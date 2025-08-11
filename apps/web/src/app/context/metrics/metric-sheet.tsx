@@ -24,17 +24,26 @@ import {
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 
+type MetricSheetProps = (
+  | {
+      metric: Metric;
+      onSubmit: (data: Metric) => void | Promise<void>;
+    }
+  | {
+      metric: null;
+      onSubmit: (data: NewMetric) => void | Promise<void>;
+    }
+) & {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+};
+
 export function MetricSheet({
   metric,
   onSubmit,
   open,
   onOpenChange,
-}: {
-  metric?: Metric;
-  onSubmit: (data: NewMetric | Metric) => void | Promise<void>;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}) {
+}: MetricSheetProps) {
   const title = metric ? 'Edit Metric' : 'Create Metric';
 
   const form = useForm<NewMetric>({
@@ -56,16 +65,18 @@ export function MetricSheet({
     }
   }, [metric, form]);
 
+  const handleSubmit = (data: NewMetric | Metric) => {
+    if (metric) {
+      onSubmit({ ...metric, ...data });
+    } else {
+      onSubmit(data);
+    }
+  };
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit((data) =>
-              onSubmit(metric ? { ...metric, ...data } : data)
-            )}
-            className="contents"
-          >
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="contents">
             <SheetHeader>
               <SheetTitle>{title}</SheetTitle>
             </SheetHeader>
