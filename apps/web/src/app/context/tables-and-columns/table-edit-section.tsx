@@ -1,7 +1,7 @@
 'use client';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle, Pencil } from 'lucide-react';
+import { AlertCircle, Pencil, Loader2 } from 'lucide-react';
 import { useTableDetailsQuery } from '@/api/use-table-details-query';
 import {
   Table,
@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
@@ -96,21 +96,42 @@ function EditableTableContext({
 }: {
   tableContext: TableContext;
 }) {
-  const { mutate: upsertTableContext } = useUpsertTableContextMutation();
+  const {
+    mutateAsync: upsertTableContext,
+    isPending,
+    error,
+  } = useUpsertTableContextMutation();
+
+  const [currentDescription, setCurrentDescription] = useState<string | null>(
+    tableContext.description ?? null
+  );
+
+  const handleSaveDescription = async (description: string | null) => {
+    const previous = currentDescription;
+    // optimistic UI
+    setCurrentDescription(description);
+    try {
+      await upsertTableContext({
+        tableContext: {
+          dataSourceConnectionId: tableContext.dataSourceConnectionId,
+          fullyQualifiedTableName: tableContext.fullyQualifiedTableName,
+          description: description ?? null,
+        },
+      });
+    } catch {
+      // revert on error
+      setCurrentDescription(previous ?? null);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-2">
       <h4 className="text-sm font-semibold">Table description</h4>
       <EditableTableDescription
-        description={tableContext.description}
-        setDescription={(description) => {
-          upsertTableContext({
-            tableContext: {
-              dataSourceConnectionId: tableContext.dataSourceConnectionId,
-              fullyQualifiedTableName: tableContext.fullyQualifiedTableName,
-              description: description ?? null,
-            },
-          });
-        }}
+        description={currentDescription}
+        onSave={handleSaveDescription}
+        isSaving={isPending}
+        error={error}
       />
     </div>
   );
@@ -290,25 +311,41 @@ function EditableColumnExampleValues({
 
 function EditableTableDescription({
   description,
-  setDescription,
+  onSave,
+  isSaving = false,
+  error = null,
 }: {
   description: string | null;
-  setDescription: (description: string | null) => void;
+  onSave: (description: string | null) => Promise<void> | void;
+  isSaving?: boolean;
+  error?: Error | null;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState<string>(description ?? '');
+  const [localError, setLocalError] = useState<string | null>(null);
 
-  const onSave = () => {
-    setDescription(draft.trim().length > 0 ? draft : null);
-    setIsEditing(false);
+  useEffect(() => {
+    setDraft(description ?? '');
+  }, [description]);
+
+  const handleSave = async () => {
+    setLocalError(null);
+    try {
+      await onSave(draft.trim().length > 0 ? draft : null);
+      setIsEditing(false);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Failed to save';
+      setLocalError(message);
+    }
   };
 
   const onCancel = () => {
     setDraft(description ?? '');
+    setLocalError(null);
     setIsEditing(false);
   };
 
-  const hasValue = draft.trim().length > 0;
+  const hasValue = !!(description && description.trim().length > 0);
 
   if (isEditing) {
     return (
@@ -319,22 +356,46 @@ function EditableTableDescription({
           placeholder="Add a description..."
           className="min-h-[80px] text-xs"
           autoFocus
+          aria-busy={isSaving}
           onKeyDown={(e) => {
             if (e.key === 'Escape') {
               onCancel();
             }
             if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-              onSave();
+              e.preventDefault();
+              void handleSave();
             }
           }}
         />
-        <div className="flex justify-end gap-2">
-          <Button variant="secondary" size="sm" onClick={onCancel}>
-            Cancel
-          </Button>
-          <Button size="sm" onClick={onSave}>
-            Save
-          </Button>
+        {(localError || error) && (
+          <div className="text-destructive text-xs">
+            {localError || error?.message}
+          </div>
+        )}
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-muted-foreground text-[11px]">
+            Press ⌘/Ctrl+Enter to save
+          </span>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={onCancel}
+              disabled={isSaving}
+            >
+              Cancel
+            </Button>
+            <Button size="sm" onClick={handleSave} disabled={isSaving}>
+              {isSaving ? (
+                <span className="inline-flex items-center gap-1">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  Saving
+                </span>
+              ) : (
+                'Save'
+              )}
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -346,12 +407,6 @@ function EditableTableDescription({
       onClick={() => setIsEditing(true)}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          setIsEditing(true);
-        }
-      }}
     >
       {hasValue ? (
         <span className="flex items-center gap-3">
