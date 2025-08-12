@@ -40,8 +40,8 @@ export function registerListTables(server: McpServer) {
         const selectedTablesSet = new Set(
           selectedTables.map((table) => table.fullyQualifiedName)
         );
-        const tables = await dataSource.getTablesList();
-        const filteredTables = tables.filter((table) =>
+        const tableDefinitions = await dataSource.getTablesList();
+        const filteredTableDefinitions = tableDefinitions.filter((table) =>
           selectedTablesSet.has(table.fullyQualifiedTableName)
         );
         const repository = getContextRepository();
@@ -59,25 +59,25 @@ export function registerListTables(server: McpServer) {
             tableContext
           );
         }
-        const tablesWithContext = filteredTables.map((table) => {
+        const tables = filteredTableDefinitions.map((tableDefinition) => {
           const tableContext = tableContextMap.get(
-            table.fullyQualifiedTableName
+            tableDefinition.fullyQualifiedTableName
           );
           return {
-            ...table,
+            ...tableDefinition,
             ...tableContext,
           };
         });
 
         console.log(
           '✅ [list-tables] Success, response length:',
-          filteredTables.length
+          tables.length
         );
         return {
           content: [
             {
               type: 'text',
-              text: JSON.stringify(tablesWithContext),
+              text: JSON.stringify(tables),
             },
           ],
         };
