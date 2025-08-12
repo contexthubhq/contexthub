@@ -15,9 +15,12 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { useMetricsQuery } from '@/api/use-metrics-query';
 import { useUpdateMetricMutation } from '@/api/use-update-metric-mutation';
+import { EmptySection } from '@/components/empty-section';
+import { AddMetricButton } from './add-metric-button';
+import { LoadingTable } from '@/components/loading-table';
 
 export function MetricsTable() {
-  const { data: metrics } = useMetricsQuery();
+  const { data: metrics, isPending } = useMetricsQuery();
   const { mutateAsync: updateMetric } = useUpdateMetricMutation();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedMetric, setSelectedMetric] = useState<Metric | undefined>(
@@ -35,6 +38,12 @@ export function MetricsTable() {
     setIsSheetOpen(false);
     setSelectedMetric(undefined);
   };
+  if (isPending) {
+    return <LoadingTable rows={3} columns={6} />;
+  }
+  if (metrics === undefined || metrics.length === 0) {
+    return <EmptyPage />;
+  }
 
   return (
     <>
@@ -50,7 +59,7 @@ export function MetricsTable() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {(metrics ?? []).map((metric) => (
+          {metrics.map((metric) => (
             <TableRow
               key={metric.id}
               onClick={() => handleEditMetric(metric)}
@@ -89,5 +98,13 @@ export function MetricsTable() {
         />
       )}
     </>
+  );
+}
+
+function EmptyPage() {
+  return (
+    <EmptySection title="No metrics" description="Add a metric to get started.">
+      <AddMetricButton />
+    </EmptySection>
   );
 }
