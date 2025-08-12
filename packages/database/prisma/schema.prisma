@@ -64,3 +64,18 @@ model ContextBranch {
 
   @@map("context_branches")
 }
+
+model ContextSourceConnection {
+  id            String   @id @default(cuid())
+  // For example: "text", "github".
+  type          String
+  // The display name of the context source connection. Set by the user.
+  name          String
+  // The configuration of the context source connection.
+  // The format of the configuration is context source specific.
+  configuration Json
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
+
+  @@map("context_source_connections")
+}
