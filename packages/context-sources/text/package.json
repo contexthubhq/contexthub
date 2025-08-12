@@ -1,0 +1,22 @@
+{
+  "name": "@contexthub/context-sources-text",
+  "type": "module",
+  "description": "Text context source",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@contexthub/context-sources-common": "workspace:*",
+    "zod": "3.25.66"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,4 +1,4 @@
-import { Tool } from '@openai/agents';
+import type { Tool } from '@openai/agents';
 
 export interface ContextSource {
   getTools(): Tool[];
