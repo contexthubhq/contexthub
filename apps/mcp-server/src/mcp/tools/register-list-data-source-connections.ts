@@ -9,7 +9,7 @@ export function registerListDataSources(server: McpServer) {
       description: 'List all data source connections available.',
     },
     async () => {
-      console.log(`🔧 [list-data-sources] Tool called.`);
+      console.log(`🔧 [list-data-source-connections] Tool called.`);
       try {
         const connections = await getDataSourceConnectionsList();
         const returnValue = connections.map((connection) => {
