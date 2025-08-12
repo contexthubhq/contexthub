@@ -88,6 +88,14 @@ export function AppSidebar() {
                           <Link href="/context/metrics">Metrics</Link>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={pathname === '/context/concepts'}
+                        >
+                          <Link href="/context/concepts">Concepts</Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
                     </SidebarMenuSub>
                   </CollapsibleContent>
                 </SidebarMenuItem>
