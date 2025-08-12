@@ -4,7 +4,7 @@ import { registerListDataSources } from './register-list-data-source-connections
 import { registerListColumns } from './register-list-columns.js';
 import { registerExecuteQuery } from './register-execute-query.js';
 import { registerListMetrics } from './register-list-metrics.js';
-import { registerListConcepts } from './register-concepts.js';
+import { registerListConcepts } from './register-list-concepts.js';
 
 export function registerTools(server: McpServer) {
   console.log('🚀 Registering ContextHub tools for the MCP server...');
