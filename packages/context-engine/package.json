@@ -14,7 +14,7 @@
     "test:agent": "tsx src/test-openai-agent-context-engine.ts"
   },
   "dependencies": {
-    "@contexthub/context-sources": "workspace:*",
+    "@contexthub/context-sources-all": "workspace:*",
     "@contexthub/core": "workspace:*",
     "@openai/agents": "0.0.14",
     "zod": "3.25.66"

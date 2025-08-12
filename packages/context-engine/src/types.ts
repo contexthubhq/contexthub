@@ -4,7 +4,7 @@ import type {
   TableContext,
   ColumnContext,
 } from '@contexthub/core';
-import type { ContextSource } from '@contexthub/context-sources';
+import type { ContextSource } from '@contexthub/context-sources-all';
 
 /**
  * Input for generating table context

@@ -178,9 +178,9 @@ importers:
 
   packages/context-engine:
     dependencies:
-      '@contexthub/context-sources':
+      '@contexthub/context-sources-all':
         specifier: workspace:*
-        version: link:../context-sources
+        version: link:../context-sources/all
       '@contexthub/core':
         specifier: workspace:*
         version: link:../core
@@ -220,14 +220,34 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
-  packages/context-sources:
+  packages/context-sources/all:
     dependencies:
-      '@contexthub/core':
+      '@contexthub/context-sources-common':
         specifier: workspace:*
-        version: link:../core
+        version: link:../common
+      '@contexthub/context-sources-text':
+        specifier: workspace:*
+        version: link:../text
+    devDependencies:
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
+
+  packages/context-sources/common:
+    dependencies:
       '@openai/agents':
         specifier: ^0.0.14
         version: 0.0.14(ws@8.18.3)(zod@3.25.66)
+    devDependencies:
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
+
+  packages/context-sources/text:
+    dependencies:
+      '@contexthub/context-sources-common':
+        specifier: workspace:*
+        version: link:../common
       zod:
         specifier: 3.25.66
         version: 3.25.66

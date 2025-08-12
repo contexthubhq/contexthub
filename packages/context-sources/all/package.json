@@ -1,0 +1,22 @@
+{
+  "name": "@contexthub/context-sources-all",
+  "type": "module",
+  "description": "All context sources package for ContextHub",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@contexthub/context-sources-common": "workspace:*",
+    "@contexthub/context-sources-text": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}

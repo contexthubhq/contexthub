@@ -1,6 +1,6 @@
 import { OpenAIAgentContextEngine } from './openai-agent-context-engine.js';
 import type { TableDefinition } from '@contexthub/core';
-import { InMemoryTextInputContextSource } from '@contexthub/context-sources';
+import { InMemoryTextInputContextSource } from '@contexthub/context-sources-all';
 
 // Test function
 async function testOpenAIAgentContextEngine() {
