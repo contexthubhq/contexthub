@@ -7,6 +7,8 @@ import {
 import { registry } from '@contexthub/data-sources-all';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
+import { getContextRepository } from '@contexthub/context-repository';
+import type { TableContext } from '@contexthub/core';
 
 export function registerListTables(server: McpServer) {
   server.registerTool(
@@ -38,19 +40,44 @@ export function registerListTables(server: McpServer) {
         const selectedTablesSet = new Set(
           selectedTables.map((table) => table.fullyQualifiedName)
         );
-        const tables = await dataSource.getTablesList();
-        const filteredTables = tables.filter((table) =>
+        const tableDefinitions = await dataSource.getTablesList();
+        const filteredTableDefinitions = tableDefinitions.filter((table) =>
           selectedTablesSet.has(table.fullyQualifiedTableName)
         );
+        const repository = getContextRepository();
+        const workingCopy = await repository.checkout({
+          branchName: repository.mainBranchName,
+        });
+        const tableContexts = await workingCopy.listTables();
+        const tableContextMap = new Map<string, TableContext>();
+        for (const tableContext of tableContexts) {
+          if (tableContext.dataSourceConnectionId !== dataSourceId) {
+            continue;
+          }
+          tableContextMap.set(
+            tableContext.fullyQualifiedTableName,
+            tableContext
+          );
+        }
+        const tables = filteredTableDefinitions.map((tableDefinition) => {
+          const tableContext = tableContextMap.get(
+            tableDefinition.fullyQualifiedTableName
+          );
+          return {
+            ...tableDefinition,
+            ...tableContext,
+          };
+        });
+
         console.log(
           '✅ [list-tables] Success, response length:',
-          filteredTables.length
+          tables.length
         );
         return {
           content: [
             {
               type: 'text',
-              text: JSON.stringify(filteredTables),
+              text: JSON.stringify(tables),
             },
           ],
         };

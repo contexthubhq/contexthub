@@ -1,7 +1,5 @@
-import {
-  ContextRepository,
-  DatabaseContextRepository,
-} from '@contexthub/context-repository';
+import type { ContextRepository } from './context-repository.js';
+import { DatabaseContextRepository } from './database-context-repository.js';
 
 /**
  * Central function to get the context repository.
