@@ -13,7 +13,7 @@ export function registerExecuteQuery(server: McpServer) {
       description:
         'Execute a query against a given data source and return the results.',
       inputSchema: {
-        dataSourceId: z.string(),
+        dataSourceConnectionId: z.string(),
         query: z
           .string()
           .describe(
@@ -21,13 +21,13 @@ export function registerExecuteQuery(server: McpServer) {
           ),
       },
     },
-    async ({ dataSourceId, query }): Promise<CallToolResult> => {
+    async ({ dataSourceConnectionId, query }): Promise<CallToolResult> => {
       console.log(
-        `🔧 [execute-query] Tool called. dataSourceId: ${dataSourceId}, query: ${query}`
+        `🔧 [execute-query] Tool called. dataSourceConnectionId: ${dataSourceConnectionId}, query: ${query}`
       );
       try {
         const connection = await getDataSourceConnection({
-          id: dataSourceId,
+          id: dataSourceConnectionId,
         });
         const dataSource = registry.createInstance({
           type: connection.type,
