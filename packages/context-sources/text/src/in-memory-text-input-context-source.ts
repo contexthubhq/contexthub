@@ -40,15 +40,21 @@ const configurationFields = [
 ];
 
 registry.register({
-  type: 'in_memory_text_input',
-  name: 'In-memory Text Input',
+  type: 'text',
+  name: 'Text',
   description: 'Simple static text provided at configuration time',
   configurationFields,
-  factory: ({ configuration }: { configuration: Record<string, unknown> }) =>
-    new InMemoryTextInputContextSource({
-      text: String((configuration as any).text ?? ''),
-      description: (configuration as any).description
-        ? String((configuration as any).description)
-        : undefined,
-    }),
+  factory: ({ configuration }: { configuration: Record<string, string> }) => {
+    const text = configuration.text;
+    const description = configuration.description;
+
+    if (!text) {
+      throw new Error('Text is required');
+    }
+
+    return new InMemoryTextInputContextSource({
+      text,
+      description,
+    });
+  },
 });

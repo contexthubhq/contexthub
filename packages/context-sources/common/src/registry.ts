@@ -2,7 +2,7 @@ import type { ContextSource } from './context-source.js';
 
 export interface ContextSourceRegistration {
   /**
-   * For example: "in_memory_text_input".
+   * For example: "text".
    */
   type: string;
   /**
@@ -27,7 +27,7 @@ export interface ContextSourceRegistration {
   factory: ({
     configuration,
   }: {
-    configuration: Record<string, unknown>;
+    configuration: Record<string, string>;
   }) => ContextSource;
 }
 
@@ -54,7 +54,7 @@ class ContextSourceRegistry {
     configuration,
   }: {
     type: string;
-    configuration: Record<string, unknown>;
+    configuration: Record<string, string>;
   }): ContextSource {
     const registration = this.sources.get(type);
     if (!registration) {
