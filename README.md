@@ -11,9 +11,9 @@ ContextHub is the easiest way to connect your data warehouse to AI assistants an
 ### Features
 
 - **Simple to try:** Just run `docker-compose up`, connect your warehouse in the UI and you have an MCP server running that AI assistants can use.
-- **Add context to your data:** Add contextual information to your tables and columns, define metrics and concepts, and expose them to the AI assistants via the MCP.
-- **Generate context automatically:** Develop your own agents or use our pre-built ones to generate context from your documentation, code or any other sources.
-- **Production ready auth:** We support 3rd party OAuth providers so you can control access to the MCP.
+- **Add context to your data:** Add contextual information for your tables and columns, define metrics and concepts, and expose them to the AI assistants via the MCP.
+- **Automate with Context Agents:** Develop your own agents or use our pre-built ones to generate and update context from your documentation, code or any other sources. Context is version-controlled so you can approve the generated changes before deploying.
+- **Production ready:** We support 3rd party OAuth providers so you can control access to the MCP. ContextHub is easy to deploy on any cloud provider.
 
 ## Quick start
 
