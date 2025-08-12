@@ -1,0 +1,23 @@
+{
+  "name": "@contexthub/context-sources-connections",
+  "type": "module",
+  "description": "Contexts source connections",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@contexthub/database": "workspace:*",
+    "zod": "3.25.66"
+  },
+  "devDependencies": {
+    "@types/node": "24.1.0",
+    "typescript": "^5.8.3"
+  }
+}
