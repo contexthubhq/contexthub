@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronRight, Database, FileJson } from 'lucide-react';
+import { Bot, ChevronRight, Database, FileJson } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 import {
@@ -94,6 +94,49 @@ export function AppSidebar() {
                           isActive={pathname === '/context/concepts'}
                         >
                           <Link href="/context/concepts">Concepts</Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </SidebarMenuItem>
+              </Collapsible>
+            </SidebarMenu>
+            <SidebarMenu>
+              <Collapsible defaultOpen className="group/collapsible">
+                <SidebarMenuItem>
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton>
+                      <Bot />
+                      <span>Agents</span>
+                      <ChevronRight className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-90" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={pathname === '/agents/context-sources'}
+                        >
+                          <Link href="/agents/context-sources">
+                            Context sources
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={pathname === '/agents/runs'}
+                        >
+                          <Link href="/agents/runs">Runs</Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={pathname === '/agents/reviews'}
+                        >
+                          <Link href="/agents/reviews">Reviews</Link>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     </SidebarMenuSub>
