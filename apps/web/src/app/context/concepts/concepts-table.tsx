@@ -14,9 +14,12 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { useConceptsQuery } from '@/api/use-concepts-query';
 import { useUpdateConceptMutation } from '@/api/use-update-concept-mutation';
+import { LoadingTable } from '@/components/loading-table';
+import { EmptySection } from '@/components/empty-section';
+import { AddConceptButton } from './add-concept-button';
 
 export function ConceptsTable() {
-  const { data: concepts } = useConceptsQuery();
+  const { data: concepts, isPending } = useConceptsQuery();
   const { mutateAsync: updateConcept } = useUpdateConceptMutation();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [selectedConcept, setSelectedConcept] = useState<Concept | undefined>(
@@ -34,6 +37,13 @@ export function ConceptsTable() {
     setIsSheetOpen(false);
     setSelectedConcept(undefined);
   };
+
+  if (isPending) {
+    return <LoadingTable rows={3} columns={5} />;
+  }
+  if (concepts === undefined || concepts.length === 0) {
+    return <EmptyPage />;
+  }
 
   return (
     <>
@@ -82,5 +92,16 @@ export function ConceptsTable() {
         />
       )}
     </>
+  );
+}
+
+function EmptyPage() {
+  return (
+    <EmptySection
+      title="No concepts"
+      description="Add a concept to get started."
+    >
+      <AddConceptButton />
+    </EmptySection>
   );
 }
