@@ -4,6 +4,8 @@ import { getDataSourceConnection } from '@contexthub/data-sources-connections';
 import { registry } from '@contexthub/data-sources-all';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
+import { ColumnContext } from '@contexthub/core';
+import { getContextRepository } from '@contexthub/context-repository';
 
 export function registerListColumns(server: McpServer) {
   server.registerTool(
@@ -12,27 +14,54 @@ export function registerListColumns(server: McpServer) {
       title: 'List columns',
       description: 'List all columns for a given table.',
       inputSchema: {
-        dataSourceId: z.string(),
+        dataSourceConnectionId: z.string(),
         fullyQualifiedTableName: z.string(),
       },
     },
     async ({
-      dataSourceId,
+      dataSourceConnectionId,
       fullyQualifiedTableName,
     }): Promise<CallToolResult> => {
       console.log(
-        `🔧 [get-table] Tool called. dataSourceId: ${dataSourceId}, fullyQualifiedTableName: ${fullyQualifiedTableName}`
+        `🔧 [list-columns] Tool called. dataSourceConnectionId: ${dataSourceConnectionId}, fullyQualifiedTableName: ${fullyQualifiedTableName}`
       );
       try {
         const connection = await getDataSourceConnection({
-          id: dataSourceId,
+          id: dataSourceConnectionId,
         });
         const dataSource = registry.createInstance({
           type: connection.type,
           credentials: connection.credentials,
         });
-        const columns = await dataSource.getColumnsList({
+        const columnDefinitions = await dataSource.getColumnsList({
           fullyQualifiedTableName,
+        });
+        const repository = getContextRepository();
+        const workingCopy = await repository.checkout({
+          branchName: repository.mainBranchName,
+        });
+        const columnContexts = await workingCopy.listColumns();
+        const columnContextMap = new Map<string, ColumnContext>();
+        for (const columnContext of columnContexts) {
+          if (columnContext.dataSourceConnectionId !== dataSourceConnectionId) {
+            continue;
+          }
+          if (
+            columnContext.fullyQualifiedTableName !== fullyQualifiedTableName
+          ) {
+            continue;
+          }
+          columnContextMap.set(columnContext.columnName, columnContext);
+        }
+        const columns = columnDefinitions.map((columnDefinition) => {
+          const columnContext = columnContextMap.get(
+            columnDefinition.columnName
+          );
+          return {
+            ...columnDefinition,
+            dataSourceConnectionId,
+            ...columnContext,
+          };
         });
         console.log(
           '✅ [list-columns] Success, response length:',

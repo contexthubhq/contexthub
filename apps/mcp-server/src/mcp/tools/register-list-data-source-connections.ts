@@ -3,10 +3,10 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
 export function registerListDataSources(server: McpServer) {
   server.registerTool(
-    'list-data-sources',
+    'list-data-source-connections',
     {
-      title: 'List data sources',
-      description: 'List all data sources available.',
+      title: 'List data source connections',
+      description: 'List all data source connections available.',
     },
     async () => {
       console.log(`🔧 [list-data-sources] Tool called.`);

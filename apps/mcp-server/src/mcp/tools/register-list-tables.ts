@@ -17,20 +17,20 @@ export function registerListTables(server: McpServer) {
       title: 'List tables',
       description: 'List all tables for a given data source.',
       inputSchema: {
-        dataSourceId: z.string(),
+        dataSourceConnectionId: z.string(),
       },
     },
-    async ({ dataSourceId }): Promise<CallToolResult> => {
+    async ({ dataSourceConnectionId }): Promise<CallToolResult> => {
       console.log(
-        `🔧 [list-tables] Tool called. dataSourceId: ${dataSourceId}`
+        `🔧 [list-tables] Tool called. dataSourceConnectionId: ${dataSourceConnectionId}`
       );
       try {
         const [connection, selectedTables] = await Promise.all([
           getDataSourceConnection({
-            id: dataSourceId,
+            id: dataSourceConnectionId,
           }),
           getSelectedTables({
-            connectionId: dataSourceId,
+            connectionId: dataSourceConnectionId,
           }),
         ]);
         const dataSource = registry.createInstance({
@@ -51,7 +51,7 @@ export function registerListTables(server: McpServer) {
         const tableContexts = await workingCopy.listTables();
         const tableContextMap = new Map<string, TableContext>();
         for (const tableContext of tableContexts) {
-          if (tableContext.dataSourceConnectionId !== dataSourceId) {
+          if (tableContext.dataSourceConnectionId !== dataSourceConnectionId) {
             continue;
           }
           tableContextMap.set(
@@ -65,6 +65,7 @@ export function registerListTables(server: McpServer) {
           );
           return {
             ...tableDefinition,
+            dataSourceConnectionId,
             ...tableContext,
           };
         });
