@@ -10,6 +10,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function ContextSourcesPage() {
   const connections = await getContextSourceConnections();
+  const availableContextSources = await getAvailableContextSources();
   return (
     <div className="space-y-4">
       <PageHeader title="Context sources" />
@@ -18,7 +19,7 @@ export default async function ContextSourcesPage() {
           <ExistingConnectionsSection connections={connections} />
         )}
         <NewConnectionsSection
-          availableContextSources={await getAvailableContextSources()}
+          availableContextSources={availableContextSources}
           connectContextSource={connectContextSource}
         />
       </div>
