@@ -6,22 +6,6 @@ export interface ContextSourceRegistration {
    */
   type: string;
   /**
-   * A human-readable name for the context source used in the UI.
-   */
-  name: string;
-  /**
-   * Optional description for the context source.
-   */
-  description?: string;
-  /**
-   * The fields required to configure the context source.
-   */
-  configurationFields: {
-    name: string;
-    description?: string;
-    isRequired: boolean;
-  }[];
-  /**
    * Factory that creates a new instance of the context source.
    */
   factory: ({
