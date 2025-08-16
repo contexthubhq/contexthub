@@ -10,7 +10,8 @@
   },
   "scripts": {
     "check-types": "tsc --noEmit",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "node --test \"**/*.test.js\""
   },
   "dependencies": {
     "@contexthub/database": "workspace:*"

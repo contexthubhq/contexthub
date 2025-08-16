@@ -1,12 +1,14 @@
-import { prisma } from '@contexthub/database';
+import { PrismaClient, prisma as defaultPrisma } from '@contexthub/database';
 import { Job } from './types.js';
 
 export async function enqueue({
+  prisma = defaultPrisma,
   queue,
   payload,
   runAt,
   maxAttempts,
 }: {
+  prisma: PrismaClient;
   queue: string;
   payload: any;
   runAt?: Date;
@@ -28,9 +30,11 @@ export async function enqueue({
 const DEFAULT_VISIBILITY_MS = 15 * 60 * 1000;
 
 export async function claimOne({
+  prisma = defaultPrisma,
   queue,
   visibilityMs = DEFAULT_VISIBILITY_MS,
 }: {
+  prisma: PrismaClient;
   queue: string;
   visibilityMs?: number;
 }): Promise<Job | null> {
@@ -62,14 +66,22 @@ export async function claimOne({
   });
 }
 
-export async function completeJob({ id }: { id: string }): Promise<void> {
+export async function completeJob({
+  prisma = defaultPrisma,
+  id,
+}: {
+  prisma: PrismaClient;
+  id: string;
+}): Promise<void> {
   await prisma.job.delete({ where: { id } });
 }
 
 export async function failJob({
+  prisma = defaultPrisma,
   id,
   error,
 }: {
+  prisma: PrismaClient;
   id: string;
   error: string;
 }): Promise<void> {
