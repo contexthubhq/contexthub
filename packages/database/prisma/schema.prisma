@@ -79,3 +79,21 @@ model ContextSourceConnection {
 
   @@map("context_source_connections")
 }
+
+model Job {
+  id      String @id @default(cuid())
+  queue   String
+  payload Json   @db.JsonB
+
+  runAt       DateTime @default(now())
+  attempts    Int      @default(0)
+  maxAttempts Int
+  lastError   String?
+
+  lockedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@map("jobs")
+}

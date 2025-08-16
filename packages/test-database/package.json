@@ -12,8 +12,8 @@
     "build": "tsc"
   },
   "dependencies": {
-    "testcontainers": "^11.5.1",
-    "@contexthub/database": "workspace:*"
+    "@contexthub/database": "workspace:*",
+    "@testcontainers/postgresql": "^11.5.1"
   },
   "devDependencies": {
     "@types/node": "24.1.0",

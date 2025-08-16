@@ -67,5 +67,22 @@ services:
       PORT: ${MCP_SERVER_PORT}
     command: pnpm --filter @contexthub/mcp-server start
 
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+      args:
+        NODE_VERSION: ${NODE_VERSION}
+        PNPM_VERSION: ${PNPM_VERSION}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      NODE_ENV: ${NODE_ENV}
+      WORKER_QUEUE: ${WORKER_QUEUE}
+      WORKER_POLL_INTERVAL_MS: ${WORKER_POLL_INTERVAL_MS}
+    command: pnpm --filter @contexthub/worker start
+
 volumes:
   postgres_data:
