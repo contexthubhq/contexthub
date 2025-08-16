@@ -362,19 +362,6 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
-  packages/job-queue:
-    dependencies:
-      '@contexthub/database':
-        specifier: workspace:*
-        version: link:../database
-    devDependencies:
-      '@types/node':
-        specifier: 24.1.0
-        version: 24.1.0
-      typescript:
-        specifier: ^5.8.3
-        version: 5.8.3
-
 packages:
 
   '@alloc/quick-lru@5.2.0':
