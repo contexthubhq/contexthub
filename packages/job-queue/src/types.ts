@@ -6,3 +6,7 @@ export type Job = {
   attempts: number;
   maxAttempts: number;
 };
+
+export const QUEUES = {
+  CONTEXT_AGENT: 'context-agent',
+} as const;

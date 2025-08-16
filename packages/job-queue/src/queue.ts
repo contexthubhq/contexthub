@@ -38,32 +38,30 @@ export async function claimOne({
   queue: string;
   visibilityMs?: number;
 }): Promise<Job | null> {
-  return prisma.$transaction(async (tx) => {
-    const [candidate] = await tx.$queryRaw<{ id: string }[]>`
-      SELECT id
-      FROM "jobs"
-      WHERE "queue" = ${queue}
-        AND "runAt" <= NOW()
-        AND "attempts" < "maxAttempts"
-        AND (
-          "lockedAt" IS NULL OR
-          "lockedAt" < NOW() - (${visibilityMs}::int * INTERVAL '1 millisecond'))
-      ORDER BY "runAt" ASC, id ASC
-      FOR UPDATE SKIP LOCKED
-      LIMIT 1
-    `;
-
-    if (!candidate) return null;
-
-    const [locked] = await tx.$queryRaw<Job[]>`
+  const now = new Date();
+  const [locked] = await prisma.$queryRaw<Job[]>`
+      WITH candidate AS (
+        SELECT id
+        FROM "jobs"
+        WHERE "queue" = ${queue}
+          AND "runAt" <= (${now} AT TIME ZONE 'UTC')
+          AND "attempts" < "maxAttempts"
+          AND (
+            "lockedAt" IS NULL OR
+            "lockedAt" < (${now} AT TIME ZONE 'UTC') - (${visibilityMs}::int * INTERVAL '1 millisecond')
+          )
+        ORDER BY "runAt" ASC, id ASC
+        FOR UPDATE SKIP LOCKED
+        LIMIT 1
+      )
       UPDATE "jobs" j
-         SET "lockedAt" = NOW(),
-             "attempts" = "attempts" + 1
-       WHERE j.id = ${candidate.id}
-       RETURNING *
+      SET "lockedAt" = (${now} AT TIME ZONE 'UTC'),
+          "attempts" = "attempts" + 1
+      FROM candidate
+      WHERE j.id = candidate.id
+      RETURNING j.*
     `;
-    return locked ?? null;
-  });
+  return locked ?? null;
 }
 
 export async function completeJob({
@@ -80,13 +78,16 @@ export async function failJob({
   prisma = defaultPrisma,
   id,
   error,
+  retryDelayMs = 0,
 }: {
   prisma: PrismaClient;
   id: string;
   error: string;
+  retryDelayMs?: number;
 }): Promise<void> {
+  const nextRunAt = new Date(Date.now() + retryDelayMs);
   await prisma.job.update({
     where: { id },
-    data: { lockedAt: null, lastError: error },
+    data: { lockedAt: null, lastError: error, runAt: nextRunAt },
   });
 }

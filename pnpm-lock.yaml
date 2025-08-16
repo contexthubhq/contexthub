@@ -182,6 +182,28 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
 
+  apps/worker:
+    dependencies:
+      '@contexthub/database':
+        specifier: workspace:*
+        version: link:../../packages/database
+      '@contexthub/job-queue':
+        specifier: workspace:*
+        version: link:../../packages/job-queue
+      dotenv:
+        specifier: ^17.2.0
+        version: 17.2.0
+    devDependencies:
+      '@types/node':
+        specifier: 24.1.0
+        version: 24.1.0
+      ts-node:
+        specifier: ^10.9.2
+        version: 10.9.2(@types/node@24.1.0)(typescript@5.8.3)
+      typescript:
+        specifier: 5.8.3
+        version: 5.8.3
+
   packages/context-engine:
     dependencies:
       '@contexthub/context-sources-all':
@@ -386,7 +408,7 @@ importers:
       '@contexthub/database':
         specifier: workspace:*
         version: link:../database
-      testcontainers:
+      '@testcontainers/postgresql':
         specifier: ^11.5.1
         version: 11.5.1
     devDependencies:
@@ -1827,6 +1849,9 @@ packages:
 
   '@techteamer/ocsp@1.0.1':
     resolution: {integrity: sha512-q4pW5wAC6Pc3JI8UePwE37CkLQ5gDGZMgjSX4MEEm4D4Di59auDQ8UNIDzC4gRnPNmmcwjpPxozq8p5pjiOmOw==}
+
+  '@testcontainers/postgresql@11.5.1':
+    resolution: {integrity: sha512-6P1QYIKRkktSVwTuwU0Pke5WbXTkvpLleyQcgknJPbZwhaIsCrhnbZlVzj2g/e+Nf9Lmdy1F2OAai+vUrBq0AQ==}
 
   '@tootallnate/once@2.0.0':
     resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}
@@ -5660,6 +5685,13 @@ snapshots:
       asn1.js-rfc5280: 3.0.0
       async: 3.2.6
       simple-lru-cache: 0.0.2
+
+  '@testcontainers/postgresql@11.5.1':
+    dependencies:
+      testcontainers: 11.5.1
+    transitivePeerDependencies:
+      - bare-buffer
+      - supports-color
 
   '@tootallnate/once@2.0.0': {}
 

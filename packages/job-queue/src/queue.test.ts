@@ -18,7 +18,7 @@ describe('JobQueue', () => {
   });
 
   afterEach(async () => {
-    await ctx.reset();
+    await ctx.prisma.job.deleteMany();
   });
 
   it('enqueue inserts a job and returns its id', async () => {
@@ -95,14 +95,13 @@ describe('JobQueue', () => {
     assert.ok(first);
     assert.equal(first?.id, id);
 
-    const visibilityMs = 10;
-    await new Promise((resolve) => setTimeout(resolve, visibilityMs));
-
-    const second = await claimOne({
-      prisma: ctx.prisma,
-      queue,
-      visibilityMs: visibilityMs + 1,
+    // Instead of sleeping and relying on host vs DB clock skew, move the lock into the past deterministically
+    await ctx.prisma.job.update({
+      where: { id },
+      data: { lockedAt: new Date(0) },
     });
+
+    const second = await claimOne({ prisma: ctx.prisma, queue });
     assert.ok(second);
     assert.equal(second?.id, id);
   });
@@ -181,7 +180,7 @@ describe('JobQueue', () => {
   });
 
   it('claimOne is scoped by queue', async () => {
-    await enqueue({
+    const a = await enqueue({
       prisma: ctx.prisma,
       queue: 'A',
       payload: { v: 'a' },
@@ -200,6 +199,6 @@ describe('JobQueue', () => {
 
     const claimedA = await claimOne({ prisma: ctx.prisma, queue: 'A' });
     assert.ok(claimedA);
-    assert.deepEqual(claimedA?.payload as any, { v: 'a' });
+    assert.equal(claimedA?.id, a.id);
   });
 });
