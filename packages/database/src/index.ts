@@ -13,3 +13,9 @@ if (process.env.NODE_ENV === 'development') {
 
 export * from '@prisma/client';
 export default prisma;
+
+export function createPrismaClient(
+  options?: ConstructorParameters<typeof PrismaClient>[0]
+) {
+  return new PrismaClient(options);
+}

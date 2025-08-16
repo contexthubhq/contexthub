@@ -1,5 +1,5 @@
 import { ContextWorkingCopy } from './context-working-copy.js';
-import { prisma } from '@contexthub/database';
+import { prisma as defaultPrisma, PrismaClient } from '@contexthub/database';
 import { z } from 'zod';
 import { InMemoryContextWorkingCopy } from './in-memory-context-working-copy.js';
 import { ContextRepository } from './context-repository.js';
@@ -19,6 +19,11 @@ const revisionContentSchema = z.object({
 
 export class DatabaseContextRepository implements ContextRepository {
   readonly mainBranchName = 'main';
+  private readonly prisma: PrismaClient;
+
+  constructor(prisma: PrismaClient = defaultPrisma) {
+    this.prisma = prisma;
+  }
 
   /**
    * Gets the tip revision of a branch.
@@ -28,7 +33,7 @@ export class DatabaseContextRepository implements ContextRepository {
   }: {
     branchName: string;
   }): Promise<{ revisionId: string }> {
-    const branch = await prisma.contextBranch.findUnique({
+    const branch = await this.prisma.contextBranch.findUnique({
       where: {
         name: branchName,
       },
@@ -47,7 +52,7 @@ export class DatabaseContextRepository implements ContextRepository {
     const { revisionId } = await this.getTipOfBranch({
       branchName,
     });
-    const revision = await prisma.contextRevision.findUnique({
+    const revision = await this.prisma.contextRevision.findUnique({
       where: {
         id: revisionId,
       },
@@ -79,11 +84,11 @@ export class DatabaseContextRepository implements ContextRepository {
       metric: metrics,
       concept: concepts,
     };
-    const newRevision = await prisma.contextRevision.create({
+    const newRevision = await this.prisma.contextRevision.create({
       data: { parentId: revisionId, content },
       select: { id: true },
     });
-    await prisma.contextBranch.update({
+    await this.prisma.contextBranch.update({
       where: {
         name: branchName,
       },
@@ -93,7 +98,7 @@ export class DatabaseContextRepository implements ContextRepository {
   }
 
   async listBranches(): Promise<string[]> {
-    const branches = await prisma.contextBranch.findMany();
+    const branches = await this.prisma.contextBranch.findMany();
     return branches.map((branch) => branch.name);
   }
 
@@ -107,7 +112,7 @@ export class DatabaseContextRepository implements ContextRepository {
     const { revisionId } = await this.getTipOfBranch({
       branchName: sourceBranchName,
     });
-    await prisma.contextBranch.create({
+    await this.prisma.contextBranch.create({
       data: {
         name: newBranchName,
         revisionId,
@@ -138,6 +143,7 @@ export class DatabaseContextRepository implements ContextRepository {
     // After the merge, the target branch will be updated to the tip of the source branch:
     // targetBranch: A -> B -> C, the branch points to C.
     const isAncestor = await isAncestorOf({
+      prisma: this.prisma,
       ancestorRevisionId: targetRevisionId,
       descendantRevisionId: sourceRevisionId,
     });
@@ -146,7 +152,7 @@ export class DatabaseContextRepository implements ContextRepository {
         `Only fast-forward merge is allowed. Tip of ${targetBranchName} is not an ancestor of ${sourceBranchName}.`
       );
     }
-    await prisma.contextBranch.update({
+    await this.prisma.contextBranch.update({
       where: { name: targetBranchName },
       data: { revisionId: sourceRevisionId },
     });
@@ -154,9 +160,11 @@ export class DatabaseContextRepository implements ContextRepository {
 }
 
 async function isAncestorOf({
+  prisma,
   ancestorRevisionId,
   descendantRevisionId,
 }: {
+  prisma: PrismaClient;
   ancestorRevisionId: string;
   descendantRevisionId: string;
 }): Promise<boolean> {
