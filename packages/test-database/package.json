@@ -1,0 +1,22 @@
+{
+  "name": "@contexthub/test-database",
+  "type": "module",
+  "description": "Test database package to help with database testing",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "testcontainers": "^11.5.1",
+    "@contexthub/database": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "24.1.0",
+    "typescript": "^5.8.3"
+  }
+}
