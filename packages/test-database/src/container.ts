@@ -35,5 +35,5 @@ export async function startPostgres(): Promise<StartedPg> {
 }
 
 export async function stopPostgres(pg: StartedPg) {
-  await pg.container.stop({ timeout: 0 });
+  await pg.container.stop({ timeout: 1000 });
 }
