@@ -1,0 +1,22 @@
+{
+  "name": "@contexthub/job-queue",
+  "type": "module",
+  "description": "Job queue",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@contexthub/database": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "24.1.0",
+    "typescript": "^5.8.3"
+  }
+}
