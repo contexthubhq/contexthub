@@ -15,4 +15,7 @@ async function main(): Promise<void> {
   });
 }
 
-void main();
+void main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
