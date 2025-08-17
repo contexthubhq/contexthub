@@ -365,6 +365,22 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
+  packages/job-queue:
+    dependencies:
+      '@contexthub/database':
+        specifier: workspace:*
+        version: link:../database
+    devDependencies:
+      '@contexthub/test-database':
+        specifier: workspace:*
+        version: link:../test-database
+      '@types/node':
+        specifier: 24.1.0
+        version: 24.1.0
+      typescript:
+        specifier: ^5.8.3
+        version: 5.8.3
+
   packages/test-database:
     dependencies:
       '@contexthub/database':
