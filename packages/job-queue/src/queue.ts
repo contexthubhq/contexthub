@@ -1,6 +1,18 @@
 import { PrismaClient, prisma as defaultPrisma } from '@contexthub/database';
 import { Job } from './types.js';
 
+export async function listJobs({
+  prisma = defaultPrisma,
+  queue,
+}: {
+  prisma: PrismaClient;
+  queue: string;
+}): Promise<Job[]> {
+  return prisma.job.findMany({
+    where: { queue },
+  });
+}
+
 /**
  * Enqueues a job to be run at a given time.
  *

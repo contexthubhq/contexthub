@@ -5,6 +5,10 @@ export type Job = {
   runAt: Date;
   attempts: number;
   maxAttempts: number;
+  lastError: string | null;
+  lockedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
 };
 
 /**
