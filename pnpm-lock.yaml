@@ -182,6 +182,28 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
 
+  apps/worker:
+    dependencies:
+      '@contexthub/database':
+        specifier: workspace:*
+        version: link:../../packages/database
+      '@contexthub/job-queue':
+        specifier: workspace:*
+        version: link:../../packages/job-queue
+      dotenv:
+        specifier: ^17.2.0
+        version: 17.2.0
+    devDependencies:
+      '@types/node':
+        specifier: 24.1.0
+        version: 24.1.0
+      ts-node:
+        specifier: ^10.9.2
+        version: 10.9.2(@types/node@24.1.0)(typescript@5.8.3)
+      typescript:
+        specifier: 5.8.3
+        version: 5.8.3
+
   packages/context-engine:
     dependencies:
       '@contexthub/context-sources-all':

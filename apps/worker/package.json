@@ -1,0 +1,22 @@
+{
+  "name": "@contexthub/worker",
+  "version": "1.0.0",
+  "description": "Background worker that pulls jobs from the queue and processes payloads",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/index.ts",
+    "start": "node dist/index.js",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@contexthub/job-queue": "workspace:*",
+    "@contexthub/database": "workspace:*",
+    "dotenv": "^17.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "5.8.3"
+  }
+}

@@ -1,0 +1,19 @@
+ARG NODE_VERSION=20-alpine
+FROM node:${NODE_VERSION}
+
+# Install pnpm
+ARG PNPM_VERSION=10.13.1
+RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
+
+WORKDIR /app
+
+# Copy source files
+COPY . .
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Build the application
+RUN pnpm run build
+
+
