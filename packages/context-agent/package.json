@@ -1,7 +1,7 @@
 {
-  "name": "@contexthub/context-engine",
+  "name": "@contexthub/context-agent",
   "type": "module",
-  "description": "AI engine for generating table and column context from various sources",
+  "description": "AI agent for generating table and column context from various sources",
   "exports": {
     ".": {
       "types": "./src/index.ts",
