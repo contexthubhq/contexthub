@@ -7,6 +7,11 @@ export type Job = {
   maxAttempts: number;
 };
 
+/**
+ * The queues that jobs can be enqueued to.
+ *
+ * @see {@link enqueue}
+ */
 export const QUEUES = {
   CONTEXT_AGENT: 'context-agent',
 } as const;

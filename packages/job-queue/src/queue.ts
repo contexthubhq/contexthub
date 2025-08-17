@@ -1,18 +1,30 @@
 import { PrismaClient, prisma as defaultPrisma } from '@contexthub/database';
 import { Job } from './types.js';
 
+/**
+ * Enqueues a job to be run at a given time.
+ *
+ * @param prisma - The Prisma client to use.
+ * @param queue - The queue to enqueue the job to. See {@link QUEUES} for
+ *   available queues.
+ * @param payload - The payload of the job.
+ * @param runAt - The time at which to run the job. Defaults to now.
+ * @param maxAttempts - The maximum number of times to attempt to run the job.
+ *   Defaults to 1.
+ * @returns The ID of the enqueued job.
+ */
 export async function enqueue({
   prisma = defaultPrisma,
   queue,
   payload,
-  runAt,
-  maxAttempts,
+  runAt = new Date(),
+  maxAttempts = 1,
 }: {
   prisma: PrismaClient;
   queue: string;
   payload: any;
   runAt?: Date;
-  maxAttempts: number;
+  maxAttempts?: number;
 }): Promise<{ id: string }> {
   return prisma.job.create({
     data: {
@@ -27,8 +39,19 @@ export async function enqueue({
   });
 }
 
-const DEFAULT_VISIBILITY_MS = 15 * 60 * 1000;
+const DEFAULT_VISIBILITY_MS = 30 * 1000; // 30 seconds
 
+/**
+ * Claims a job from the queue.
+ *
+ * @param prisma - The Prisma client to use.
+ * @param queue - The queue to claim a job from. See {@link QUEUES} for
+ *   available queues.
+ * @param visibilityMs - The visibility timeout for the job. Defaults to 30 seconds.
+ *   If a job is claimed, and is not completed or failed within this time, the job
+ *   will be made available again.
+ * @returns The claimed job, or null if no job is available.
+ */
 export async function claimOne({
   prisma = defaultPrisma,
   queue,
@@ -64,6 +87,12 @@ export async function claimOne({
   return locked ?? null;
 }
 
+/**
+ * Completes a job.
+ *
+ * @param prisma - The Prisma client to use.
+ * @param id - The ID of the job to complete.
+ */
 export async function completeJob({
   prisma = defaultPrisma,
   id,
@@ -74,6 +103,14 @@ export async function completeJob({
   await prisma.job.delete({ where: { id } });
 }
 
+/**
+ * Fails a job making it available again after a delay.
+ *
+ * @param prisma - The Prisma client to use.
+ * @param id - The ID of the job to fail.
+ * @param error - The error that occurred.
+ * @param retryDelayMs - The delay before the job is retried. Defaults to 0.
+ */
 export async function failJob({
   prisma = defaultPrisma,
   id,
