@@ -5,8 +5,8 @@ export async function listJobs({
   prisma = defaultPrisma,
   queue,
 }: {
-  prisma: PrismaClient;
-  queue: string;
+  prisma?: PrismaClient;
+  queue?: string;
 }): Promise<Job[]> {
   return prisma.job.findMany({
     where: { queue },
@@ -33,7 +33,7 @@ export async function enqueue({
   runAt = new Date(),
   maxAttempts = 1,
 }: {
-  prisma: PrismaClient;
+  prisma?: PrismaClient;
   queue: string;
   payload: any;
   runAt?: Date;
@@ -70,7 +70,7 @@ export async function claimOne({
   queue,
   visibilityMs = DEFAULT_VISIBILITY_MS,
 }: {
-  prisma: PrismaClient;
+  prisma?: PrismaClient;
   queue: string;
   visibilityMs?: number;
 }): Promise<Job | null> {
@@ -110,7 +110,7 @@ export async function completeJob({
   prisma = defaultPrisma,
   id,
 }: {
-  prisma: PrismaClient;
+  prisma?: PrismaClient;
   id: string;
 }): Promise<void> {
   await prisma.job.delete({ where: { id } });
@@ -130,7 +130,7 @@ export async function failJob({
   error,
   retryDelayMs = 0,
 }: {
-  prisma: PrismaClient;
+  prisma?: PrismaClient;
   id: string;
   error: string;
   retryDelayMs?: number;
