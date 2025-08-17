@@ -11,8 +11,7 @@
   "scripts": {
     "type-check": "tsc --noEmit",
     "build": "tsc",
-    "test": "node --test \"**/*.test.js\"",
-    "test-cli": "node dist/cli.js"
+    "test": "node --test \"**/*.test.js\""
   },
   "dependencies": {
     "@contexthub/core": "workspace:*",
