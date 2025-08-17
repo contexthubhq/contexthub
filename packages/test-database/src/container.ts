@@ -18,6 +18,8 @@ export async function startPostgres(): Promise<StartedPg> {
   };
 }
 
+const STOP_TIMEOUT_MS = 10_000;
+
 export async function stopPostgres(pg: StartedPg) {
-  await pg.container.stop();
+  await pg.container.stop({ timeout: STOP_TIMEOUT_MS });
 }
