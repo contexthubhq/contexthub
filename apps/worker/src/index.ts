@@ -3,8 +3,8 @@ import { QUEUES } from '@contexthub/job-queue';
 import { runWorker } from './run-worker.js';
 import { handleContextAgentJob } from './handle-context-agent-job.js';
 
-const POLL_INTERVAL_MS = 1_000;
-const VISIBILITY_MS = 10_000;
+const POLL_INTERVAL_MS = 1_000; // 1 second
+const VISIBILITY_MS = 60 * 60 * 1000; // 1 hour
 
 async function main(): Promise<void> {
   await runWorker({
