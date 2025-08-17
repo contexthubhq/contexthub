@@ -39,7 +39,7 @@ export async function enqueue({
   });
 }
 
-const DEFAULT_VISIBILITY_MS = 60 * 60 * 1000; // 1 hour
+const DEFAULT_VISIBILITY_MS = 30 * 1000; // 30 seconds
 
 /**
  * Claims a job from the queue.
@@ -47,7 +47,7 @@ const DEFAULT_VISIBILITY_MS = 60 * 60 * 1000; // 1 hour
  * @param prisma - The Prisma client to use.
  * @param queue - The queue to claim a job from. See {@link QUEUES} for
  *   available queues.
- * @param visibilityMs - The visibility timeout for the job. Defaults to 1 hour.
+ * @param visibilityMs - The visibility timeout for the job. Defaults to 30 seconds.
  *   If a job is claimed, and is not completed or failed within this time, the job
  *   will be made available again.
  * @returns The claimed job, or null if no job is available.
