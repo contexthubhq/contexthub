@@ -10,6 +10,7 @@ export async function listJobs({
 }): Promise<Job[]> {
   return prisma.job.findMany({
     where: { queue },
+    orderBy: { runAt: 'asc' },
   });
 }
 
