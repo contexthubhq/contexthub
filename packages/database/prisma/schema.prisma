@@ -97,3 +97,24 @@ model Job {
 
   @@map("jobs")
 }
+
+model ContextAgentResult {
+  id    String  @id @default(cuid())
+  // Note that this is not a foreign key because the job will be deleted after
+  // it has been completed.
+  jobId String @unique
+
+  // If the result is closed without being merged, this will be set.
+  closedAt DateTime?
+
+  // The name of the branch that has the results of the context agent run. This will
+  // be merged into the main branch if approved.
+  branchName String? @unique
+  // The id of the revision in the main branch that was created during the merge.
+  mergeRevisionId String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@map("context_agent_results")
+}
