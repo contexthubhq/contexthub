@@ -8,7 +8,7 @@ export function EmptySection({
 }: {
   title: string;
   description: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }) {
   return (
     <div className="flex flex-col items-center justify-center gap-6 rounded-lg border border-dashed p-10">

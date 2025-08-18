@@ -63,6 +63,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@contexthub/context-agent':
+        specifier: workspace:*
+        version: link:../../packages/context-agent
       '@contexthub/context-repository':
         specifier: workspace:*
         version: link:../../packages/context-repository
@@ -81,6 +84,9 @@ importers:
       '@contexthub/data-sources-connections':
         specifier: workspace:*
         version: link:../../packages/data-sources/connections
+      '@contexthub/job-queue':
+        specifier: workspace:*
+        version: link:../../packages/job-queue
       '@hookform/resolvers':
         specifier: ^5.2.1
         version: 5.2.1(react-hook-form@7.61.1(react@19.1.0))
