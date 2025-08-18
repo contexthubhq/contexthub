@@ -204,7 +204,7 @@ importers:
         specifier: 5.8.3
         version: 5.8.3
 
-  packages/context-engine:
+  packages/context-agent:
     dependencies:
       '@contexthub/context-sources-all':
         specifier: workspace:*
