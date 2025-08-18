@@ -4,7 +4,7 @@ import {
   createTestDbContext,
   type TestDbContext,
 } from '@contexthub/test-database';
-import { enqueue, claimOne, completeJob, failJob } from './index.js';
+import { enqueue, claimOne, completeJob, failJob, heartbeat } from './index.js';
 
 describe('JobQueue', () => {
   let ctx: TestDbContext;
@@ -104,6 +104,40 @@ describe('JobQueue', () => {
     const second = await claimOne({ prisma: ctx.prisma, queue });
     assert.ok(second);
     assert.equal(second?.id, id);
+  });
+
+  it('heartbeat extends lock to prevent re-claim', async () => {
+    const queue = 'q';
+    const { id } = await enqueue({
+      prisma: ctx.prisma,
+      queue,
+      payload: { hb: true },
+      maxAttempts: 5,
+    });
+
+    const claimed = await claimOne({
+      prisma: ctx.prisma,
+      queue,
+      visibilityMs: 60_000,
+    });
+    assert.ok(claimed);
+    assert.equal(claimed?.id, id);
+
+    // Expire the lock deterministically
+    await ctx.prisma.job.update({
+      where: { id },
+      data: { lockedAt: new Date(0) },
+    });
+
+    // Heartbeat should refresh lockedAt to now, making the job not claimable within visibility window
+    await heartbeat({ prisma: ctx.prisma, id });
+
+    const none = await claimOne({
+      prisma: ctx.prisma,
+      queue,
+      visibilityMs: 30_000,
+    });
+    assert.equal(none, null);
   });
 
   it('claimOne stops after reaching maxAttempts', async () => {

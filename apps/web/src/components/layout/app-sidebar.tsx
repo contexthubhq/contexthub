@@ -126,17 +126,9 @@ export function AppSidebar() {
                       <SidebarMenuSubItem>
                         <SidebarMenuSubButton
                           asChild
-                          isActive={pathname === '/agents/runs'}
+                          isActive={pathname.startsWith('/agents/runs')}
                         >
-                          <Link href="/agents/runs">Runs</Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton
-                          asChild
-                          isActive={pathname === '/agents/reviews'}
-                        >
-                          <Link href="/agents/reviews">Reviews</Link>
+                          <Link href="/agents/runs">Agent runs</Link>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     </SidebarMenuSub>
