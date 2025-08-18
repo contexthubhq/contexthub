@@ -8,10 +8,14 @@ export async function listJobs({
   prisma?: PrismaClient;
   queue?: string;
 }): Promise<Job[]> {
-  return prisma.job.findMany({
+  const jobs = await prisma.job.findMany({
     where: { queue },
     orderBy: { runAt: 'asc' },
   });
+  return jobs.map((job) => ({
+    ...job,
+    status: getJobStatus(job),
+  }));
 }
 
 /**
@@ -75,7 +79,7 @@ export async function claimOne({
   visibilityMs?: number;
 }): Promise<Job | null> {
   const now = new Date();
-  const [locked] = await prisma.$queryRaw<Job[]>`
+  const [locked] = await prisma.$queryRaw<Omit<Job, 'status'>[]>`
       WITH candidate AS (
         SELECT id
         FROM "jobs"
@@ -97,7 +101,12 @@ export async function claimOne({
       WHERE j.id = candidate.id
       RETURNING j.*
     `;
-  return locked ?? null;
+
+  if (!locked) {
+    return null;
+  }
+
+  return { ...locked, status: getJobStatus(locked) };
 }
 
 /**
@@ -158,4 +167,14 @@ export async function heartbeat({
   id: string;
 }): Promise<void> {
   await prisma.job.update({ where: { id }, data: { lockedAt: new Date() } });
+}
+
+function getJobStatus(job: Omit<Job, 'status'>): Job['status'] {
+  if (job.lockedAt) {
+    return 'running';
+  }
+  if (job.attempts >= job.maxAttempts) {
+    return 'failed';
+  }
+  return 'pending';
 }

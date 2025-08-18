@@ -14,7 +14,8 @@
     "test": "node --test \"**/*.test.js\""
   },
   "dependencies": {
-    "@contexthub/database": "workspace:*"
+    "@contexthub/database": "workspace:*",
+    "zod": "3.25.66"
   },
   "devDependencies": {
     "@types/node": "24.1.0",

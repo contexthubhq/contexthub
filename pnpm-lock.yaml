@@ -401,6 +401,9 @@ importers:
       '@contexthub/database':
         specifier: workspace:*
         version: link:../database
+      zod:
+        specifier: 3.25.66
+        version: 3.25.66
     devDependencies:
       '@contexthub/test-database':
         specifier: workspace:*
