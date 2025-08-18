@@ -212,6 +212,9 @@ importers:
       '@contexthub/core':
         specifier: workspace:*
         version: link:../core
+      '@contexthub/database':
+        specifier: workspace:*
+        version: link:../database
       '@openai/agents':
         specifier: 0.0.14
         version: 0.0.14(ws@8.18.3)(zod@3.25.66)
