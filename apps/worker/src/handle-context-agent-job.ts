@@ -9,7 +9,7 @@ export async function handleContextAgentJob(job: Job): Promise<void> {
   await prisma.contextAgentResult.create({
     data: {
       jobId: job.id,
-      branchName: 'agent-run-1',
+      branchName: `agent-run-${job.id}`,
     },
   });
 }
