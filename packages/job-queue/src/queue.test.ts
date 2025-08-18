@@ -6,6 +6,10 @@ import {
 } from '@contexthub/test-database';
 import { enqueue, claimOne, completeJob, failJob, heartbeat } from './index.js';
 
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 describe('JobQueue', () => {
   let ctx: TestDbContext;
 
@@ -65,12 +69,15 @@ describe('JobQueue', () => {
   });
 
   it('claimOne respects visibility timeout', async () => {
+    // Use past date to avoid clock skew problems.
+    const past = new Date(Date.now() - 1000);
     const queue = 'q';
     const { id } = await enqueue({
       prisma: ctx.prisma,
       queue,
       payload: { v: 1 },
       maxAttempts: 3,
+      runAt: past,
     });
 
     const first = await claimOne({ prisma: ctx.prisma, queue });
@@ -84,11 +91,14 @@ describe('JobQueue', () => {
 
   it('claimOne can re-acquire after visibility timeout', async () => {
     const queue = 'q';
+    // Use past date to avoid clock skew problems.
+    const past = new Date(Date.now() - 1000);
     const { id } = await enqueue({
       prisma: ctx.prisma,
       queue,
       payload: { v: 1 },
       maxAttempts: 3,
+      runAt: past,
     });
 
     const first = await claimOne({ prisma: ctx.prisma, queue });
@@ -108,11 +118,14 @@ describe('JobQueue', () => {
 
   it('heartbeat extends lock to prevent re-claim', async () => {
     const queue = 'q';
+    // Use past date to avoid clock skew problems.
+    const past = new Date(Date.now() - 1000);
     const { id } = await enqueue({
       prisma: ctx.prisma,
       queue,
       payload: { hb: true },
       maxAttempts: 5,
+      runAt: past,
     });
 
     const claimed = await claimOne({
@@ -142,11 +155,14 @@ describe('JobQueue', () => {
 
   it('claimOne stops after reaching maxAttempts', async () => {
     const queue = 'q';
+    // Use past date to avoid clock skew problems.
+    const past = new Date(Date.now() - 1000);
     const { id } = await enqueue({
       prisma: ctx.prisma,
       queue,
       payload: { m: true },
       maxAttempts: 2,
+      runAt: past,
     });
 
     const first = await claimOne({
@@ -157,6 +173,9 @@ describe('JobQueue', () => {
     assert.ok(first);
     assert.equal(first?.id, id);
 
+    // Sleep to avoid clock skew problems.
+    await sleep(100);
+
     const second = await claimOne({
       prisma: ctx.prisma,
       queue,
@@ -164,6 +183,9 @@ describe('JobQueue', () => {
     });
     assert.ok(second);
     assert.equal(second?.id, id);
+
+    // Sleep to avoid clock skew problems.
+    await sleep(100);
 
     const third = await claimOne({
       prisma: ctx.prisma,
@@ -175,12 +197,15 @@ describe('JobQueue', () => {
 
   it('failJob makes job available again and stores last error', async () => {
     const queue = 'q';
+    // Use past date to avoid clock skew problems.
+    const past = new Date(Date.now() - 1000);
     const error = 'boom';
     const { id } = await enqueue({
       prisma: ctx.prisma,
       queue,
       payload: { f: 1 },
       maxAttempts: 3,
+      runAt: past,
     });
 
     const claimed = await claimOne({ prisma: ctx.prisma, queue });
@@ -196,11 +221,14 @@ describe('JobQueue', () => {
 
   it('completed jobs cannot be claimed', async () => {
     const queue = 'q';
+    // Use past date to avoid clock skew problems.
+    const past = new Date(Date.now() - 1000);
     const { id } = await enqueue({
       prisma: ctx.prisma,
       queue,
       payload: { v: 1 },
       maxAttempts: 10,
+      runAt: past,
     });
 
     const claimed = await claimOne({ prisma: ctx.prisma, queue });
@@ -214,17 +242,21 @@ describe('JobQueue', () => {
   });
 
   it('claimOne is scoped by queue', async () => {
+    // Use past date to avoid clock skew problems.
+    const past = new Date(Date.now() - 1000);
     const a = await enqueue({
       prisma: ctx.prisma,
       queue: 'A',
       payload: { v: 'a' },
       maxAttempts: 3,
+      runAt: past,
     });
     const b = await enqueue({
       prisma: ctx.prisma,
       queue: 'B',
       payload: { v: 'b' },
       maxAttempts: 3,
+      runAt: past,
     });
 
     const claimedB = await claimOne({ prisma: ctx.prisma, queue: 'B' });
