@@ -141,3 +141,21 @@ export async function failJob({
     data: { lockedAt: null, lastError: error, runAt: nextRunAt },
   });
 }
+
+/**
+ * Heartbeats a job.
+ *
+ * This prevents long running jobs to be claimed again by another worker.
+ *
+ * @param prisma - The Prisma client to use.
+ * @param id - The ID of the job to heartbeat.
+ */
+export async function heartbeat({
+  prisma = defaultPrisma,
+  id,
+}: {
+  prisma?: PrismaClient;
+  id: string;
+}): Promise<void> {
+  await prisma.job.update({ where: { id }, data: { lockedAt: new Date() } });
+}
