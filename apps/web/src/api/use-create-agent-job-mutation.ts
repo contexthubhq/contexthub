@@ -9,7 +9,7 @@ async function createAgentJob() {
   });
   const data = await response.json();
   if (!response.ok) {
-    throw new Error(data.message || 'Failed to create concept.');
+    throw new Error(data.message || 'Failed to create agent job.');
   }
   return;
 }
