@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withErrorHandling } from '@/lib/with-error-handling';
-import { AgentJob } from '@/types/agent-job';
 import { ApiError } from '@/lib/api-error';
-import { listJobs, QUEUES } from '@contexthub/job-queue';
+import { listJobs, QUEUES, type Job } from '@contexthub/job-queue';
+import {
+  ContextAgentResult,
+  getContextAgentResult,
+} from '@contexthub/context-agent';
 
-async function getAgentResultDetailsHandler(
+async function getAgentJobDetailsHandler(
   _request: NextRequest,
   { params }: { params: Promise<{ jobId: string }> }
-): Promise<NextResponse<{ agentJob: AgentJob }>> {
+): Promise<
+  NextResponse<{ job: Job | null; result: ContextAgentResult | null }>
+> {
   const jobId = (await params).jobId;
   if (!jobId) {
     throw ApiError.badRequest('Job ID is required');
@@ -15,24 +20,11 @@ async function getAgentResultDetailsHandler(
   const jobs = await listJobs({
     queue: QUEUES.CONTEXT_AGENT,
   });
-  const job = jobs.find((job) => job.id === jobId);
-  if (!job) {
-    throw ApiError.notFound('Agent job not found');
-  }
-  let status: AgentJob['status'];
-  if (job.lockedAt) {
-    status = 'running';
-  } else if (job.attempts >= job.maxAttempts) {
-    status = 'failed';
-  } else {
-    status = 'pending';
-  }
-  const agentJob = {
-    ...job,
-    status,
-  };
+  const job = jobs.find((job) => job.id === jobId) ?? null;
 
-  return NextResponse.json({ agentJob });
+  const result = await getContextAgentResult({ jobId });
+
+  return NextResponse.json({ job, result });
 }
 
-export const GET = withErrorHandling(getAgentResultDetailsHandler);
+export const GET = withErrorHandling(getAgentJobDetailsHandler);

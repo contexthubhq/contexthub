@@ -9,7 +9,6 @@ import {
 } from '@/components/ui/breadcrumb';
 import Link from 'next/link';
 import { JobSection } from './job-section';
-import { ResultSection } from './result-section';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,7 +25,6 @@ export default async function ResultPage({
         <Breadcrumbs jobId={jobId} />
       </div>
       <JobSection jobId={jobId} />
-      <ResultSection jobId={jobId} />
     </div>
   );
 }

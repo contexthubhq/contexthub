@@ -14,13 +14,10 @@ import {
 import { useRouter } from 'next/navigation';
 
 export function JobsTable() {
-  const {
-    data: agentJobs,
-    isLoading,
-    error,
-  } = useAgentJobsQuery({
+  const { data, isLoading, error } = useAgentJobsQuery({
     refetchInterval: 1000,
   });
+  const { jobs } = data ?? {};
   const router = useRouter();
   if (isLoading) {
     return <LoadingTable rows={3} columns={6} />;
@@ -30,7 +27,7 @@ export function JobsTable() {
     return <div>Error: {error.message}</div>;
   }
 
-  if (agentJobs === undefined || agentJobs.length === 0) {
+  if (jobs === undefined || jobs.length === 0) {
     return (
       <EmptySection title="No jobs" description="No queued or failed jobs." />
     );
@@ -47,7 +44,7 @@ export function JobsTable() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {agentJobs?.map((job) => (
+        {jobs.map((job) => (
           <TableRow
             key={job.id}
             onClick={() => router.push(`/agents/runs/${job.id}`)}

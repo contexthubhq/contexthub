@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withErrorHandling } from '@/lib/with-error-handling';
 import { ApiError } from '@/lib/api-error';
-import { AgentJob } from '@/types/agent-job';
-import { enqueue, listJobs, QUEUES } from '@contexthub/job-queue';
+import { enqueue, listJobs, QUEUES, type Job } from '@contexthub/job-queue';
+import {
+  ContextAgentResult,
+  listContextAgentResults,
+} from '@contexthub/context-agent';
 
 async function postAgentJobHandler(): Promise<
   NextResponse<{ success: boolean }>
@@ -20,31 +23,13 @@ async function postAgentJobHandler(): Promise<
 }
 
 async function getAgentJobsHandler(): Promise<
-  NextResponse<{ agentJobs: AgentJob[] }>
+  NextResponse<{ jobs: Job[]; results: ContextAgentResult[] }>
 > {
   const jobs = await listJobs({
     queue: QUEUES.CONTEXT_AGENT,
   });
-  const agentJobs = jobs.map((job) => {
-    let status: AgentJob['status'];
-    if (job.lockedAt) {
-      status = 'running';
-    } else if (job.attempts >= job.maxAttempts) {
-      status = 'failed';
-    } else {
-      status = 'pending';
-    }
-    return {
-      id: job.id,
-      status,
-      runAt: job.runAt,
-      attempts: job.attempts,
-      maxAttempts: job.maxAttempts,
-      lastError: job.lastError,
-    };
-  });
-
-  return NextResponse.json({ agentJobs });
+  const results = await listContextAgentResults({});
+  return NextResponse.json({ jobs, results });
 }
 
 export const POST = withErrorHandling(postAgentJobHandler);

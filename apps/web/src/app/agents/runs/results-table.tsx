@@ -1,6 +1,6 @@
 'use client';
 
-import { useAgentResultsQuery } from '@/api/use-agent-results-query';
+import { useAgentJobsQuery } from '@/api/use-agent-jobs-query';
 import { EmptySection } from '@/components/empty-section';
 import { LoadingTable } from '@/components/loading-table';
 import {
@@ -14,13 +14,10 @@ import {
 import { useRouter } from 'next/navigation';
 
 export function ResultsTable() {
-  const {
-    data: agentResults,
-    isLoading,
-    error,
-  } = useAgentResultsQuery({
+  const { data, isLoading, error } = useAgentJobsQuery({
     refetchInterval: 1000,
   });
+  const { results } = data ?? {};
   const router = useRouter();
 
   if (isLoading) {
@@ -31,7 +28,7 @@ export function ResultsTable() {
     return <div>Error: {error.message}</div>;
   }
 
-  if (agentResults === undefined || agentResults.length === 0) {
+  if (results === undefined || results.length === 0) {
     return <EmptySection title="No results" description="No results found" />;
   }
 
@@ -45,7 +42,7 @@ export function ResultsTable() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {agentResults?.map((result) => (
+        {results.map((result) => (
           <TableRow
             key={result.id}
             onClick={() => router.push(`/agents/runs/${result.jobId}`)}
