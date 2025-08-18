@@ -4,13 +4,13 @@ export const jobSchema = z.object({
   id: z.string(),
   queue: z.string(),
   payload: z.any(),
-  runAt: z.date(),
+  runAt: z.coerce.date(),
   attempts: z.number(),
   maxAttempts: z.number(),
   lastError: z.string().nullable(),
-  lockedAt: z.date().nullable(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  lockedAt: z.coerce.date().nullable(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
   status: z.enum(['pending', 'running', 'failed']),
 });
 
