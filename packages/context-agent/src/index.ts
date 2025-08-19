@@ -1,10 +1,5 @@
 // Types and interfaces
-export type {
-  GenerateTableContextInput,
-  GenerateColumnContextInput,
-  TableContextResult,
-  ColumnContextResult,
-} from './types.js';
+export type { GenerateTableContextInput, TableContextResult } from './types.js';
 
 // Context engine interface
 export type { ContextEngine } from './context-engine.js';

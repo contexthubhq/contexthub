@@ -1,169 +1,118 @@
 import type { GenerateTableContextInput, TableContextResult } from './types.js';
 import type { ContextEngine } from './context-engine.js';
-import type { TableContext, TableDefinition } from '@contexthub/core';
-import { Agent, run } from '@openai/agents';
+import {
+  columnContextSchema,
+  columnDefinitionSchema,
+  tableContextSchema,
+  tableDefinitionSchema,
+} from '@contexthub/core';
+import { Agent, run, Tool } from '@openai/agents';
+import z from 'zod';
+import { ContextSource } from '@contexthub/context-sources-all';
 
 /**
  * OpenAI Agent-based context engine that processes context sources iteratively
  */
 export class OpenAIAgentContextEngine implements ContextEngine {
+  private static tableContextAgentOutputSchema = z.object({
+    newTableContext: tableContextSchema.omit({
+      dataSourceConnectionId: true,
+      fullyQualifiedTableName: true,
+    }),
+    newColumnContexts: z.array(
+      columnContextSchema.omit({
+        dataSourceConnectionId: true,
+        fullyQualifiedTableName: true,
+      })
+    ),
+  });
+  private static tableContextAgentInputSchema = z.object({
+    dataSourceConnectionId: z.string(),
+    dataSourceConnectionName: z.string(),
+    tableDefinitionSchema: tableDefinitionSchema,
+    columnDefinitions: z.array(columnDefinitionSchema),
+    existingTableContext: tableContextSchema,
+    existingColumnContexts: z.array(columnContextSchema),
+  });
+  private tableContextAgent: Agent<
+    typeof OpenAIAgentContextEngine.tableContextAgentInputSchema,
+    typeof OpenAIAgentContextEngine.tableContextAgentOutputSchema
+  >;
+  constructor(
+    private readonly contextSources: ContextSource[],
+    private readonly config: { model: string }
+  ) {
+    // Get tools from current context source
+    const tools: Tool[] = [];
+    for (const source of this.contextSources) {
+      const toolsForSource = source.getTools();
+      tools.push(...toolsForSource);
+    }
+    // Create agent with current source's tools
+    this.tableContextAgent = new Agent<
+      typeof OpenAIAgentContextEngine.tableContextAgentInputSchema,
+      typeof OpenAIAgentContextEngine.tableContextAgentOutputSchema
+    >({
+      name: 'Data warehouse context synthesizer',
+      instructions: `
+You are a Data warehouse context synthesizer for structured data (warehouses, marts, BI).
+You must create a new context for a given table and its columns that helps LLMs understand and accurately query the data.
+
+The context should improve the correctness, clarity, and usefulness for LLM-based querying.
+
+Guardrails:
+- If changing the context doesn't meaningfully improve the context, do not change it.
+- Only use information that is available from the tools, don't make up any information.
+- Only generate context for the columns that are provided.
+
+Definitions:
+- column context describes semantics, examples, and business hints for a column.
+- table context describes a table and how to use it.
+
+You will be given the following inputs:
+- The table definition
+- The existing table context
+- The existing column contexts
+- The tools to use to get input for generating the context
+
+Output the full new table context and column contexts. If nothing changed, just return the existing table and column contexts.
+`,
+      outputType: OpenAIAgentContextEngine.tableContextAgentOutputSchema,
+      tools,
+      model: this.config.model,
+    });
+  }
   async generateTableContext(
     input: GenerateTableContextInput
   ): Promise<TableContextResult> {
-    let accumulatedContext = '';
-    const sourcesUsed: string[] = [];
-
-    // Process context sources iteratively
-    for (const contextSource of input.contextSources) {
-      try {
-        // Get tools from current context source
-        const tools = await contextSource.getTools();
-
-        // Create agent with current source's tools
-        const agent = new Agent({
-          name: 'Data agent',
-          instructions: this.generateTableContextPrompt(
-            input.table,
-            accumulatedContext
-          ),
-          tools: tools,
-        });
-
-        // Run the agent using the run function
-        const result = await run(agent, [
-          {
-            role: 'user',
-            content: `Please analyze the table "${input.table.tableName}" in schema "${input.table.tableSchema}" and provide context information using the available tools.`,
-          },
-        ]);
-
-        const sourceContext = this.parseTableDescription(
-          result.finalOutput || ''
-        );
-
-        if (sourceContext) {
-          // Accumulate context from this source
-          accumulatedContext +=
-            (accumulatedContext ? '\n\n' : '') + sourceContext;
-          sourcesUsed.push(contextSource.constructor.name);
-        }
-      } catch (error) {
-        console.warn(
-          `Failed to process context source ${contextSource.constructor.name}:`,
-          error
-        );
-      }
-    }
-
-    // Final pass to synthesize all accumulated context
-    const finalAgent = new Agent({
-      name: 'Data agent',
-      instructions: this.generateFinalSynthesisPrompt(
-        input.table,
-        accumulatedContext
-      ),
-    });
-
-    const finalResult = await run(finalAgent, [
-      {
-        role: 'user',
-        content: `Please synthesize all the accumulated context information into a comprehensive description of the table "${input.table.tableName}".`,
+    // Run the agent using the run function
+    const result = await run(this.tableContextAgent, 'Generate new context', {
+      context: {
+        dataSourceConnectionName: input.dataSourceConnectionName,
+        tableDefinition: input.tableDefinition,
+        columnDefinitions: input.columnDefinitions,
+        existingTableContext: input.existingTableContext,
+        existingColumnContexts: input.existingColumnContexts,
       },
-    ]);
-
-    const finalContext = this.parseTableDescription(
-      finalResult.finalOutput || ''
-    );
-
-    // Parse the final response into table context
-    const context: TableContext = {
-      dataSourceConnectionId: input.dataSourceConnectionId,
-      fullyQualifiedTableName: input.table.fullyQualifiedTableName,
-      description:
-        finalContext || accumulatedContext || 'No context could be generated.',
-    };
+    });
+    if (!result.finalOutput) {
+      throw new Error('No output from agent');
+    }
 
     return {
-      table: input.table,
-      context,
-      sourcesUsed,
+      newTableContext: {
+        ...result.finalOutput.newTableContext,
+        dataSourceConnectionId: input.dataSourceConnectionId,
+        fullyQualifiedTableName: input.tableDefinition.fullyQualifiedTableName,
+      },
+      newColumnContexts: result.finalOutput.newColumnContexts.map(
+        (columnContext) => ({
+          ...columnContext,
+          dataSourceConnectionId: input.dataSourceConnectionId,
+          fullyQualifiedTableName:
+            input.tableDefinition.fullyQualifiedTableName,
+        })
+      ),
     };
-  }
-
-  /**
-   * Generate prompt for individual context source processing
-   */
-  private generateTableContextPrompt(
-    table: TableDefinition,
-    previousContext: string
-  ): string {
-    return `You are a database expert. Based on the available tools and any previous context information, provide additional insights about what the table "${
-      table.tableName
-    }" in schema "${table.tableSchema}" is used for.
-
-Table Information:
-- Table Name: ${table.tableName}
-- Schema: ${table.tableSchema}
-- Catalog: ${table.tableCatalog}
-
-${
-  previousContext
-    ? `Previous Context Information:
-${previousContext}
-
-`
-    : ''
-}Please use the available tools to gather context information and provide additional insights that explain:
-1. What this table represents in business terms
-2. What kind of data it stores
-3. How it might be used in queries
-
-Provide clear, concise additional information based on the tools available. If the tools don't provide relevant information, respond with "No additional context available from this source."`;
-  }
-
-  /**
-   * Generate prompt for final synthesis of all accumulated context
-   */
-  private generateFinalSynthesisPrompt(
-    table: TableDefinition,
-    accumulatedContext: string
-  ): string {
-    return `You are a database expert. Synthesize the following accumulated context information into a clear, comprehensive description of what the table "${
-      table.tableName
-    }" in schema "${table.tableSchema}" is used for.
-
-Table Information:
-- Table Name: ${table.tableName}
-- Schema: ${table.tableSchema}
-- Catalog: ${table.tableCatalog}
-
-Accumulated Context Information:
-${accumulatedContext || 'No context information was gathered from any sources.'}
-
-Please provide a final, synthesized description that explains:
-1. What this table represents in business terms
-2. What kind of data it stores
-3. How it might be used in queries
-
-Create a clear, well-structured description that combines all the available information. If no context was gathered, provide a generic description based on the table name and schema.`;
-  }
-
-  /**
-   * Parse the agent response into a table description
-   */
-  private parseTableDescription(response: string): string | null {
-    // Clean up the response
-    const cleaned = response.trim();
-
-    if (!cleaned) {
-      return null;
-    }
-
-    // Remove any markdown formatting if present
-    const withoutMarkdown = cleaned
-      .replace(/^#+\s*/, '')
-      .replace(/\*\*(.*?)\*\*/g, '$1');
-
-    return withoutMarkdown;
   }
 }

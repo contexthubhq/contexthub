@@ -18,7 +18,8 @@
     "@contexthub/core": "workspace:*",
     "@contexthub/database": "workspace:*",
     "@openai/agents": "0.0.14",
-    "zod": "3.25.66"
+    "zod": "3.25.66",
+    "dotenv": "^17.2.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
