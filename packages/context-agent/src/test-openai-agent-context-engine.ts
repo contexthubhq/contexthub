@@ -1,129 +1,139 @@
+import 'dotenv/config';
 import { OpenAIAgentContextEngine } from './openai-agent-context-engine.js';
-import type { TableDefinition } from '@contexthub/core';
+import type { ColumnDefinition, TableDefinition } from '@contexthub/core';
 import { InMemoryTextInputContextSource } from '@contexthub/context-sources-all';
 
 // Test function
 async function testOpenAIAgentContextEngine() {
-  console.log(
-    '🚀 Starting OpenAIAgentContextEngine test with InMemoryTextInputContextSource...\n'
-  );
-
-  try {
-    // Check if OpenAI API key is available
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      console.log('⚠️  OPENAI_API_KEY not found in environment variables');
-      console.log(
-        "   This test will show the structure but won't make actual API calls"
-      );
-      console.log('   Set OPENAI_API_KEY to test with real OpenAI API\n');
-    } else {
-      console.log('✅ OpenAI API key found\n');
-    }
-
-    // Create context sources using InMemoryTextInputContextSource
-    const contextSources = [
-      new InMemoryTextInputContextSource({
-        name: 'Users table documentation',
-        text: 'The users table stores user account information including profile details, authentication data, and account settings. It is used for user management, authentication, and personalization features.',
-        description: 'Documentation about the users table',
-      }),
-      new InMemoryTextInputContextSource({
-        name: 'Users table schema',
-        text: 'The table contains columns: id (primary key), username, email, created_at, updated_at, and status. The id column is auto-incrementing, email must be unique, and status can be active, inactive, or pending.',
-        description: 'Schema analysis of the users table',
-      }),
-      new InMemoryTextInputContextSource({
-        name: 'Users table usage patterns',
-        text: 'This table is frequently queried for user authentication, profile management, and account status checks. Common queries include finding users by email, checking account status, and retrieving user profiles.',
-        description: 'Usage patterns and common queries',
-      }),
-    ];
-
-    // Create test table definition
-    const testTable: TableDefinition = {
-      tableName: 'users',
-      tableSchema: 'public',
-      tableCatalog: 'my_database',
-      fullyQualifiedTableName: 'my_database.public.users',
-    };
-
-    console.log('📋 Test Configuration:');
-    console.log('   Table:', testTable.tableName);
-    console.log('   Schema:', testTable.tableSchema);
-    console.log('   Context Sources:', contextSources.length);
-    console.log('');
-
-    if (apiKey) {
-      // Create context engine (no constructor parameters needed)
-      const contextEngine = new OpenAIAgentContextEngine();
-
-      console.log('🔄 Generating table context...\n');
-
-      // Generate context
-      const result = await contextEngine.generateTableContext({
-        dataSourceConnectionId: 'ds1',
-        table: testTable,
-        contextSources: contextSources,
-      });
-
-      console.log('✅ Context Generation Complete!\n');
-      console.log('📊 Results:');
-      console.log('   Sources Used:', result.sourcesUsed.join(', '));
-      console.log('   Description:', result.context.description);
-      console.log('');
-    } else {
-      // Show structure without making API calls
-      console.log('📋 Test Structure (without API calls):');
-      console.log('   - InMemoryTextInputContextSource instances created');
-      console.log('   - Table definition prepared');
-      console.log('   - Context engine would process sources iteratively');
-      console.log('   - Final synthesis would combine all context');
-      console.log('');
-
-      // Test tool generation from context sources
-      console.log('🔧 Testing tool generation from context sources:');
-      for (const source of contextSources) {
-        try {
-          const tools = await source.getTools();
-          console.log(
-            `   ✅ ${source.constructor.name}: ${tools.length} tools generated`
-          );
-
-          // Show tool details
-          for (const tool of tools) {
-            if (tool.type === 'function') {
-              console.log(`      - Tool: ${tool.name}`);
-              console.log(`      - Description: ${tool.description}`);
-            }
-          }
-        } catch (error) {
-          console.log(
-            `   ❌ ${source.constructor.name}: Error generating tools -`,
-            error
-          );
-        }
-      }
-      console.log('');
-
-      // Test creating new context sources
-      console.log('🔧 Testing context source creation:');
-      const newSource = new InMemoryTextInputContextSource({
-        name: 'New context source',
-        text: 'This is a test text input for the context source.',
-        description: 'Test description',
-      });
-      console.log(
-        '   ✅ Successfully created and configured new context source'
-      );
-      console.log('');
-    }
-
-    console.log('🎉 Test completed successfully!');
-  } catch (error) {
-    console.error('❌ Test failed:', error);
-    process.exit(1);
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error('OPENAI_API_KEY not found in environment variables');
   }
+  if (!process.env.OPENAI_MODEL) {
+    throw new Error('OPENAI_MODEL not found in environment variables');
+  }
+
+  // Create context sources using InMemoryTextInputContextSource
+  const contextSources = [
+    new InMemoryTextInputContextSource({
+      name: 'Users table documentation',
+      text: 'The users table stores user account information including profile details, authentication data, and account settings. It is used for user management, authentication, and personalization features.',
+      description: 'Documentation about the users table',
+    }),
+    new InMemoryTextInputContextSource({
+      name: 'Users table schema',
+      text: 'The table contains columns: id (primary key), username, email, created_at, updated_at, and status. The id column is auto-incrementing, email must be unique, and status can be active, inactive, or pending.',
+      description: 'Schema analysis of the users table',
+    }),
+    new InMemoryTextInputContextSource({
+      name: 'Users table usage patterns',
+      text: 'This table is frequently queried for user authentication, profile management, and account status checks. Common queries include finding users by email, checking account status, and retrieving user profiles.',
+      description: 'Usage patterns and common queries',
+    }),
+  ];
+
+  // Create test table definition
+  const tableDefinition: TableDefinition = {
+    tableName: 'users',
+    tableSchema: 'public',
+    tableCatalog: 'my_database',
+    fullyQualifiedTableName: 'my_database.public.users',
+  };
+
+  const baseColumnProps = {
+    tableName: tableDefinition.tableName,
+    tableSchema: tableDefinition.tableSchema,
+    tableCatalog: tableDefinition.tableCatalog,
+    fullyQualifiedTableName: tableDefinition.fullyQualifiedTableName,
+  };
+
+  const columnDefinitions: ColumnDefinition[] = [
+    {
+      ...baseColumnProps,
+      columnName: 'id',
+      ordinalPosition: 1,
+      isNullable: false,
+      dataType: 'integer',
+      columnDefault: null,
+      fullyQualifiedTableName: tableDefinition.fullyQualifiedTableName,
+      fullyQualifiedColumnName: `${tableDefinition.fullyQualifiedTableName}.id`,
+    },
+    {
+      ...baseColumnProps,
+      columnName: 'username',
+      ordinalPosition: 2,
+      isNullable: false,
+      dataType: 'varchar',
+      columnDefault: null,
+      fullyQualifiedTableName: tableDefinition.fullyQualifiedTableName,
+      fullyQualifiedColumnName: `${tableDefinition.fullyQualifiedTableName}.username`,
+    },
+    {
+      ...baseColumnProps,
+      columnName: 'email',
+      ordinalPosition: 3,
+      isNullable: false,
+      dataType: 'varchar',
+      columnDefault: null,
+      fullyQualifiedTableName: tableDefinition.fullyQualifiedTableName,
+      fullyQualifiedColumnName: `${tableDefinition.fullyQualifiedTableName}.email`,
+    },
+    {
+      ...baseColumnProps,
+      columnName: 'created_at',
+      ordinalPosition: 4,
+      isNullable: false,
+      dataType: 'timestamp',
+      columnDefault: null,
+      fullyQualifiedTableName: tableDefinition.fullyQualifiedTableName,
+      fullyQualifiedColumnName: `${tableDefinition.fullyQualifiedTableName}.created_at`,
+    },
+    {
+      ...baseColumnProps,
+      columnName: 'updated_at',
+      ordinalPosition: 5,
+      isNullable: false,
+      dataType: 'timestamp',
+      columnDefault: null,
+      fullyQualifiedTableName: tableDefinition.fullyQualifiedTableName,
+      fullyQualifiedColumnName: `${tableDefinition.fullyQualifiedTableName}.updated_at`,
+    },
+    {
+      ...baseColumnProps,
+      columnName: 'status',
+      ordinalPosition: 6,
+      isNullable: false,
+      dataType: 'varchar',
+      columnDefault: null,
+      fullyQualifiedTableName: tableDefinition.fullyQualifiedTableName,
+      fullyQualifiedColumnName: `${tableDefinition.fullyQualifiedTableName}.status`,
+    },
+  ];
+
+  console.log('📋 Test Configuration:');
+  console.log('   Table:', tableDefinition.tableName);
+  console.log('   Schema:', tableDefinition.tableSchema);
+  console.log('   Columns:', columnDefinitions.length);
+  console.log('   Context Sources:', contextSources.length);
+  console.log('');
+
+  // Create context engine (no constructor parameters needed)
+  const contextEngine = new OpenAIAgentContextEngine(contextSources, {
+    model: process.env.OPENAI_MODEL,
+  });
+
+  console.log('🔄 Generating table context...\n');
+
+  // Generate context
+  const result = await contextEngine.generateTableContext({
+    dataSourceConnectionId: 'ds1',
+    dataSourceConnectionName: 'data warehouse',
+    tableDefinition,
+    columnDefinitions,
+    existingTableContext: null,
+    existingColumnContexts: [],
+  });
+
+  console.log(JSON.stringify(result, null, 2));
 }
 
 // Run the test

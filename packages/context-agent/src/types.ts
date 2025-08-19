@@ -4,7 +4,6 @@ import type {
   TableContext,
   ColumnContext,
 } from '@contexthub/core';
-import type { ContextSource } from '@contexthub/context-sources-all';
 import z from 'zod';
 
 /**
@@ -16,38 +15,26 @@ export interface GenerateTableContextInput {
    */
   dataSourceConnectionId: string;
   /**
+   * The name of the data source connection this context is associated with.
+   * This can be used to identify the data source in question when using context sources.
+   */
+  dataSourceConnectionName: string;
+  /**
    * The table definition to generate context for
    */
-  table: TableDefinition;
-
+  tableDefinition: TableDefinition;
   /**
-   * List of context sources to use for inference
+   * The columns to generate context for.
    */
-  contextSources: ContextSource[];
-}
-
-/**
- * Input for generating column context
- */
-export interface GenerateColumnContextInput {
+  columnDefinitions: ColumnDefinition[];
   /**
-   * The id of the data source connection this context is associated with.
+   * Existing table context to use as a starting point.
    */
-  dataSourceConnectionId: string;
+  existingTableContext: TableContext | null;
   /**
-   * The column definition to generate context for
+   * Existing column context to use as a starting point.
    */
-  column: ColumnDefinition;
-
-  /**
-   * The table this column belongs to
-   */
-  table: TableDefinition;
-
-  /**
-   * List of context sources to use for inference
-   */
-  contextSources: ContextSource[];
+  existingColumnContexts: ColumnContext[];
 }
 
 /**
@@ -55,34 +42,13 @@ export interface GenerateColumnContextInput {
  */
 export interface TableContextResult {
   /**
-   * The original table definition
-   */
-  table: TableDefinition;
-
-  /**
    * Generated table context
    */
-  context: TableContext;
-
+  newTableContext: TableContext;
   /**
-   * Sources used to generate this context
+   * Generated column contexts
    */
-  sourcesUsed: string[];
-}
-
-/**
- * Result of column context generation
- */
-export interface ColumnContextResult {
-  /**
-   * The original column definition
-   */
-  column: ColumnDefinition;
-
-  /**
-   * Generated column context
-   */
-  context: ColumnContext;
+  newColumnContexts: ColumnContext[];
 }
 
 export const contextAgentResultSchema = z.object({
