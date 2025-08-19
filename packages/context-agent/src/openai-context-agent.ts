@@ -1,5 +1,8 @@
-import type { GenerateTableContextInput, TableContextResult } from './types.js';
-import type { ContextEngine } from './context-engine.js';
+import type {
+  ContextAgent,
+  GenerateTableContextInput,
+  TableContextResult,
+} from './context-agent.js';
 import {
   columnContextSchema,
   columnDefinitionSchema,
@@ -13,7 +16,7 @@ import { ContextSource } from '@contexthub/context-sources-all';
 /**
  * OpenAI Agent-based context engine that processes context sources iteratively
  */
-export class OpenAIAgentContextEngine implements ContextEngine {
+export class OpenAIContextAgent implements ContextAgent {
   private static tableContextAgentOutputSchema = z.object({
     newTableContext: tableContextSchema.omit({
       dataSourceConnectionId: true,
@@ -35,8 +38,8 @@ export class OpenAIAgentContextEngine implements ContextEngine {
     existingColumnContexts: z.array(columnContextSchema),
   });
   private tableContextAgent: Agent<
-    typeof OpenAIAgentContextEngine.tableContextAgentInputSchema,
-    typeof OpenAIAgentContextEngine.tableContextAgentOutputSchema
+    typeof OpenAIContextAgent.tableContextAgentInputSchema,
+    typeof OpenAIContextAgent.tableContextAgentOutputSchema
   >;
   constructor(
     private readonly contextSources: ContextSource[],
@@ -48,19 +51,20 @@ export class OpenAIAgentContextEngine implements ContextEngine {
     );
     // Create agent with current source's tools
     this.tableContextAgent = new Agent<
-      typeof OpenAIAgentContextEngine.tableContextAgentInputSchema,
-      typeof OpenAIAgentContextEngine.tableContextAgentOutputSchema
+      typeof OpenAIContextAgent.tableContextAgentInputSchema,
+      typeof OpenAIContextAgent.tableContextAgentOutputSchema
     >({
       name: 'Data warehouse context synthesizer',
       instructions: `
 You are a Data warehouse context synthesizer for structured data (warehouses, marts, BI).
-You must create a new context for a given table and its columns that helps LLMs understand and accurately query the data.
+You should attempt to create a new context for a given table and its columns that helps LLMs understand and accurately query the data.
 
-The context should improve the correctness, clarity, and usefulness for LLM-based querying.
+The context should improve the correctness, clarity, and usefulness for LLM-based querying. If the context is not helpful, you should return the existing table and column contexts.
 
 Guardrails:
 - If changing the context doesn't meaningfully improve the context, do not change it.
 - Only use information that is available from the tools, don't make up any information.
+- If the tools don't provide meaningful information, do not change the context.
 - Only generate context for the columns that are provided.
 
 Definitions:
@@ -68,14 +72,15 @@ Definitions:
 - table context describes a table and how to use it.
 
 You will be given the following inputs:
-- The table definition
+- The table definition. This will have identifying information for the table. This identifying information should be used to find relevant information in the tools.
+- The column definitions. This will have identifying information for the columns. This identifying information should be used to find relevant information in the tools.
 - The existing table context
 - The existing column contexts
 - The tools to use to get input for generating the context
 
 Output the full new table context and column contexts. If nothing changed, just return the existing table and column contexts.
 `,
-      outputType: OpenAIAgentContextEngine.tableContextAgentOutputSchema,
+      outputType: OpenAIContextAgent.tableContextAgentOutputSchema,
       tools,
       model: this.config.model,
     });
@@ -83,16 +88,12 @@ Output the full new table context and column contexts. If nothing changed, just 
   async generateTableContext(
     input: GenerateTableContextInput
   ): Promise<TableContextResult> {
-    // Run the agent using the run function
-    const result = await run(this.tableContextAgent, 'Generate new context', {
-      context: {
-        dataSourceConnectionName: input.dataSourceConnectionName,
-        tableDefinition: input.tableDefinition,
-        columnDefinitions: input.columnDefinitions,
-        existingTableContext: input.existingTableContext,
-        existingColumnContexts: input.existingColumnContexts,
-      },
-    });
+    const prompt = `
+Generate a new context using the following inputs (JSON format):
+
+${JSON.stringify(input, null, 2)}
+`;
+    const result = await run(this.tableContextAgent, prompt);
     if (!result.finalOutput) {
       throw new Error('No output from agent');
     }

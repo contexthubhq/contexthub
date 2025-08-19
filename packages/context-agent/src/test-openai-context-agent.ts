@@ -1,10 +1,9 @@
 import 'dotenv/config';
-import { OpenAIAgentContextEngine } from './openai-agent-context-engine.js';
+import { OpenAIContextAgent } from './openai-context-agent.js';
 import type { ColumnDefinition, TableDefinition } from '@contexthub/core';
 import { TextContextSource } from '@contexthub/context-sources-all';
 
-// Test function
-async function testOpenAIAgentContextEngine() {
+async function testOpenAIContextAgent() {
   if (!process.env.OPENAI_API_KEY) {
     throw new Error('OPENAI_API_KEY not found in environment variables');
   }
@@ -30,7 +29,6 @@ async function testOpenAIAgentContextEngine() {
     }),
   ];
 
-  // Create test table definition
   const tableDefinition: TableDefinition = {
     tableName: 'users',
     tableSchema: 'public',
@@ -108,22 +106,13 @@ async function testOpenAIAgentContextEngine() {
     },
   ];
 
-  console.log('📋 Test Configuration:');
-  console.log('   Table:', tableDefinition.tableName);
-  console.log('   Schema:', tableDefinition.tableSchema);
-  console.log('   Columns:', columnDefinitions.length);
-  console.log('   Context Sources:', contextSources.length);
-  console.log('');
-
-  // Create context engine (no constructor parameters needed)
-  const contextEngine = new OpenAIAgentContextEngine(contextSources, {
+  const contextAgent = new OpenAIContextAgent(contextSources, {
     model: process.env.OPENAI_MODEL,
   });
 
   console.log('🔄 Generating table context...\n');
 
-  // Generate context
-  const result = await contextEngine.generateTableContext({
+  const result = await contextAgent.generateTableContext({
     dataSourceConnectionId: 'ds1',
     dataSourceConnectionName: 'data warehouse',
     tableDefinition,
@@ -135,5 +124,4 @@ async function testOpenAIAgentContextEngine() {
   console.log(JSON.stringify(result, null, 2));
 }
 
-// Run the test
-testOpenAIAgentContextEngine().catch(console.error);
+testOpenAIContextAgent().catch(console.error);

@@ -126,7 +126,7 @@ export class DatabaseContextRepository implements ContextRepository {
   }: {
     sourceBranchName: string;
     targetBranchName: string;
-  }): Promise<void> {
+  }): Promise<{ revisionId: string }> {
     const { revisionId: sourceRevisionId } = await this.getTipOfBranch({
       branchName: sourceBranchName,
     });
@@ -156,6 +156,7 @@ export class DatabaseContextRepository implements ContextRepository {
       where: { name: targetBranchName },
       data: { revisionId: sourceRevisionId },
     });
+    return { revisionId: sourceRevisionId };
   }
 }
 

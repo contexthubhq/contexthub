@@ -10,7 +10,9 @@ export async function listJobs({
 }): Promise<Job[]> {
   const jobs = await prisma.job.findMany({
     where: { queue },
-    orderBy: { runAt: 'asc' },
+    orderBy: {
+      createdAt: 'desc',
+    },
   });
   return jobs.map((job) => ({
     ...job,
