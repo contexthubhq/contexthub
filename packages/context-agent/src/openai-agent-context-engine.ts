@@ -43,11 +43,9 @@ export class OpenAIAgentContextEngine implements ContextEngine {
     private readonly config: { model: string }
   ) {
     // Get tools from current context source
-    const tools: Tool[] = [];
-    for (const source of this.contextSources) {
-      const toolsForSource = source.getTools();
-      tools.push(...toolsForSource);
-    }
+    const tools: Tool[] = this.contextSources.flatMap((source) =>
+      source.getTools()
+    );
     // Create agent with current source's tools
     this.tableContextAgent = new Agent<
       typeof OpenAIAgentContextEngine.tableContextAgentInputSchema,
