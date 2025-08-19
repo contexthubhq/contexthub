@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { OpenAIAgentContextEngine } from './openai-agent-context-engine.js';
 import type { ColumnDefinition, TableDefinition } from '@contexthub/core';
-import { InMemoryTextInputContextSource } from '@contexthub/context-sources-all';
+import { TextContextSource } from '@contexthub/context-sources-all';
 
 // Test function
 async function testOpenAIAgentContextEngine() {
@@ -12,19 +12,18 @@ async function testOpenAIAgentContextEngine() {
     throw new Error('OPENAI_MODEL not found in environment variables');
   }
 
-  // Create context sources using InMemoryTextInputContextSource
   const contextSources = [
-    new InMemoryTextInputContextSource({
+    new TextContextSource({
       name: 'Users table documentation',
       text: 'The users table stores user account information including profile details, authentication data, and account settings. It is used for user management, authentication, and personalization features.',
       description: 'Documentation about the users table',
     }),
-    new InMemoryTextInputContextSource({
+    new TextContextSource({
       name: 'Users table schema',
       text: 'The table contains columns: id (primary key), username, email, created_at, updated_at, and status. The id column is auto-incrementing, email must be unique, and status can be active, inactive, or pending.',
       description: 'Schema analysis of the users table',
     }),
-    new InMemoryTextInputContextSource({
+    new TextContextSource({
       name: 'Users table usage patterns',
       text: 'This table is frequently queried for user authentication, profile management, and account status checks. Common queries include finding users by email, checking account status, and retrieving user profiles.',
       description: 'Usage patterns and common queries',
