@@ -26,6 +26,7 @@ export class InMemoryTextInputContextSource implements ContextSource {
   getTools(): Tool[] {
     return [
       tool({
+        // OpenAI agents index tools by name.
         name: `${this.name}.get_content`,
         description: this.description || 'Get the stored text content',
         parameters: z.object({}).strict(),
@@ -39,8 +40,13 @@ export class InMemoryTextInputContextSource implements ContextSource {
 
 registry.register({
   type: 'text',
-  factory: ({ configuration }: { configuration: Record<string, string> }) => {
-    const name = configuration.name;
+  factory: ({
+    name,
+    configuration,
+  }: {
+    name: string;
+    configuration: Record<string, string>;
+  }) => {
     const text = configuration.text;
     const description = configuration.description;
 

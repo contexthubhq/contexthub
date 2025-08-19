@@ -17,6 +17,7 @@ export async function connectContextSource({
     // Make sure we can create an instance before saving.
     registry.createInstance({
       type,
+      name,
       configuration,
     });
   } catch (error) {

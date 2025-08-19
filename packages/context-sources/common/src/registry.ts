@@ -9,8 +9,10 @@ export interface ContextSourceRegistration {
    * Factory that creates a new instance of the context source.
    */
   factory: ({
+    name,
     configuration,
   }: {
+    name: string;
     configuration: Record<string, string>;
   }) => ContextSource;
 }
@@ -35,9 +37,11 @@ class ContextSourceRegistry {
 
   createInstance({
     type,
+    name,
     configuration,
   }: {
     type: string;
+    name: string;
     configuration: Record<string, string>;
   }): ContextSource {
     const registration = this.sources.get(type);
@@ -45,7 +49,7 @@ class ContextSourceRegistry {
       throw new Error(`Context source ${type} not found`);
     }
 
-    return registration.factory({ configuration });
+    return registration.factory({ name, configuration });
   }
 }
 
