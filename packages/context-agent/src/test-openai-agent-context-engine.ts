@@ -73,7 +73,39 @@ async function testOpenAIAgentContextEngine() {
       isNullable: false,
       dataType: 'varchar',
       columnDefault: null,
-      fullyQualifiedTableName: tableDefinition.fullyQualifiedTableName,
+  const baseColumnProps = {
+    tableName: tableDefinition.tableName,
+    tableSchema: tableDefinition.tableSchema,
+    tableCatalog: tableDefinition.tableCatalog,
+    fullyQualifiedTableName: tableDefinition.fullyQualifiedTableName,
+  };
+
+  const columnDefinitions: ColumnDefinition[] = [
+    {
+      ...baseColumnProps,
+      columnName: 'id',
+      ordinalPosition: 1,
+      isNullable: false,
+      dataType: 'integer',
+      columnDefault: null,
+      fullyQualifiedColumnName: `${tableDefinition.fullyQualifiedTableName}.id`,
+    },
+    {
+      ...baseColumnProps,
+      columnName: 'username',
+      ordinalPosition: 2,
+      isNullable: false,
+      dataType: 'varchar',
+      columnDefault: null,
+      fullyQualifiedColumnName: `${tableDefinition.fullyQualifiedTableName}.username`,
+    },
+    {
+      ...baseColumnProps,
+      columnName: 'email',
+      ordinalPosition: 3,
+      isNullable: false,
+      dataType: 'varchar',
+      columnDefault: null,
       fullyQualifiedColumnName: `${tableDefinition.fullyQualifiedTableName}.email`,
     },
     {
