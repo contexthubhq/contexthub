@@ -62,7 +62,7 @@ async function testOpenAIAgentContextEngine() {
       dataType: 'varchar',
       columnDefault: null,
       fullyQualifiedTableName: tableDefinition.fullyQualifiedTableName,
-      fullyQualifiedColumnName: `${tableDefinition.fullyQualifiedTableName}.name`,
+      fullyQualifiedColumnName: `${tableDefinition.fullyQualifiedTableName}.username`,
     },
     {
       tableName: tableDefinition.tableName,
