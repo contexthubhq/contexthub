@@ -7,15 +7,18 @@ import {
 import { z } from 'zod';
 
 export interface InMemoryTextInputConfig {
+  name: string;
   text: string;
   description?: string;
 }
 
 export class InMemoryTextInputContextSource implements ContextSource {
+  private name: string;
   private text: string = '';
   private description: string = '';
 
-  constructor({ text, description }: InMemoryTextInputConfig) {
+  constructor({ name, text, description }: InMemoryTextInputConfig) {
+    this.name = name;
     this.text = text;
     this.description = description || '';
   }
@@ -23,7 +26,8 @@ export class InMemoryTextInputContextSource implements ContextSource {
   getTools(): Tool[] {
     return [
       tool({
-        name: 'get_text_content',
+        // OpenAI agents index tools by name.
+        name: `${this.name}.get_content`,
         description: this.description || 'Get the stored text content',
         parameters: z.object({}).strict(),
         execute: async () => {
@@ -36,15 +40,25 @@ export class InMemoryTextInputContextSource implements ContextSource {
 
 registry.register({
   type: 'text',
-  factory: ({ configuration }: { configuration: Record<string, string> }) => {
+  factory: ({
+    name,
+    configuration,
+  }: {
+    name: string;
+    configuration: Record<string, string>;
+  }) => {
     const text = configuration.text;
     const description = configuration.description;
 
     if (!text) {
       throw new Error('Text is required');
     }
+    if (!name) {
+      throw new Error('Name is required');
+    }
 
     return new InMemoryTextInputContextSource({
+      name,
       text,
       description,
     });
