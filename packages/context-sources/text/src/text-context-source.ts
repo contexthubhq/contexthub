@@ -6,18 +6,18 @@ import {
 } from '@contexthub/context-sources-common';
 import { z } from 'zod';
 
-export interface InMemoryTextInputConfig {
+export interface TextContextSourceConfig {
   name: string;
   text: string;
   description?: string;
 }
 
-export class InMemoryTextInputContextSource implements ContextSource {
+export class TextContextSource implements ContextSource {
   private name: string;
   private text: string = '';
   private description: string = '';
 
-  constructor({ name, text, description }: InMemoryTextInputConfig) {
+  constructor({ name, text, description }: TextContextSourceConfig) {
     this.name = name;
     this.text = text;
     this.description = description || '';
@@ -57,7 +57,7 @@ registry.register({
       throw new Error('Name is required');
     }
 
-    return new InMemoryTextInputContextSource({
+    return new TextContextSource({
       name,
       text,
       description,

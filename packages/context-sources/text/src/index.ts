@@ -1,1 +1,1 @@
-export { InMemoryTextInputContextSource } from './in-memory-text-input-context-source.js';
+export { TextContextSource } from './text-context-source.js';

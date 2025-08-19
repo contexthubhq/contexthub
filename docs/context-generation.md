@@ -8,7 +8,6 @@ Context sources provide tools for AI agents to gather information about database
 
 ```typescript
 interface ContextSource {
-  create(input: any): Promise<void>;
   getTools(): Promise<Tool[]>;
 }
 ```
@@ -24,4 +23,4 @@ Context sources are designed to be used with the `@openai/agents` library. The `
 
 ## Available Implementations
 
-- `InMemoryTextInputContextSource`: Stores text content in memory and provides it as a tool
+- `TextContextSource`: Stores plain text content and provides it as a tool
