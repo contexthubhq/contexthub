@@ -39,11 +39,16 @@ async function testOpenAIAgentContextEngine() {
     fullyQualifiedTableName: 'my_database.public.users',
   };
 
+  const baseColumnProps = {
+    tableName: tableDefinition.tableName,
+    tableSchema: tableDefinition.tableSchema,
+    tableCatalog: tableDefinition.tableCatalog,
+    fullyQualifiedTableName: tableDefinition.fullyQualifiedTableName,
+  };
+
   const columnDefinitions: ColumnDefinition[] = [
     {
-      tableName: tableDefinition.tableName,
-      tableSchema: tableDefinition.tableSchema,
-      tableCatalog: tableDefinition.tableCatalog,
+      ...baseColumnProps,
       columnName: 'id',
       ordinalPosition: 1,
       isNullable: false,
@@ -53,9 +58,7 @@ async function testOpenAIAgentContextEngine() {
       fullyQualifiedColumnName: `${tableDefinition.fullyQualifiedTableName}.id`,
     },
     {
-      tableName: tableDefinition.tableName,
-      tableSchema: tableDefinition.tableSchema,
-      tableCatalog: tableDefinition.tableCatalog,
+      ...baseColumnProps,
       columnName: 'username',
       ordinalPosition: 2,
       isNullable: false,
@@ -65,9 +68,7 @@ async function testOpenAIAgentContextEngine() {
       fullyQualifiedColumnName: `${tableDefinition.fullyQualifiedTableName}.username`,
     },
     {
-      tableName: tableDefinition.tableName,
-      tableSchema: tableDefinition.tableSchema,
-      tableCatalog: tableDefinition.tableCatalog,
+      ...baseColumnProps,
       columnName: 'email',
       ordinalPosition: 3,
       isNullable: false,
@@ -77,9 +78,7 @@ async function testOpenAIAgentContextEngine() {
       fullyQualifiedColumnName: `${tableDefinition.fullyQualifiedTableName}.email`,
     },
     {
-      tableName: tableDefinition.tableName,
-      tableSchema: tableDefinition.tableSchema,
-      tableCatalog: tableDefinition.tableCatalog,
+      ...baseColumnProps,
       columnName: 'created_at',
       ordinalPosition: 4,
       isNullable: false,
@@ -89,9 +88,7 @@ async function testOpenAIAgentContextEngine() {
       fullyQualifiedColumnName: `${tableDefinition.fullyQualifiedTableName}.created_at`,
     },
     {
-      tableName: tableDefinition.tableName,
-      tableSchema: tableDefinition.tableSchema,
-      tableCatalog: tableDefinition.tableCatalog,
+      ...baseColumnProps,
       columnName: 'updated_at',
       ordinalPosition: 5,
       isNullable: false,
@@ -101,9 +98,7 @@ async function testOpenAIAgentContextEngine() {
       fullyQualifiedColumnName: `${tableDefinition.fullyQualifiedTableName}.updated_at`,
     },
     {
-      tableName: tableDefinition.tableName,
-      tableSchema: tableDefinition.tableSchema,
-      tableCatalog: tableDefinition.tableCatalog,
+      ...baseColumnProps,
       columnName: 'status',
       ordinalPosition: 6,
       isNullable: false,
