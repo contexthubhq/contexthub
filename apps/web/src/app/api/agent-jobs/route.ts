@@ -2,10 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withErrorHandling } from '@/lib/with-error-handling';
 import { ApiError } from '@/lib/api-error';
 import { enqueue, listJobs, QUEUES, type Job } from '@contexthub/job-queue';
-import {
-  ContextAgentResult,
-  listContextAgentResults,
-} from '@contexthub/context-agent';
+import { ContextAgentResult } from '@contexthub/context-agent';
+import { listContextAgentResults } from '@contexthub/context-agent/server';
 
 async function postAgentJobHandler(): Promise<
   NextResponse<{ success: boolean }>

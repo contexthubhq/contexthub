@@ -6,6 +6,10 @@
     ".": {
       "types": "./src/index.ts",
       "default": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./src/server.ts",
+      "default": "./dist/server.js"
     }
   },
   "scripts": {
@@ -17,12 +21,16 @@
     "@contexthub/context-sources-all": "workspace:*",
     "@contexthub/core": "workspace:*",
     "@contexthub/database": "workspace:*",
+    "@contexthub/context-repository": "workspace:*",
+    "@contexthub/data-sources-all": "workspace:*",
+    "@contexthub/data-sources-connections": "workspace:*",
+    "@contexthub/context-sources-connections": "workspace:*",
     "@openai/agents": "0.0.14",
     "zod": "3.25.66",
     "dotenv": "^17.2.0"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
+    "@types/node": "^24.1.0",
     "tsx": "^4.7.0",
     "typescript": "^5.8.3"
   }

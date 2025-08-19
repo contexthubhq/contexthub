@@ -2,10 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withErrorHandling } from '@/lib/with-error-handling';
 import { ApiError } from '@/lib/api-error';
 import { listJobs, QUEUES, type Job } from '@contexthub/job-queue';
-import {
-  ContextAgentResult,
-  getContextAgentResult,
-} from '@contexthub/context-agent';
+import { ContextAgentResult } from '@contexthub/context-agent';
+import { getContextAgentResult } from '@contexthub/context-agent/server';
 
 async function getAgentJobDetailsHandler(
   _request: NextRequest,

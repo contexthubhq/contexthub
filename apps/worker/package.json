@@ -12,6 +12,7 @@
   "dependencies": {
     "@contexthub/job-queue": "workspace:*",
     "@contexthub/database": "workspace:*",
+    "@contexthub/context-agent": "workspace:*",
     "dotenv": "^17.2.0"
   },
   "devDependencies": {

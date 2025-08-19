@@ -46,5 +46,10 @@ export interface ContextRepository {
   merge(params: {
     sourceBranchName: string;
     targetBranchName: string;
-  }): Promise<void>;
+  }): Promise<{
+    /**
+     * The revision ID of the merged revision.
+     */
+    revisionId: string;
+  }>;
 }
