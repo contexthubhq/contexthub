@@ -1,5 +1,5 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { getContextRepository } from '@contexthub/context-repository';
+import { getContextRepository } from '@contexthub/context-repository/server';
 
 export function registerListConcepts(server: McpServer) {
   server.registerTool(

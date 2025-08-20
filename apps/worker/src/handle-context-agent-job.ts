@@ -1,4 +1,4 @@
-import { Job } from '@contexthub/job-queue';
+import type { Job } from '@contexthub/job-queue';
 import { run } from '@contexthub/context-agent/server';
 
 export async function handleContextAgentJob(job: Job): Promise<void> {

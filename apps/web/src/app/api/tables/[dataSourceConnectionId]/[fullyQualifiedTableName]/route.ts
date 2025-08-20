@@ -8,7 +8,7 @@ import { getDataSourceConnection } from '@contexthub/data-sources-connections';
 import { NextRequest, NextResponse } from 'next/server';
 import { withErrorHandling } from '@/lib/with-error-handling';
 import { ApiError } from '@/lib/api-error';
-import { getContextRepository } from '@contexthub/context-repository';
+import { getContextRepository } from '@contexthub/context-repository/server';
 import { ColumnContext } from '@contexthub/core';
 
 export const dynamic = 'force-dynamic';

@@ -1,7 +1,7 @@
 import { getDataSourceConnectionsList } from '@contexthub/data-sources-connections';
 import { getContextSourceConnectionsList } from '@contexthub/context-sources-connections';
 import { ContextAgentRunner } from './context-agent-runner.js';
-import { getContextRepository } from '@contexthub/context-repository';
+import { getContextRepository } from '@contexthub/context-repository/server';
 import { OpenAIContextAgent } from './openai-context-agent.js';
 import { registry as contextSourceRegistry } from '@contexthub/context-sources-all';
 

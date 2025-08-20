@@ -1,4 +1,5 @@
-import { Job, claimOne, completeJob, failJob } from '@contexthub/job-queue';
+import type { Job } from '@contexthub/job-queue';
+import { claimOne, completeJob, failJob } from '@contexthub/job-queue/server';
 import { prisma } from '@contexthub/database';
 
 type Handler = (job: Job) => Promise<void>;

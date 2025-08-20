@@ -4,7 +4,7 @@ import {
   createTestDbContext,
   type TestDbContext,
 } from '@contexthub/test-database';
-import { enqueue, claimOne, completeJob, failJob, heartbeat } from './index.js';
+import { enqueue, claimOne, completeJob, failJob, heartbeat } from './queue.js';
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
