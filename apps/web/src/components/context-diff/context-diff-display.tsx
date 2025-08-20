@@ -1,299 +1,563 @@
+'use client';
+
+import React from 'react';
+import type { TableContext, ColumnContext } from '@contexthub/core';
 import { ContextWorkingCopyDiff } from '@contexthub/context-repository';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 
-type TableContext = ContextWorkingCopyDiff['table']['added'][number];
-type ColumnContext = ContextWorkingCopyDiff['column']['added'][number];
-type Metric = ContextWorkingCopyDiff['metric']['added'][number];
-type Concept = ContextWorkingCopyDiff['concept']['added'][number];
+import {
+  Table as TableIcon,
+  Columns3,
+  Plus,
+  Minus,
+  GitCompare,
+  Info,
+  ChevronDown,
+} from 'lucide-react';
 
-export function ContextDiffDisplay({ diff }: { diff: ContextWorkingCopyDiff }) {
-  const hasAnyChanges =
-    hasChanges(diff.table) ||
-    hasChanges(diff.column) ||
-    hasChanges(diff.metric) ||
-    hasChanges(diff.concept);
+/* -----------------------------------------------------------------------------------------------
+ * Small utils
+ * ---------------------------------------------------------------------------------------------*/
 
-  if (!hasAnyChanges) {
+type PrimitiveVal = string | null | undefined;
+type FieldType = 'text' | 'mono' | 'code' | 'array';
+
+type FieldSpec<T> = {
+  key: keyof T;
+  label: string;
+  type: FieldType;
+  /** For arrays: compare as sets (order-insensitive). */
+  asSet?: boolean;
+};
+
+const isNil = (v: unknown) => v === null || v === undefined;
+const toStr = (v: PrimitiveVal) => (isNil(v) ? '' : String(v));
+
+function setsEqual(a: string[], b: string[]) {
+  if (a.length !== b.length) return false;
+  const A = new Set(a);
+  for (const x of b) if (!A.has(x)) return false;
+  return true;
+}
+
+function diffArrays(before: string[], after: string[]) {
+  const beforeSet = new Set(before);
+  const afterSet = new Set(after);
+  const added: string[] = [];
+  const removed: string[] = [];
+  const unchanged: string[] = [];
+
+  for (const v of Array.from(afterSet)) {
+    if (!beforeSet.has(v)) added.push(v);
+    else unchanged.push(v);
+  }
+  for (const v of Array.from(beforeSet)) {
+    if (!afterSet.has(v)) removed.push(v);
+  }
+
+  // Sort for stable UI
+  added.sort();
+  removed.sort();
+  unchanged.sort();
+  return { added, removed, unchanged };
+}
+
+function fieldChanged(
+  type: FieldType,
+  before: unknown,
+  after: unknown,
+  asSet?: boolean
+) {
+  if (type === 'array') {
+    const b = Array.isArray(before) ? (before as string[]) : [];
+    const a = Array.isArray(after) ? (after as string[]) : [];
+    return asSet ? !setsEqual(b, a) : JSON.stringify(b) !== JSON.stringify(a);
+  }
+  return (
+    toStr(before as PrimitiveVal).trim() !== toStr(after as PrimitiveVal).trim()
+  );
+}
+
+function countChanges<T>(c: {
+  added: T[];
+  removed: T[];
+  modified: Array<{ before: T; after: T }>;
+}) {
+  return {
+    added: c.added.length,
+    removed: c.removed.length,
+    modified: c.modified.length,
+    total: c.added.length + c.removed.length + c.modified.length,
+  };
+}
+
+/* -----------------------------------------------------------------------------------------------
+ * Field definitions for each entity type
+ * ---------------------------------------------------------------------------------------------*/
+
+const tableFields: FieldSpec<TableContext>[] = [
+  {
+    key: 'dataSourceConnectionId',
+    label: 'Data Source Connection ID',
+    type: 'mono',
+  },
+  {
+    key: 'fullyQualifiedTableName',
+    label: 'Fully Qualified Table Name',
+    type: 'mono',
+  },
+  { key: 'description', label: 'Description', type: 'text' },
+];
+
+const columnFields: FieldSpec<ColumnContext>[] = [
+  {
+    key: 'dataSourceConnectionId',
+    label: 'Data Source Connection ID',
+    type: 'mono',
+  },
+  {
+    key: 'fullyQualifiedTableName',
+    label: 'Fully Qualified Table Name',
+    type: 'mono',
+  },
+  { key: 'columnName', label: 'Column Name', type: 'mono' },
+  { key: 'description', label: 'Description', type: 'text' },
+  { key: 'exampleValues', label: 'Example Values', type: 'array', asSet: true },
+];
+
+/* -----------------------------------------------------------------------------------------------
+ * Value renderers
+ * ---------------------------------------------------------------------------------------------*/
+
+function ValueView({ type, value }: { type: FieldType; value: unknown }) {
+  if (type === 'array') {
+    const arr = Array.isArray(value) ? (value as string[]) : [];
+    if (arr.length === 0)
+      return <span className="text-muted-foreground text-xs">—</span>;
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">No changes</CardTitle>
-        </CardHeader>
-        <CardContent className="text-muted-foreground text-sm">
-          The agent did not propose any changes.
-        </CardContent>
-      </Card>
+      <div className="flex flex-wrap gap-1">
+        {arr.map((v, i) => (
+          <Badge
+            key={`${v}-${i}`}
+            variant="secondary"
+            className="text-xs font-normal"
+          >
+            {v}
+          </Badge>
+        ))}
+      </div>
     );
   }
 
+  const str = toStr(value as PrimitiveVal);
+  if (!str) return <span className="text-muted-foreground">—</span>;
+
+  if (type === 'mono') {
+    return (
+      <code className="bg-muted rounded px-1.5 py-0.5 text-xs">{str}</code>
+    );
+  }
+
+  if (type === 'code') {
+    return (
+      <pre className="bg-muted whitespace-pre-wrap break-words rounded p-2 text-xs">
+        {str}
+      </pre>
+    );
+  }
+
+  // text
+  return <div className="whitespace-pre-wrap break-words text-xs">{str}</div>;
+}
+
+function FieldRow({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="flex flex-col gap-4">
-      <EntitySection
-        entityLabel="Tables"
-        entityKey={getTableKey}
-        changes={diff.table}
-        toDisplay={tableToDisplay}
-      />
-      <EntitySection
-        entityLabel="Columns"
-        entityKey={getColumnKey}
-        changes={diff.column}
-        toDisplay={columnToDisplay}
-      />
-      <EntitySection
-        entityLabel="Metrics"
-        entityKey={getMetricKey}
-        changes={diff.metric}
-        toDisplay={metricToDisplay}
-      />
-      <EntitySection
-        entityLabel="Concepts"
-        entityKey={getConceptKey}
-        changes={diff.concept}
-        toDisplay={conceptToDisplay}
-      />
+    <div className="grid grid-cols-12 gap-3 p-2">
+      <div className="text-muted-foreground col-span-4 flex items-center text-xs font-medium">
+        {label}
+      </div>
+      <div className="col-span-8">{children}</div>
     </div>
   );
 }
 
-function hasChanges<T>(c: ContextWorkingCopyDiff['table'] | any): boolean {
+/* Modified field: side-by-side before/after */
+function FieldRowDiff({
+  label,
+  type,
+  before,
+  after,
+  asSet,
+}: {
+  label: string;
+  type: FieldType;
+  before: unknown;
+  after: unknown;
+  asSet?: boolean;
+}) {
+  const content =
+    type === 'array'
+      ? (() => {
+          const b = Array.isArray(before) ? (before as string[]) : [];
+          const a = Array.isArray(after) ? (after as string[]) : [];
+          const { added, removed, unchanged } = diffArrays(b, a);
+          return (
+            <div className="flex flex-wrap gap-1">
+              {removed.map((x, i) => (
+                <Badge
+                  key={`rm-${x}-${i}`}
+                  variant="destructive"
+                  className="font-normal"
+                  title="Removed"
+                >
+                  <Minus className="mr-1 h-3 w-3" />
+                  {x}
+                </Badge>
+              ))}
+              {unchanged.map((x, i) => (
+                <Badge
+                  key={`eq-${x}-${i}`}
+                  variant="secondary"
+                  className="font-normal"
+                >
+                  {x}
+                </Badge>
+              ))}
+              {added.map((x, i) => (
+                <Badge
+                  key={`add-${x}-${i}`}
+                  className="bg-emerald-600 font-normal text-white hover:bg-emerald-600/90"
+                  title="Added"
+                >
+                  <Plus className="mr-1 h-3 w-3" />
+                  {x}
+                </Badge>
+              ))}
+              {added.length === 0 &&
+              removed.length === 0 &&
+              unchanged.length === 0 ? (
+                <span className="text-muted-foreground">—</span>
+              ) : null}
+            </div>
+          );
+        })()
+      : (() => {
+          const b = toStr(before as PrimitiveVal);
+          const a = toStr(after as PrimitiveVal);
+          return (
+            <div className="grid gap-2 sm:grid-cols-2">
+              <div>
+                <div className="text-muted-foreground mb-1 text-xs font-medium">
+                  Before
+                </div>
+                <ValueView type={type} value={b} />
+              </div>
+              <div>
+                <div className="text-muted-foreground mb-1 text-xs font-medium">
+                  After
+                </div>
+                <ValueView type={type} value={a} />
+              </div>
+            </div>
+          );
+        })();
+
+  return <FieldRow label={label}>{content}</FieldRow>;
+}
+
+/* -----------------------------------------------------------------------------------------------
+ * Generic section blocks
+ * ---------------------------------------------------------------------------------------------*/
+
+function EmptyState({ text }: { text: string }) {
   return (
-    (c.added && c.added.length > 0) ||
-    (c.removed && c.removed.length > 0) ||
-    (c.modified && c.modified.length > 0)
+    <div className="text-muted-foreground flex items-center gap-2 rounded-md border border-dashed p-4 text-sm">
+      <Info className="h-4 w-4" />
+      {text}
+    </div>
   );
 }
 
-function EntitySection<
-  T extends TableContext | ColumnContext | Metric | Concept,
->(props: {
-  entityLabel: string;
-  entityKey: (t: T) => string;
+function SectionShell({
+  title,
+  count,
+  icon,
+  children,
+}: {
+  title: string;
+  count: number;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <Card className="shadow-none">
+      <Collapsible defaultOpen={false}>
+        <CardHeader>
+          <CollapsibleTrigger asChild>
+            <button className="flex w-full items-center justify-between text-left">
+              <span className="flex items-center gap-2 text-sm">
+                {icon}
+                {title}
+              </span>
+              <span className="flex items-center gap-2 text-sm">
+                <Badge variant="secondary">{count}</Badge>
+                <ChevronDown className="h-4 w-4" />
+              </span>
+            </button>
+          </CollapsibleTrigger>
+        </CardHeader>
+        <CollapsibleContent asChild>
+          <CardContent className="pt-0">{children}</CardContent>
+        </CollapsibleContent>
+      </Collapsible>
+    </Card>
+  );
+}
+
+/* -----------------------------------------------------------------------------------------------
+ * Per-entity render helpers
+ * ---------------------------------------------------------------------------------------------*/
+
+function tableKey(t: TableContext) {
+  return `${t.dataSourceConnectionId}::${t.fullyQualifiedTableName}`;
+}
+function tableTitle(t: TableContext) {
+  return t.fullyQualifiedTableName;
+}
+
+function columnKey(c: ColumnContext) {
+  return `${c.dataSourceConnectionId}::${c.fullyQualifiedTableName}::${c.columnName}`;
+}
+function columnTitle(c: ColumnContext) {
+  return `${c.fullyQualifiedTableName}.${c.columnName}`;
+}
+
+/* Simple details renderer used by Added/Removed items */
+function DetailsList<T>({
+  entity,
+  fields,
+}: {
+  entity: T;
+  fields: FieldSpec<T>[];
+}) {
+  return (
+    <div className="divide-y">
+      {fields.map((f) => (
+        <FieldRow key={String(f.key)} label={f.label}>
+          <ValueView type={f.type} value={(entity as any)[f.key]} />
+        </FieldRow>
+      ))}
+    </div>
+  );
+}
+
+/* Modified details: show only changed fields (nice and focused) */
+function ModifiedDetails<T>({
+  before,
+  after,
+  fields,
+}: {
+  before: T;
+  after: T;
+  fields: FieldSpec<T>[];
+}) {
+  const changed = fields.filter((f) =>
+    fieldChanged(f.type, (before as any)[f.key], (after as any)[f.key], f.asSet)
+  );
+
+  const showing = changed.length > 0 ? changed : fields; // fallback if our detector failed
+
+  return (
+    <div className="divide-y">
+      {showing.map((f) => (
+        <FieldRowDiff
+          key={String(f.key)}
+          label={f.label}
+          type={f.type}
+          before={(before as any)[f.key]}
+          after={(after as any)[f.key]}
+          asSet={f.asSet}
+        />
+      ))}
+    </div>
+  );
+}
+
+/* -----------------------------------------------------------------------------------------------
+ * Entity diff list (generic)
+ * ---------------------------------------------------------------------------------------------*/
+
+function EntityDiffList<T>({
+  label,
+  changes,
+  fields,
+  getKey,
+  getTitle,
+}: {
+  label: string;
   changes: {
     added: T[];
     removed: T[];
     modified: Array<{ before: T; after: T }>;
   };
-  toDisplay: (t: T) => Record<string, string>;
+  fields: FieldSpec<T>[];
+  getKey: (x: T) => string;
+  getTitle: (x: T) => string;
 }) {
-  const { entityLabel, entityKey, changes, toDisplay } = props;
-  if (!hasChanges(changes)) return null;
-
-  const totalCount =
-    changes.added.length + changes.removed.length + changes.modified.length;
+  const totals = countChanges(changes);
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle className="text-base">{entityLabel}</CardTitle>
-        <div className="flex items-center gap-2">
-          {changes.added.length > 0 && (
-            <Badge className="bg-emerald-600 text-white hover:bg-emerald-700">
-              +{changes.added.length} added
-            </Badge>
-          )}
-          {changes.removed.length > 0 && (
-            <Badge variant="destructive">
-              -{changes.removed.length} removed
-            </Badge>
-          )}
-          {changes.modified.length > 0 && (
-            <Badge variant="secondary">
-              {changes.modified.length} modified
-            </Badge>
-          )}
-          <Badge variant="outline">{totalCount} total</Badge>
-        </div>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-6">
-        {changes.added.length > 0 && (
-          <div className="flex flex-col gap-2">
-            <div className="text-sm font-medium">Added</div>
-            <div className="flex flex-col divide-y rounded-md border">
-              {changes.added.map((item, idx) => (
-                <div key={`${entityKey(item)}:added:${idx}`} className="p-3">
-                  <ItemTitle title={entityKey(item)} />
-                  <ItemFields fields={toDisplay(item)} />
-                </div>
+    <div className="space-y-4">
+      {/* Summary strip */}
+      <div className="flex flex-col gap-3">
+        <SectionShell
+          title="Added"
+          count={totals.added}
+          icon={<Plus className="h-4 w-4" />}
+        >
+          {changes.added.length === 0 ? (
+            <EmptyState text={`No ${label.toLowerCase()} were added.`} />
+          ) : (
+            <div className="space-y-3">
+              {changes.added.map((item) => (
+                <Card key={getKey(item)} className="shadow-none">
+                  <CardHeader>
+                    <CardTitle className="flex gap-2 text-xs">
+                      {getTitle(item)}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <DetailsList entity={item} fields={fields} />
+                  </CardContent>
+                </Card>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </SectionShell>
 
-        {changes.removed.length > 0 && (
-          <div className="flex flex-col gap-2">
-            <div className="text-sm font-medium">Removed</div>
-            <div className="flex flex-col divide-y rounded-md border">
-              {changes.removed.map((item, idx) => (
-                <div
-                  key={`${entityKey(item)}:removed:${idx}`}
-                  className="p-3 opacity-70"
+        <SectionShell
+          title="Removed"
+          count={totals.removed}
+          icon={<Minus className="h-4 w-4" />}
+        >
+          {changes.removed.length === 0 ? (
+            <EmptyState text={`No ${label.toLowerCase()} were removed.`} />
+          ) : (
+            <div className="space-y-3">
+              {changes.removed.map((item) => (
+                <Card key={getKey(item)} className="shadow-none">
+                  <CardHeader>
+                    <CardTitle className="flex gap-2 text-xs">
+                      {getTitle(item)}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <DetailsList entity={item} fields={fields} />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </SectionShell>
+
+        <SectionShell
+          title="Modified"
+          count={totals.modified}
+          icon={<GitCompare className="h-4 w-4" />}
+        >
+          {changes.modified.length === 0 ? (
+            <EmptyState text={`No ${label.toLowerCase()} were modified.`} />
+          ) : (
+            <div className="space-y-3">
+              {changes.modified.map(({ before, after }) => (
+                <Card
+                  key={`${getKey(before)}::${getKey(after)}`}
+                  className="shadow-none"
                 >
-                  <ItemTitle title={entityKey(item)} />
-                  <ItemFields fields={toDisplay(item)} />
-                </div>
+                  <CardHeader>
+                    <CardTitle className="flex gap-2 text-xs">
+                      {getTitle(after)}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ModifiedDetails
+                      before={before}
+                      after={after}
+                      fields={fields}
+                    />
+                  </CardContent>
+                </Card>
               ))}
             </div>
-          </div>
-        )}
-
-        {changes.modified.length > 0 && (
-          <div className="flex flex-col gap-2">
-            <div className="text-sm font-medium">Modified</div>
-            <div className="flex flex-col gap-3">
-              {changes.modified.map(({ before, after }, idx) => {
-                const key = entityKey(after);
-                const beforeDisplay = toDisplay(before);
-                const afterDisplay = toDisplay(after);
-                const changedKeys = Object.keys(afterDisplay).filter(
-                  (k) => (beforeDisplay[k] ?? '') !== (afterDisplay[k] ?? '')
-                );
-
-                return (
-                  <div
-                    key={`${key}:modified:${idx}`}
-                    className="rounded-md border"
-                  >
-                    <div className="flex items-center justify-between p-3">
-                      <ItemTitle title={key} />
-                      <Badge variant="secondary">
-                        {changedKeys.length} field
-                        {changedKeys.length === 1 ? '' : 's'} changed
-                      </Badge>
-                    </div>
-                    <Separator />
-                    <div className="grid gap-0 md:grid-cols-2">
-                      <div className="p-3">
-                        <div className="text-muted-foreground mb-2 text-xs font-medium uppercase">
-                          Before
-                        </div>
-                        <ItemFields
-                          fields={beforeDisplay}
-                          highlightKeys={changedKeys}
-                          variant="before"
-                        />
-                      </div>
-                      <Separator className="md:hidden" />
-                      <div className="p-3">
-                        <div className="text-muted-foreground mb-2 text-xs font-medium uppercase">
-                          After
-                        </div>
-                        <ItemFields
-                          fields={afterDisplay}
-                          highlightKeys={changedKeys}
-                          variant="after"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
-function ItemTitle({ title }: { title: string }) {
-  return <div className="text-sm font-medium">{title}</div>;
-}
-
-function ItemFields({
-  fields,
-  highlightKeys = [],
-  variant,
-}: {
-  fields: Record<string, string>;
-  highlightKeys?: string[];
-  variant?: 'before' | 'after';
-}) {
-  const entries = Object.entries(fields);
-  if (entries.length === 0) return null;
-
-  return (
-    <div className="mt-1 flex flex-col gap-1">
-      {entries.map(([label, value]) => {
-        const isChanged = highlightKeys.includes(label);
-        const base = 'rounded-md border px-2 py-1 text-xs';
-        const changed =
-          variant === 'before'
-            ? 'border-amber-300 bg-amber-50 dark:bg-amber-950/20'
-            : 'border-emerald-300 bg-emerald-50 dark:bg-emerald-950/20';
-        const className = isChanged
-          ? `${base} ${changed}`
-          : 'text-xs text-muted-foreground';
-        return (
-          <div key={label} className="grid grid-cols-3 items-start gap-2">
-            <div className="text-muted-foreground col-span-1 text-[11px] uppercase tracking-wide">
-              {label}
-            </div>
-            <div className="col-span-2">
-              <div className={className}>{value || '—'}</div>
-            </div>
-          </div>
-        );
-      })}
+          )}
+        </SectionShell>
+      </div>
     </div>
   );
 }
 
-function tableToDisplay(t: TableContext): Record<string, string> {
-  return {
-    Connection: t.dataSourceConnectionId,
-    Table: t.fullyQualifiedTableName,
-    Description: t.description ?? '',
-  };
-}
+export function ContextDiffDisplay({ diff }: { diff: ContextWorkingCopyDiff }) {
+  const sections = React.useMemo(() => {
+    const t = countChanges(diff.table);
+    const c = countChanges(diff.column);
+    const defaultTab = t.total > 0 ? 'table' : 'column';
 
-function columnToDisplay(c: ColumnContext): Record<string, string> {
-  return {
-    Connection: c.dataSourceConnectionId,
-    Table: c.fullyQualifiedTableName,
-    Column: c.columnName,
-    Description: c.description ?? '',
-    'Example values': c.exampleValues?.join(', ') ?? '',
-  };
-}
+    return {
+      totals: { table: t, column: c },
+      defaultTab,
+    };
+  }, [diff]);
 
-function metricToDisplay(m: Metric): Record<string, string> {
-  return {
-    Name: m.name,
-    Description: m.description ?? '',
-    Formula: m.formula ?? '',
-    Tags: m.tags?.join(', ') ?? '',
-    'Example queries': m.exampleQueries?.join('\n') ?? '',
-    Unit: m.unitOfMeasure ?? '',
-    Id: m.id,
-  };
-}
+  return (
+    <Tabs defaultValue={sections.defaultTab}>
+      <TabsList>
+        <TabsTrigger value="table" className="flex items-center gap-2">
+          <TableIcon className="h-4 w-4" /> Tables
+          <Badge variant="secondary" className="ml-2">
+            {sections.totals.table.total}
+          </Badge>
+        </TabsTrigger>
+        <TabsTrigger value="column" className="flex items-center gap-2">
+          <Columns3 className="h-4 w-4" /> Columns
+          <Badge variant="secondary" className="ml-2">
+            {sections.totals.column.total}
+          </Badge>
+        </TabsTrigger>
+      </TabsList>
 
-function conceptToDisplay(c: Concept): Record<string, string> {
-  return {
-    Name: c.name,
-    Description: c.description ?? '',
-    Synonyms: c.synonyms?.join(', ') ?? '',
-    Tags: c.tags?.join(', ') ?? '',
-    'Example values': c.exampleValues?.join(', ') ?? '',
-    Id: c.id,
-  };
-}
+      <TabsContent value="table">
+        <EntityDiffList<TableContext>
+          label="Tables"
+          changes={diff.table}
+          fields={tableFields}
+          getKey={tableKey}
+          getTitle={tableTitle}
+        />
+      </TabsContent>
 
-function getTableKey(t: TableContext): string {
-  return `${t.dataSourceConnectionId} • ${t.fullyQualifiedTableName}`;
-}
-
-function getColumnKey(c: ColumnContext): string {
-  return `${c.dataSourceConnectionId} • ${c.fullyQualifiedTableName} • ${c.columnName}`;
-}
-
-function getMetricKey(m: Metric): string {
-  return m.name || m.id;
-}
-
-function getConceptKey(c: Concept): string {
-  return c.name || c.id;
+      <TabsContent value="column">
+        <EntityDiffList<ColumnContext>
+          label="Columns"
+          changes={diff.column}
+          fields={columnFields}
+          getKey={columnKey}
+          getTitle={columnTitle}
+        />
+      </TabsContent>
+    </Tabs>
+  );
 }

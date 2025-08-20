@@ -45,7 +45,7 @@ export function JobSection({ jobId }: { jobId: string }) {
         )}
       </div>
       {result && (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-8">
           <div className="flex flex-col gap-2">
             <h2 className="text-lg font-medium">Results</h2>
             <p className="text-muted-foreground text-sm">{result?.status}</p>
@@ -57,7 +57,7 @@ export function JobSection({ jobId }: { jobId: string }) {
                 disabled={isClosingResult}
                 onClick={() => closeResult({ jobId })}
               >
-                {isClosingResult ? 'Closing...' : 'Close'}
+                {isClosingResult ? 'Discarding...' : 'Discard'}
               </Button>
               <Button
                 variant="default"
