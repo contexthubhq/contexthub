@@ -3,6 +3,7 @@
 import { useAgentJobDetailsQuery } from '@/api/use-agent-job-details-query';
 import { useCloseContextAgentResultMutation } from '@/api/use-close-context-agent-result-mutation';
 import { useMergeContextAgentResultMutation } from '@/api/use-merge-context-agent-result-mutation';
+import { ContextDiffDisplay } from '@/components/context-diff/context-diff-display';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -67,6 +68,7 @@ export function JobSection({ jobId }: { jobId: string }) {
               </Button>
             </div>
           )}
+          <ContextDiffDisplay diff={result.diff} />
         </div>
       )}
     </div>
