@@ -1,6 +1,6 @@
 import { prisma as defaultPrisma, PrismaClient } from '@contexthub/database';
 import { getContextAgentResult } from './get-context-agent-result.js';
-import { getContextRepository } from '@contexthub/context-repository';
+import { getContextRepository } from '@contexthub/context-repository/server';
 
 export async function mergeContextAgentResult({
   prisma = defaultPrisma,

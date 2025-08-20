@@ -5,7 +5,7 @@ import { registry } from '@contexthub/data-sources-all';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import { ColumnContext } from '@contexthub/core';
-import { getContextRepository } from '@contexthub/context-repository';
+import { getContextRepository } from '@contexthub/context-repository/server';
 
 export function registerListColumns(server: McpServer) {
   server.registerTool(
