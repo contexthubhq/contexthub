@@ -5,10 +5,8 @@ import { QUEUES, type Job } from '@contexthub/job-queue';
 import { listJobs } from '@contexthub/job-queue/server';
 import { ContextAgentResult } from '@contexthub/context-agent';
 import { getContextAgentResult } from '@contexthub/context-agent/server';
-import {
-  ContextWorkingCopyDiff,
-  getContextRepository,
-} from '@contexthub/context-repository';
+import type { ContextWorkingCopyDiff } from '@contexthub/context-repository';
+import { getContextRepository } from '@contexthub/context-repository/server';
 
 async function getAgentJobDetailsHandler(
   _request: NextRequest,
