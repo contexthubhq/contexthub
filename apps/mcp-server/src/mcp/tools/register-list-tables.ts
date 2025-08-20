@@ -7,7 +7,7 @@ import {
 import { registry } from '@contexthub/data-sources-all';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { getContextRepository } from '@contexthub/context-repository';
+import { getContextRepository } from '@contexthub/context-repository/server';
 import type { TableContext } from '@contexthub/core';
 
 export function registerListTables(server: McpServer) {

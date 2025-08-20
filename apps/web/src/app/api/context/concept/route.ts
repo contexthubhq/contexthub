@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withErrorHandling } from '@/lib/with-error-handling';
 import { ApiError } from '@/lib/api-error';
 import { Concept, conceptSchema, newConceptSchema } from '@contexthub/core';
-import { getContextRepository } from '@contexthub/context-repository';
+import { getContextRepository } from '@contexthub/context-repository/server';
 
 async function putConceptHandler(
   request: NextRequest
