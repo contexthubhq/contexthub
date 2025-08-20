@@ -67,7 +67,7 @@ function hasChanges<T>(c: ContextWorkingCopyDiff['table'] | any): boolean {
 }
 
 function EntitySection<
-  T extends TableContext | ColumnContext | Metric | Concept
+  T extends TableContext | ColumnContext | Metric | Concept,
 >(props: {
   entityLabel: string;
   entityKey: (t: T) => string;
