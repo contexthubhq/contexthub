@@ -2,12 +2,16 @@ import {
   ContextRepository,
   ContextWorkingCopy,
 } from '@contexthub/context-repository';
+import type { TableDefinition, ColumnDefinition } from '@contexthub/core';
 import { ContextAgent } from './context-agent.js';
 import {
   getDataSourceConnection,
   getSelectedTables,
 } from '@contexthub/data-sources-connections';
-import { registry as dataSourceRegistry } from '@contexthub/data-sources-all';
+import {
+  DataSource,
+  registry as dataSourceRegistry,
+} from '@contexthub/data-sources-all';
 import { createContextAgentResult } from './create-context-agent-result.js';
 
 export class ContextAgentRunner {
@@ -78,41 +82,70 @@ export class ContextAgentRunner {
       connectionId: dataSourceConnectionId,
     });
     const allTables = await dataSource.getTablesList();
-    for (const selectedTable of selectedTables) {
-      const tableDefinition = allTables.find(
-        (table) =>
-          table.fullyQualifiedTableName === selectedTable.fullyQualifiedName
-      );
-      if (!tableDefinition) {
-        continue;
-      }
-      const columnDefinitions = await dataSource.getColumnsList({
-        fullyQualifiedTableName: selectedTable.fullyQualifiedName,
-      });
-      const existingTableContext =
-        (await mainWorkingCopy.getTable({
+    await Promise.all(
+      selectedTables.map((selectedTable) =>
+        this.runSingleTable({
           dataSourceConnectionId,
-          fullyQualifiedTableName: selectedTable.fullyQualifiedName,
-        })) ?? null;
-      const existingColumnContexts = (
-        await mainWorkingCopy.listColumns()
-      ).filter(
-        (column) =>
-          column.dataSourceConnectionId === dataSourceConnectionId &&
-          column.fullyQualifiedTableName === selectedTable.fullyQualifiedName
-      );
-      const tableContextResult = await this.contextAgent.generateTableContext({
-        dataSourceConnectionId,
-        dataSourceConnectionName: connection.name,
-        tableDefinition,
-        columnDefinitions,
-        existingTableContext,
-        existingColumnContexts,
+          connectionName: connection.name,
+          selectedTableFullyQualifiedName: selectedTable.fullyQualifiedName,
+          dataSource,
+          allTables,
+          mainWorkingCopy,
+          newWorkingCopy,
+        })
+      )
+    );
+  }
+
+  private async runSingleTable({
+    dataSourceConnectionId,
+    connectionName,
+    selectedTableFullyQualifiedName,
+    dataSource,
+    allTables,
+    mainWorkingCopy,
+    newWorkingCopy,
+  }: {
+    dataSourceConnectionId: string;
+    connectionName: string;
+    selectedTableFullyQualifiedName: string;
+    dataSource: DataSource;
+    allTables: TableDefinition[];
+    mainWorkingCopy: ContextWorkingCopy;
+    newWorkingCopy: ContextWorkingCopy;
+  }): Promise<void> {
+    const tableDefinition = allTables.find(
+      (table) =>
+        table.fullyQualifiedTableName === selectedTableFullyQualifiedName
+    );
+    if (!tableDefinition) {
+      return;
+    }
+    const columnDefinitions: ColumnDefinition[] =
+      await dataSource.getColumnsList({
+        fullyQualifiedTableName: selectedTableFullyQualifiedName,
       });
-      await newWorkingCopy.upsertTable(tableContextResult.newTableContext);
-      for (const columnContext of tableContextResult.newColumnContexts) {
-        await newWorkingCopy.upsertColumn(columnContext);
-      }
+    const existingTableContext =
+      (await mainWorkingCopy.getTable({
+        dataSourceConnectionId,
+        fullyQualifiedTableName: selectedTableFullyQualifiedName,
+      })) ?? null;
+    const existingColumnContexts = (await mainWorkingCopy.listColumns()).filter(
+      (column) =>
+        column.dataSourceConnectionId === dataSourceConnectionId &&
+        column.fullyQualifiedTableName === selectedTableFullyQualifiedName
+    );
+    const tableContextResult = await this.contextAgent.generateTableContext({
+      dataSourceConnectionId,
+      dataSourceConnectionName: connectionName,
+      tableDefinition,
+      columnDefinitions,
+      existingTableContext,
+      existingColumnContexts,
+    });
+    await newWorkingCopy.upsertTable(tableContextResult.newTableContext);
+    for (const columnContext of tableContextResult.newColumnContexts) {
+      await newWorkingCopy.upsertColumn(columnContext);
     }
   }
 }
